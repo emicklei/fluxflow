@@ -1,3 +1,3 @@
-module github.com/emicklei/gostep
+module github.com/emicklei/fluxflow
 
-go 1.25.0
+go 1.25
