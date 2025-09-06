@@ -5,6 +5,6 @@ import "fmt"
 var out = "Hello, World!"
 
 func main() {
-	in := "Welcome to Go!"
-	fmt.Println("fluxflow", in, out)
+	in1, in2 := "Welcome to Go!", 2025
+	fmt.Println("fluxflow", in1, in2, out)
 }
