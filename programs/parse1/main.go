@@ -3,46 +3,41 @@ package main
 import (
 	"fmt"
 	"go/ast"
-	"go/parser"
 	"go/token"
 	"log"
-	"os"
-	"path/filepath"
-	"strings"
+
+	"golang.org/x/tools/go/packages"
 )
 
 func main() {
 	fset := token.NewFileSet()
 	dirPath := "../test1"
 
-	files, err := os.ReadDir(dirPath)
+	cfg := &packages.Config{
+		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles,
+		Fset: fset,
+		Dir:  dirPath,
+	}
+	pkgs, err := packages.Load(cfg, ".")
 	if err != nil {
-		log.Fatalf("failed to read directory: %v", err)
+		log.Fatalf("failed to load packages: %v", err)
+	}
+	if packages.PrintErrors(pkgs) > 0 {
+		log.Fatal("errors during package loading")
 	}
 
-	pkg := &ast.Package{
-		Name:  "main",
-		Files: make(map[string]*ast.File),
+	if len(pkgs) == 0 {
+		log.Fatal("no packages found")
 	}
 
-	for _, file := range files {
-		if !file.IsDir() && strings.HasSuffix(file.Name(), ".go") {
-			filePath := filepath.Join(dirPath, file.Name())
-			f, err := parser.ParseFile(fset, filePath, nil, parser.AllErrors)
+	for _, pkg := range pkgs {
+		fmt.Println("Package:", pkg.Name)
+		for _, f := range pkg.Syntax {
+			// ast.Print writes to os.Stdout
+			err := ast.Print(fset, f)
 			if err != nil {
-				log.Printf("could not parse file %s: %v", filePath, err)
-				continue
-			}
-			pkg.Files[filePath] = f
-			if pkg.Name == "" {
-				pkg.Name = f.Name.Name
+				log.Fatalf("failed to print ast for file: %v", err)
 			}
 		}
-	}
-
-	fmt.Println("Package:", pkg.Name)
-	err = ast.Print(fset, pkg)
-	if err != nil {
-		log.Fatal(err)
 	}
 }
