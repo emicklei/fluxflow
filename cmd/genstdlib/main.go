@@ -20,6 +20,21 @@ var excludedPackages = []string{
 	"reflect",
 	"runtime",
 	"testing",
+	"go",
+	"syscall",
+}
+
+// ExcludedSymbol defines a symbol to be excluded from a specific package.
+type ExcludedSymbol struct {
+	Package string
+	Symbol  string
+}
+
+var excludedSymbols = []ExcludedSymbol{
+	{"hash/crc64", "ECMA"},
+	{"hash/crc64", "ISO"},
+	{"math", "MaxUint"},
+	{"math", "MaxUint64"},
 }
 
 func main() {
@@ -95,6 +110,16 @@ func main() {
 		alias := pkgAliases[pkg]
 		fmt.Fprintf(outFile, "\tstdpkg[\"%s\"] = map[string]reflect.Value{\n", pkg)
 		for _, fun := range pkgInfo.Funcs {
+			isExcluded := false
+			for _, excluded := range excludedSymbols {
+				if pkg == excluded.Package && fun == excluded.Symbol {
+					isExcluded = true
+					break
+				}
+			}
+			if isExcluded {
+				continue
+			}
 			fmt.Fprintf(outFile, "\t\t\"%s\": reflect.ValueOf(%s.%s),\n", fun, alias, fun)
 		}
 		fmt.Fprintln(outFile, "\t}")
@@ -289,8 +314,9 @@ func getExportedFunctions(pkgImportPath string) (string, []string, error) {
 
 		for _, decl := range f.Decls {
 			if fn, ok := decl.(*ast.FuncDecl); ok {
+				isGeneric := fn.Type.TypeParams != nil && fn.Type.TypeParams.NumFields() > 0
 				// Only include functions, not methods.
-				if fn.Recv == nil && fn.Name.IsExported() &&
+				if fn.Recv == nil && fn.Name.IsExported() && !isGeneric &&
 					!strings.HasPrefix(fn.Name.Name, "Test") &&
 					!strings.HasPrefix(fn.Name.Name, "Example") &&
 					!strings.HasPrefix(fn.Name.Name, "Benchmark") {
@@ -301,9 +327,26 @@ func getExportedFunctions(pkgImportPath string) (string, []string, error) {
 				if gd.Tok == token.VAR || gd.Tok == token.CONST {
 					for _, spec := range gd.Specs {
 						if vs, ok := spec.(*ast.ValueSpec); ok {
-							for _, name := range vs.Names {
-								if name.IsExported() {
-									funcSet[name.Name] = struct{}{}
+							isGeneric := false
+							if vs.Type != nil {
+								if ft, ok := vs.Type.(*ast.FuncType); ok {
+									if ft.TypeParams != nil && ft.TypeParams.NumFields() > 0 {
+										isGeneric = true
+									}
+								}
+							}
+							if !isGeneric && len(vs.Values) > 0 {
+								if fl, ok := vs.Values[0].(*ast.FuncLit); ok {
+									if fl.Type.TypeParams != nil && fl.Type.TypeParams.NumFields() > 0 {
+										isGeneric = true
+									}
+								}
+							}
+							if !isGeneric {
+								for _, name := range vs.Names {
+									if name.IsExported() {
+										funcSet[name.Name] = struct{}{}
+									}
 								}
 							}
 						}
