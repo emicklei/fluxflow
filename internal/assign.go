@@ -3,10 +3,6 @@ package internal
 import "go/ast"
 
 type Assign struct {
-	node
+	step
 	*ast.AssignStmt
-}
-
-func (a *Assign) Eval(ec EvalContext) {
-
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/token"
@@ -9,9 +10,12 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
+var programPath = flag.String("program", "../test1", "Path to the Go program to parse")
+
 func main() {
+	flag.Parse()
 	fset := token.NewFileSet()
-	dirPath := "../test2"
+	dirPath := *programPath
 
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles,

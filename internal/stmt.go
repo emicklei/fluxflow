@@ -3,6 +3,6 @@ package internal
 import "go/ast"
 
 type Stmt struct {
-	node
+	step
 	*ast.ExprStmt
 }

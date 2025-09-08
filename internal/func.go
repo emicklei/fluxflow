@@ -3,6 +3,6 @@ package internal
 import "go/ast"
 
 type Func struct {
-	node
+	Step
 	*ast.FuncDecl
 }

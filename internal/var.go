@@ -2,7 +2,8 @@ package internal
 
 import "go/ast"
 
+// For both variable and constant for now
 type Var struct {
-	node
-	*ast.ValueSpec
+	step
+	spec *ast.ValueSpec
 }
