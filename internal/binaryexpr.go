@@ -13,7 +13,7 @@ type BinaryExpr struct {
 	*ast.BinaryExpr
 }
 
-func (s *BinaryExpr) Eval() reflect.Value {
+func (s BinaryExpr) Eval(env *Env) reflect.Value {
 	switch s.Op {
 	case token.ADD:
 		return s.X.ADD(s.Y)
@@ -51,6 +51,8 @@ func (i INT) ADD_FLOAT(left FLOAT) reflect.Value {
 }
 
 type Expr interface {
+	Eval(env *Env) reflect.Value
+
 	ADD(right Expr) reflect.Value
 	ADD_INT(INT) reflect.Value
 
@@ -61,11 +63,13 @@ type Expr interface {
 
 	ADD_FLOAT(FLOAT) reflect.Value
 	SUB_FLOAT(FLOAT) reflect.Value
+
+	Assign(env *Env, val reflect.Value)
 }
 
 var _ Expr = operatorUnimplemented{}
 
-type operatorUnimplemented struct{}
+type operatorUnimplemented struct{ step }
 
 func (o operatorUnimplemented) ADD(right Expr) reflect.Value {
 	panic("not implemented")
@@ -86,6 +90,9 @@ func (o operatorUnimplemented) ADD_FLOAT(left FLOAT) reflect.Value {
 	panic("not implemented")
 }
 func (o operatorUnimplemented) SUB_FLOAT(left FLOAT) reflect.Value {
+	panic("not implemented")
+}
+func (o operatorUnimplemented) Assign(env *Env, val reflect.Value) {
 	panic("not implemented")
 }
 

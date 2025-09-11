@@ -16,7 +16,7 @@ func TestBinaryIntegerAddition(t *testing.T) {
 		Y:          right.Operand(),
 		BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 	}
-	result := expr.Eval()
+	result := expr.Eval(newEnv())
 	if result.Kind() != reflect.Int {
 		t.Fatalf("expected int result, got %v", result.Kind())
 	}
@@ -34,7 +34,7 @@ func TestBinaryIntegerSubtraction(t *testing.T) {
 		Y:          right.Operand(),
 		BinaryExpr: &ast.BinaryExpr{Op: token.SUB},
 	}
-	result := expr.Eval()
+	result := expr.Eval(nil)
 	if result.Kind() != reflect.Int {
 		t.Fatalf("expected int result, got %v", result.Kind())
 	}
@@ -52,7 +52,7 @@ func TestBinaryStringAddition(t *testing.T) {
 		Y:          right.Operand(),
 		BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 	}
-	result := expr.Eval()
+	result := expr.Eval(nil)
 	if result.Kind() != reflect.String {
 		t.Fatalf("expected string result, got %v", result.Kind())
 	}
@@ -60,6 +60,8 @@ func TestBinaryStringAddition(t *testing.T) {
 		t.Fatalf(`expected "Hello, World!", got %s`, result.String())
 	}
 }
+
+// 3.14 + 42
 func TestBinaryAddFloatToInteger(t *testing.T) {
 	left := Literal{BasicLit: &ast.BasicLit{Kind: token.FLOAT, Value: "3.14"}}
 	right := Literal{BasicLit: &ast.BasicLit{Kind: token.INT, Value: "42"}}
@@ -68,7 +70,7 @@ func TestBinaryAddFloatToInteger(t *testing.T) {
 		Y:          right.Operand(),
 		BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 	}
-	result := expr.Eval()
+	result := expr.Eval(nil)
 	if result.Kind() != reflect.Float64 {
 		t.Fatalf("expected float64 result, got %v", result.Kind())
 	}

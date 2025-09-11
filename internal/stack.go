@@ -4,7 +4,8 @@ import "reflect"
 
 type stackFrame struct {
 	returnStep   Step
-	localVars    map[string]reflect.Value
+	env          *Env
+	localVars    map[string]Var
 	funcArgs     []reflect.Value
 	returnValues []reflect.Value
 }
@@ -15,13 +16,11 @@ func (s *stack) push(f stackFrame) {
 	*s = append(*s, f)
 }
 
-func (s *stack) pop() (stackFrame, bool) {
-	if len(*s) == 0 {
-		return stackFrame{}, false
-	}
+// pre: stack not empty
+func (s *stack) pop() stackFrame {
 	f := (*s)[len(*s)-1]
 	*s = (*s)[:len(*s)-1]
-	return f, true
+	return f
 }
 
 func (s stack) peek() (stackFrame, bool) {
@@ -29,4 +28,9 @@ func (s stack) peek() (stackFrame, bool) {
 		return stackFrame{}, false
 	}
 	return s[len(s)-1], true
+}
+
+// pre: stack not empty
+func (s stack) top() stackFrame {
+	return s[len(s)-1]
 }

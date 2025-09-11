@@ -12,7 +12,7 @@ type Literal struct {
 	*ast.BasicLit
 }
 
-func (s Literal) Eval() reflect.Value {
+func (s Literal) Eval(env *Env) reflect.Value {
 	switch s.Kind {
 	case token.INT:
 		i, _ := strconv.Atoi(s.Value)
