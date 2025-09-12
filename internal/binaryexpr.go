@@ -8,6 +8,7 @@ import (
 )
 
 type BinaryExpr struct {
+	step
 	X Expr
 	Y Expr
 	*ast.BinaryExpr

@@ -6,6 +6,7 @@ import (
 )
 
 type Ident struct {
+	operatorUnimplemented
 	step
 	*ast.Ident
 }

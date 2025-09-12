@@ -8,6 +8,7 @@ import (
 )
 
 type Literal struct {
+	operatorUnimplemented
 	Step
 	*ast.BasicLit
 }

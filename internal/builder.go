@@ -9,8 +9,9 @@ import (
 var _ ast.Visitor = (*builder)(nil)
 
 type builder struct {
-	stack []Step
-	vm    *VM
+	stack     []Step
+	exprStack []Expr
+	vm        *VM
 }
 
 func (b *builder) push(s Step) {
@@ -42,9 +43,28 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s := &Assign{AssignStmt: n}
 		for _, l := range n.Lhs {
 			b.Visit(l)
+			e := b.pop()
+			s.Lhs = append(s.Lhs, e.(Expr))
+		}
+		for _, r := range n.Rhs {
+			b.Visit(r)
+			e := b.pop()
+			s.Rhs = append(s.Rhs, e.(Expr))
 		}
 		b.push(s)
 	case *ast.ImportSpec:
+	case *ast.BasicLit:
+		s := &Literal{BasicLit: n}
+		b.push(s)
+	case *ast.BinaryExpr:
+		s := &BinaryExpr{BinaryExpr: n}
+		b.Visit(n.X)
+		e := b.pop()
+		s.X = e.(Expr)
+		b.Visit(n.Y)
+		e = b.pop()
+		s.Y = e.(Expr)
+		b.push(s)
 	default:
 		log.Println("unvisited", fmt.Sprintf("%T", n))
 	}
