@@ -37,9 +37,6 @@ func (e *Env) ownerOf(name string) *Env {
 	return e
 }
 
-func (e *Env) set(name string, value any) {
-
+func (e *Env) set(name string, value reflect.Value) {
+	e.symbolTable[name] = value
 }
-
-// pacakge env
-// function env

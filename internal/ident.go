@@ -6,11 +6,13 @@ import (
 )
 
 type Ident struct {
-	operatorUnimplemented
 	step
 	*ast.Ident
 }
 
 func (i Ident) Eval(env *Env) reflect.Value {
 	return env.lookUp(i.Obj.Name)
+}
+func (i Ident) Assign(env *Env, value reflect.Value) {
+	env.set(i.Obj.Name, value)
 }

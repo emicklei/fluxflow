@@ -7,13 +7,13 @@ import (
 	"strconv"
 )
 
-type Literal struct {
+type BasicLit struct {
 	operatorUnimplemented
 	Step
 	*ast.BasicLit
 }
 
-func (s Literal) Eval(env *Env) reflect.Value {
+func (s BasicLit) Eval(env *Env) reflect.Value {
 	switch s.Kind {
 	case token.INT:
 		i, _ := strconv.Atoi(s.Value)
@@ -26,17 +26,6 @@ func (s Literal) Eval(env *Env) reflect.Value {
 	case token.CHAR:
 		// a character literal is a rune, which is an alias for int32
 		return reflect.ValueOf(s.Value)
-	}
-	panic("not implemented")
-}
-func (s Literal) Operand() Expr {
-	switch s.Kind {
-	case token.INT:
-		return INT{value: s.Value}
-	case token.STRING:
-		return STRING{value: s.Value}
-	case token.FLOAT:
-		return FLOAT{value: s.Value}
 	}
 	panic("not implemented")
 }

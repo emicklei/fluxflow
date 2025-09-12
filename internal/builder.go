@@ -9,15 +9,14 @@ import (
 var _ ast.Visitor = (*builder)(nil)
 
 type builder struct {
-	stack     []Step
-	exprStack []Expr
-	vm        *VM
+	stack []any
 }
 
-func (b *builder) push(s Step) {
+func (b *builder) push(s any) {
+	fmt.Printf("%T\n", s)
 	b.stack = append(b.stack, s)
 }
-func (b *builder) pop() Step {
+func (b *builder) pop() any {
 	top := b.stack[len(b.stack)-1]
 	b.stack = b.stack[0 : len(b.stack)-1]
 	return top
@@ -54,7 +53,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.ImportSpec:
 	case *ast.BasicLit:
-		s := &Literal{BasicLit: n}
+		s := &BasicLit{BasicLit: n}
 		b.push(s)
 	case *ast.BinaryExpr:
 		s := &BinaryExpr{BinaryExpr: n}

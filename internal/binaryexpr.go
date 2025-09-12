@@ -4,10 +4,10 @@ import (
 	"go/ast"
 	"go/token"
 	"reflect"
-	"strconv"
 )
 
 type BinaryExpr struct {
+	operatorUnimplemented
 	step
 	X Expr
 	Y Expr
@@ -15,124 +15,92 @@ type BinaryExpr struct {
 }
 
 func (s BinaryExpr) Eval(env *Env) reflect.Value {
-	switch s.Op {
-	case token.ADD:
-		return s.X.ADD(s.Y)
-	case token.SUB:
-		return s.X.SUB(s.Y)
+	v := BinaryExprValue{
+		left:  s.X.Eval(env),
+		op:    s.Op,
+		right: s.Y.Eval(env),
 	}
-	panic("not implemented")
+	return v.Eval()
 }
 
-type INT struct {
-	operatorUnimplemented
-	value string
+type BinaryExprValue struct {
+	left  reflect.Value
+	op    token.Token
+	right reflect.Value
 }
 
-func (i INT) ADD(right Expr) reflect.Value {
-	return right.ADD_INT(i)
+func (b BinaryExprValue) Eval() reflect.Value {
+	switch b.left.Kind() {
+	case reflect.Int:
+		return b.IntEval(b.left.Int())
+	case reflect.Float64:
+		return b.FloatEval(b.left.Float())
+	case reflect.String:
+		if b.op == token.ADD && b.right.Kind() == reflect.String {
+			return reflect.ValueOf(b.left.String() + b.right.String())
+		}
+	}
+	panic("not implemented:" + b.left.Kind().String())
 }
-func (i INT) ADD_INT(left INT) reflect.Value {
-	li, _ := strconv.Atoi(left.value)
-	ri, _ := strconv.Atoi(i.value)
-	return reflect.ValueOf(li + ri)
+func (b BinaryExprValue) IntEval(left int64) reflect.Value {
+	switch b.right.Kind() {
+	case reflect.Int:
+		return b.IntOpInt(left, b.right.Int())
+	case reflect.Float64:
+		return b.FloatOpFloat(float64(left), b.right.Float())
+	}
+	panic("not implemented:" + b.right.Kind().String())
 }
-func (i INT) SUB(right Expr) reflect.Value {
-	return right.SUB_INT(i)
+
+func (b BinaryExprValue) FloatEval(left float64) reflect.Value {
+	switch b.right.Kind() {
+	case reflect.Float64:
+		return b.FloatOpFloat(left, b.right.Float())
+	case reflect.Int:
+		return b.FloatOpFloat(left, float64(b.right.Int()))
+	}
+	panic("not implemented:" + b.right.Kind().String())
 }
-func (i INT) SUB_INT(left INT) reflect.Value {
-	li, _ := strconv.Atoi(left.value)
-	ri, _ := strconv.Atoi(i.value)
-	return reflect.ValueOf(li - ri)
+
+func (b BinaryExprValue) FloatOpFloat(left float64, right float64) reflect.Value {
+	switch b.op {
+	case token.ADD:
+		return reflect.ValueOf(left + right)
+	case token.SUB:
+		return reflect.ValueOf(left - right)
+	case token.MUL:
+		return reflect.ValueOf(left * right)
+	case token.QUO:
+		return reflect.ValueOf(left / right)
+	}
+	panic("not implemented:" + b.op.String())
 }
-func (i INT) ADD_FLOAT(left FLOAT) reflect.Value {
-	li, _ := strconv.Atoi(i.value)
-	ri, _ := strconv.ParseFloat(left.value, 64)
-	return reflect.ValueOf(float64(li) + ri)
+
+func (b BinaryExprValue) IntOpInt(left int64, right int64) reflect.Value {
+	switch b.op {
+	case token.ADD:
+		return reflect.ValueOf(left + right)
+	case token.SUB:
+		return reflect.ValueOf(left - right)
+	case token.MUL:
+		return reflect.ValueOf(left * right)
+	case token.QUO:
+		return reflect.ValueOf(left / right)
+	case token.REM:
+		return reflect.ValueOf(left % right)
+	}
+	panic("not implemented:" + b.op.String())
 }
 
 type Expr interface {
 	Eval(env *Env) reflect.Value
-
-	ADD(right Expr) reflect.Value
-	ADD_INT(INT) reflect.Value
-
-	SUB(right Expr) reflect.Value
-	SUB_INT(INT) reflect.Value
-
-	ADD_STRING(STRING) reflect.Value
-
-	ADD_FLOAT(FLOAT) reflect.Value
-	SUB_FLOAT(FLOAT) reflect.Value
-
-	Assign(env *Env, val reflect.Value)
+	Assign(env *Env, value reflect.Value)
 }
 
 var _ Expr = operatorUnimplemented{}
 
 type operatorUnimplemented struct{ step }
 
-func (o operatorUnimplemented) ADD(right Expr) reflect.Value {
+func (operatorUnimplemented) Assign(env *Env, value reflect.Value) {
 	panic("not implemented")
-}
-func (o operatorUnimplemented) ADD_INT(left INT) reflect.Value {
-	panic("not implemented")
-}
-func (o operatorUnimplemented) ADD_STRING(left STRING) reflect.Value {
-	panic("not implemented")
-}
-func (o operatorUnimplemented) SUB(right Expr) reflect.Value {
-	panic("not implemented")
-}
-func (o operatorUnimplemented) SUB_INT(left INT) reflect.Value {
-	panic("not implemented")
-}
-func (o operatorUnimplemented) ADD_FLOAT(left FLOAT) reflect.Value {
-	panic("not implemented")
-}
-func (o operatorUnimplemented) SUB_FLOAT(left FLOAT) reflect.Value {
-	panic("not implemented")
-}
-func (o operatorUnimplemented) Assign(env *Env, val reflect.Value) {
-	panic("not implemented")
-}
-
-type STRING struct {
-	operatorUnimplemented
-	value string
-}
-
-func (s STRING) ADD(right Expr) reflect.Value {
-	return right.ADD_STRING(s)
-}
-func (s STRING) ADD_STRING(left STRING) reflect.Value {
-	return reflect.ValueOf(left.value + s.value)
-}
-
-type FLOAT struct {
-	operatorUnimplemented
-	value string
-}
-
-func (f FLOAT) ADD(right Expr) reflect.Value {
-	return right.ADD_FLOAT(f)
-}
-func (f FLOAT) ADD_FLOAT(left FLOAT) reflect.Value {
-	li, _ := strconv.ParseFloat(left.value, 64)
-	ri, _ := strconv.ParseFloat(f.value, 64)
-	return reflect.ValueOf(li + ri)
-}
-
-func (f FLOAT) SUB(right Expr) reflect.Value {
-	return right.SUB_FLOAT(f)
-}
-func (f FLOAT) SUB_FLOAT(left FLOAT) reflect.Value {
-	li, _ := strconv.ParseFloat(left.value, 64)
-	ri, _ := strconv.ParseFloat(f.value, 64)
-	return reflect.ValueOf(li - ri)
-}
-func (f FLOAT) ADD_INT(left INT) reflect.Value {
-	li, _ := strconv.Atoi(left.value)
-	ri, _ := strconv.ParseFloat(f.value, 64)
-	return reflect.ValueOf(float64(li) + ri)
 }
