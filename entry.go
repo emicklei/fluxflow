@@ -5,5 +5,5 @@ import (
 )
 
 func DoDecl(decl any) {
-	internal.DoDecl(decl)
+	internal.BuildSteps(decl)
 }

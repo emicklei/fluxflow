@@ -14,6 +14,6 @@ type Var struct {
 func (v *Var) Assign(env *Env, value reflect.Value) {
 	env.set(v.spec.Names[0].Name, value)
 }
-func (v *Var) Eval(env *Env) reflect.Value {
-	return env.lookUp(v.spec.Names[0].Name)
+func (v *Var) Eval(vm *VM) reflect.Value {
+	return vm.localEnv().lookUp(v.spec.Names[0].Name)
 }

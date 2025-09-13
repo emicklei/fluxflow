@@ -9,12 +9,10 @@ import (
 )
 
 type BasicLit struct {
-	operatorUnimplemented
-	Step
 	*ast.BasicLit
 }
 
-func (s BasicLit) Eval(env *Env) reflect.Value {
+func (s BasicLit) Eval(vm *VM) reflect.Value {
 	switch s.Kind {
 	case token.INT:
 		i, _ := strconv.Atoi(s.Value)

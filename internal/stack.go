@@ -3,7 +3,7 @@ package internal
 import "reflect"
 
 type stackFrame struct {
-	returnStep   Step
+	returnStep   *step
 	env          *Env
 	localVars    map[string]Var
 	funcArgs     []reflect.Value

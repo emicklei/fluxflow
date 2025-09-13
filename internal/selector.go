@@ -13,12 +13,12 @@ type SelectorExpr struct {
 }
 
 // return a function?
-func (s SelectorExpr) Eval(env *Env) reflect.Value {
+func (s SelectorExpr) Eval(vm *VM) reflect.Value {
 	/**
 	look up X
 	apply selector Sel
 	**/
-	_ = s.X.Eval(env)
+	_ = s.X.Eval(vm)
 	return reflect.Value{} // obj.Select(s.SelectorExpr.Sel.Name)
 }
 

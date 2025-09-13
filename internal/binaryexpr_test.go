@@ -16,7 +16,7 @@ func TestBinaryIntegerAddition(t *testing.T) {
 		Y:          right,
 		BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 	}
-	result := expr.Eval(newEnv())
+	result := expr.Eval(newVM())
 	if result.Kind() != reflect.Int64 {
 		t.Fatalf("expected int result, got %v", result.Kind())
 	}
@@ -33,7 +33,7 @@ func TestBinaryIntegerAddition2(t *testing.T) {
 		Y:          right,
 		BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 	}
-	result := expr.Eval(newEnv())
+	result := expr.Eval(newVM())
 	if result.Kind() != reflect.Int64 {
 		t.Fatalf("expected int result, got %v", result.Kind())
 	}

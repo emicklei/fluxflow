@@ -9,17 +9,16 @@ import (
 
 type BinaryExpr struct {
 	operatorUnimplemented
-	step
 	X Expr
 	Y Expr
 	*ast.BinaryExpr
 }
 
-func (s BinaryExpr) Eval(env *Env) reflect.Value {
+func (s BinaryExpr) Eval(vm *VM) reflect.Value {
 	v := BinaryExprValue{
-		left:  s.X.Eval(env),
+		left:  s.X.Eval(vm),
 		op:    s.Op,
-		right: s.Y.Eval(env),
+		right: s.Y.Eval(vm),
 	}
 	return v.Eval()
 }
@@ -97,15 +96,10 @@ func (b BinaryExprValue) IntOpInt(left int64, right int64) reflect.Value {
 	panic("not implemented:" + b.op.String())
 }
 
-type Expr interface {
-	Eval(env *Env) reflect.Value
-	Assign(env *Env, value reflect.Value)
-}
-
-var _ Expr = operatorUnimplemented{}
+var _ Expr = &operatorUnimplemented{}
 
 type operatorUnimplemented struct{ step }
 
-func (operatorUnimplemented) Assign(env *Env, value reflect.Value) {
+func (*operatorUnimplemented) Assign(env *Env, value reflect.Value) {
 	panic("not implemented")
 }

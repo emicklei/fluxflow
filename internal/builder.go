@@ -8,22 +8,41 @@ import (
 var _ ast.Visitor = (*builder)(nil)
 
 type builder struct {
-	stack []any
+	stack []*step
 }
 
-func (b *builder) push(s any) {
+func (b *builder) push(s Evaluable) {
 	if str, ok := s.(fmt.Stringer); ok {
 		fmt.Printf("%v\n", str.String())
 	} else {
 		fmt.Printf("%T\n", s)
 	}
-	b.stack = append(b.stack, s)
+	step := new(step)
+	step.Evaluable = s
+	if len(b.stack) > 0 {
+		top := b.stack[len(b.stack)-1]
+		step.Prev(top)
+	}
+	b.stack = append(b.stack, step)
 }
 
-func (b *builder) pop() any {
+func (b *builder) pop() Evaluable {
 	top := b.stack[len(b.stack)-1]
 	b.stack = b.stack[0 : len(b.stack)-1]
-	return top
+	return top.Evaluable
+}
+
+func (b *builder) last() *step {
+	if len(b.stack) == 0 {
+		return nil
+	}
+	return b.stack[len(b.stack)-1]
+}
+func (b *builder) first() *step {
+	if len(b.stack) == 0 {
+		return nil
+	}
+	return b.stack[0]
 }
 
 // Visit implements the ast.Visitor interface
@@ -33,11 +52,10 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s := &Var{spec: n}
 		b.push(s)
 	case *ast.ExprStmt:
-		s := &Stmt{ExprStmt: n}
+		s := &ExprStmt{ExprStmt: n}
 		b.Visit(n.X)
 		e := b.pop()
 		s.X = e.(Expr)
-		s.step = b.linked(s.step)
 		b.push(s)
 	case *ast.Ident:
 		s := &Ident{Ident: n}
@@ -47,7 +65,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			b.Visit(s)
 		}
 	case *ast.AssignStmt:
-		s := &Assign{AssignStmt: n}
+		s := &AssignStmt{AssignStmt: n}
 		for _, l := range n.Lhs {
 			b.Visit(l)
 			e := b.pop()
@@ -58,7 +76,6 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			e := b.pop()
 			s.Rhs = append(s.Rhs, e.(Expr))
 		}
-		s.step = b.linked(s.step)
 		b.push(s)
 	case *ast.ImportSpec:
 	case *ast.BasicLit:
@@ -100,13 +117,4 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		fmt.Println("unvisited", fmt.Sprintf("%T", n))
 	}
 	return b
-}
-
-func (b *builder) linked(s step) step {
-	if len(b.stack) == 0 {
-		return s
-	}
-	top := b.stack[len(b.stack)-1]
-	s.Prev(top.(Step))
-	return s
 }

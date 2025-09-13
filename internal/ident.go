@@ -11,11 +11,21 @@ type Ident struct {
 	*ast.Ident
 }
 
-func (i Ident) Eval(env *Env) reflect.Value {
-	return env.lookUp(i.Obj.Name)
+func (i Ident) Eval(vm *VM) reflect.Value {
+	name := i.Name
+	// TODO why?
+	if i.Obj != nil {
+		name = i.Obj.Name
+	}
+	return vm.localEnv().lookUp(name)
 }
-func (i Ident) Assign(env *Env, value reflect.Value) {
-	env.set(i.Obj.Name, value)
+func (i Ident) Assign(vm *VM, value reflect.Value) {
+	name := i.Name
+	// TODO why?
+	if i.Obj != nil {
+		name = i.Obj.Name
+	}
+	vm.localEnv().set(name, value)
 }
 func (i Ident) String() string {
 	if i.Obj == nil {

@@ -3,17 +3,18 @@ package internal
 import (
 	"fmt"
 	"go/ast"
+	"reflect"
 )
 
-type Stmt struct {
-	step
+type ExprStmt struct {
 	X Expr
 	*ast.ExprStmt
 }
 
-func (s Stmt) Perform(vm *VM) {
-	s.X.Eval(vm.env)
+func (s ExprStmt) Eval(vm *VM) reflect.Value {
+	return s.X.Eval(vm)
 }
-func (s Stmt) String() string {
-	return fmt.Sprintf("Stmt(%v)", s.X)
+
+func (s ExprStmt) String() string {
+	return fmt.Sprintf("ExprStmt(%v)", s.X)
 }

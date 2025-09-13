@@ -8,3 +8,7 @@ type VM struct {
 func newVM() *VM {
 	return &VM{env: newEnv()}
 }
+
+func (vm *VM) localEnv() *Env {
+	return vm.env
+}
