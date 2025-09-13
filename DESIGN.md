@@ -1,0 +1,51 @@
+# Fluxflow Design
+
+This document outlines the software design and architecture of the Fluxflow Go interpreter.
+
+## Overview
+
+Fluxflow is designed to interpret a Go program by parsing its source code into an Abstract Syntax Tree (AST) and then walking this tree to execute the program's logic. The primary goal is to enable interactive debugging and a REPL-like experience for Go.
+
+The interpreter is composed of several key components that work together to manage the program's state, execution flow, and interaction with Go's language features.
+
+## Core Components
+
+### 1. Parsing
+
+- **Input:** A valid Go program, including its sub-packages.
+- **Process:** Fluxflow uses the standard `go/parser` package to parse all the `.go` source files into an AST. This AST provides a structured, tree-like representation of the source code that is ideal for interpretation.
+- **Output:** A complete AST for the entire program.
+
+### 2. Program Representation
+
+- **Builder:** The `internal/builder.go` component takes the source AST and constructs an internal representation of the program. This involves creating a call graph and preparing the necessary data structures for execution.
+
+### 3. The Virtual Machine (VM)
+
+- **Engine:** The core of the interpreter is the Virtual Machine (VM), located in `internal/vm.go`. The VM is responsible for driving the execution of the program.
+- **Execution Loop:** It operates on a step-by-step basis, processing one statement or expression at a time. This design is fundamental to allowing features like step-through debugging.
+
+### 4. State Management
+
+- **Environment (`env.go`):** This component manages the state of variables, constants, and functions within different scopes. It handles variable declarations, assignments, and lookups.
+- **Call Stack (`stack.go`):** The call stack tracks active function calls. Each time a function is invoked, a new frame is pushed onto the stack, containing the function's local variables and execution context. When a function returns, its frame is popped.
+
+## Execution Flow
+
+The interpretation process for various language constructs is handled by dedicated components:
+
+- **Statements (`stmt.go`):** A central dispatcher for handling different types of statements (e.g., `if`, `for`, `return`).
+- **Expressions:** Specific files are dedicated to evaluating different kinds of expressions:
+  - `binaryexpr.go`: Handles binary operations (`+`, `-`, `*`, `/`, `==`, etc.).
+  - `unary.go`: Handles unary operations (`-`, `!`).
+  - `call.go`: Manages function calls, including pushing to the call stack and passing arguments.
+  - `literal.go`: Processes literal values (integers, strings, etc.).
+- **Control Flow:**
+  - `if.go`: Implements the logic for `if-else` statements.
+  - `return.go`: Handles `return` statements, passing return values back to the caller.
+- **Assignments (`assign.go`):** Manages the assignment of values to variables.
+
+## External Code and Built-ins
+
+- **Standard Library & External Packages:** Code from packages outside the main program (standard library, `go.mod` dependencies) is not interpreted directly. Instead, Fluxflow uses Go's `reflect` package to interact with these compiled packages, allowing the interpreted program to call their functions and use their types. The `internal/stdlib_generated.go` file likely contains pre-generated wrappers for standard library functions.
+- **Built-in Functions (`builtins.go`):** Go's built-in functions (e.g., `len`, `cap`, `append`) are implemented natively within the interpreter to ensure correct and efficient behavior.
