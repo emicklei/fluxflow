@@ -48,6 +48,12 @@ func (b *builder) first() *step {
 // Visit implements the ast.Visitor interface
 func (b *builder) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
+	case *ast.UnaryExpr:
+		s := &UnaryExpr{UnaryExpr: n}
+		b.Visit(n.X)
+		e := b.pop()
+		s.X = e.(Expr)
+		b.push(s)
 	case *ast.ValueSpec:
 		s := &Var{spec: n}
 		b.push(s)
@@ -140,7 +146,14 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.FuncDecl:
-		// s := &FuncDecl{FuncDecl: n}
+		s := &FuncDecl{FuncDecl: n}
+		b.Visit(n.Name)
+		e := b.pop()
+		s.Name = e.(*Ident)
+		b.Visit(n.Body)
+		e = b.pop()
+		s.Body = e.(*BlockStmt)
+		b.push(s)
 	case *ast.GenDecl:
 		// IMPORT, CONST, TYPE, or VAR
 	default:
