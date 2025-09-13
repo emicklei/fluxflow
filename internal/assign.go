@@ -12,6 +12,8 @@ type AssignStmt struct {
 	*ast.AssignStmt
 }
 
+func (a AssignStmt) stmtStep() Evaluable { return a }
+
 func (a AssignStmt) Eval(vm *VM) reflect.Value {
 	for i, rhs := range a.Rhs {
 		v := rhs.Eval(vm)

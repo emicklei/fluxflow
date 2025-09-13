@@ -15,3 +15,8 @@ type Statement interface{}
 type Expr interface {
 	Eval(vm *VM) reflect.Value
 }
+
+// All statement nodes implement the Stmt interface.
+type Stmt interface {
+	stmtStep() Evaluable
+}

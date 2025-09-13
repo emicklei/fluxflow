@@ -92,6 +92,18 @@ func (b BinaryExprValue) IntOpInt(left int64, right int64) reflect.Value {
 		return reflect.ValueOf(left / right)
 	case token.REM:
 		return reflect.ValueOf(left % right)
+	case token.EQL:
+		return reflect.ValueOf(left == right)
+	case token.NEQ:
+		return reflect.ValueOf(left != right)
+	case token.LSS:
+		return reflect.ValueOf(left < right)
+	case token.LEQ:
+		return reflect.ValueOf(left <= right)
+	case token.GTR:
+		return reflect.ValueOf(left > right)
+	case token.GEQ:
+		return reflect.ValueOf(left >= right)
 	}
 	panic("not implemented:" + b.op.String())
 }

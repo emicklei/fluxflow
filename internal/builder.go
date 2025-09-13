@@ -61,9 +61,13 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s := &Ident{Ident: n}
 		b.push(s)
 	case *ast.BlockStmt:
-		for _, s := range n.List {
-			b.Visit(s)
+		s := &BlockStmt{BlockStmt: n}
+		for _, stmt := range n.List {
+			b.Visit(stmt)
+			e := b.pop()
+			s.List = append(s.List, e.(Stmt))
 		}
+		b.push(s)
 	case *ast.AssignStmt:
 		s := &AssignStmt{AssignStmt: n}
 		for _, l := range n.Lhs {
@@ -112,6 +116,20 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.Visit(n.X)
 		e := b.pop()
 		s.X = e.(Expr)
+		b.push(s)
+	case *ast.IfStmt:
+		s := &IfStmt{IfStmt: n}
+		if n.Init != nil {
+			b.Visit(n.Init)
+			e := b.pop()
+			s.Init = e.(Expr)
+		}
+		b.Visit(n.Cond)
+		e := b.pop()
+		s.Cond = e.(Expr)
+		b.Visit(n.Body)
+		e = b.pop()
+		s.Body = e.(*BlockStmt)
 		b.push(s)
 	default:
 		fmt.Println("unvisited", fmt.Sprintf("%T", n))

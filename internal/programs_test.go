@@ -8,31 +8,38 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func TestProgram0(t *testing.T) {
-	loadAndRun(t, "../programs/test0", func(obj any) {
+func TestProgramPrint(t *testing.T) {
+	loadAndRun(t, "../programs/test_print", func(obj any) {
 		RunSteps(obj)
 	})
 }
 
-func TestProgram1(t *testing.T) {
-	loadAndRun(t, "../programs/test1", func(obj any) {
+func TestProgramMulitAssign(t *testing.T) {
+	loadAndRun(t, "../programs/test_multiassign", func(obj any) {
 		BuildSteps(obj)
 		//s := DoDecl(obj)
 		//structexplorer.NewService("some structure", s).Start()
 	})
 }
 
-func TestProgram2(t *testing.T) {
-	loadAndRun(t, "../programs/test2", func(obj any) {
+func TestProgramGeneric(t *testing.T) {
+	loadAndRun(t, "../programs/test_generic", func(obj any) {
 		BuildSteps(obj)
 	})
 }
-func TestProgram3(t *testing.T) {
-	loadAndRun(t, "../programs/test3", func(obj any) {
+func TestProgramTypeAssert(t *testing.T) {
+	loadAndRun(t, "../programs/test_typeassert", func(obj any) {
 		// Show(DoDecl(obj))
 		BuildSteps(obj)
 	})
 }
+
+func TestProgramIf(t *testing.T) {
+	loadAndRun(t, "../programs/test_if", func(obj any) {
+		RunSteps(obj)
+	})
+}
+
 func loadAndRun(t *testing.T, dirPath string, fn func(obj any)) {
 	fset := token.NewFileSet()
 

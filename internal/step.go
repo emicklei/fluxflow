@@ -10,16 +10,6 @@ type step struct {
 	Evaluable
 }
 
-// // used?
-// func (s *step) Eval(vm *VM) reflect.Value {
-// 	return reflect.Value{}
-// }
-
-// // used?
-// func (s *step) Assign(env *Env, value reflect.Value) {
-// 	// no-op
-// }
-
 func (s *step) String() string {
 	if s == nil {
 		return "nil"

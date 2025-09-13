@@ -11,6 +11,8 @@ type ExprStmt struct {
 	*ast.ExprStmt
 }
 
+func (s *ExprStmt) stmtStep() Evaluable { return s }
+
 func (s ExprStmt) Eval(vm *VM) reflect.Value {
 	return s.X.Eval(vm)
 }
