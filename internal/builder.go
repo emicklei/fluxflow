@@ -131,6 +131,18 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		e = b.pop()
 		s.Body = e.(*BlockStmt)
 		b.push(s)
+	case *ast.ReturnStmt:
+		s := &ReturnStmt{ReturnStmt: n}
+		for _, r := range n.Results {
+			b.Visit(r)
+			e := b.pop()
+			s.Results = append(s.Results, e.(Expr))
+		}
+		b.push(s)
+	case *ast.FuncDecl:
+		// s := &FuncDecl{FuncDecl: n}
+	case *ast.GenDecl:
+		// IMPORT, CONST, TYPE, or VAR
 	default:
 		fmt.Println("unvisited", fmt.Sprintf("%T", n))
 	}

@@ -1,46 +1,38 @@
 package internal
 
 import (
+	"fmt"
 	"go/token"
-	"log"
+	"reflect"
 	"testing"
 
 	"golang.org/x/tools/go/packages"
 )
 
 func TestProgramPrint(t *testing.T) {
-	loadAndRun(t, "../programs/test_print", func(obj any) {
-		RunSteps(obj)
-	})
+	loadAndRun(t, "../programs/test_print")
 }
 
 func TestProgramMulitAssign(t *testing.T) {
-	loadAndRun(t, "../programs/test_multiassign", func(obj any) {
-		BuildSteps(obj)
-		//s := DoDecl(obj)
-		//structexplorer.NewService("some structure", s).Start()
-	})
+	loadAndRun(t, "../programs/test_multiassign")
 }
 
 func TestProgramGeneric(t *testing.T) {
-	loadAndRun(t, "../programs/test_generic", func(obj any) {
-		BuildSteps(obj)
-	})
+	loadAndRun(t, "../programs/test_generic")
 }
 func TestProgramTypeAssert(t *testing.T) {
-	loadAndRun(t, "../programs/test_typeassert", func(obj any) {
-		// Show(DoDecl(obj))
-		BuildSteps(obj)
-	})
+	loadAndRun(t, "../programs/test_typeassert")
 }
 
 func TestProgramIf(t *testing.T) {
-	loadAndRun(t, "../programs/test_if", func(obj any) {
-		RunSteps(obj)
-	})
+	loadAndRun(t, "../programs/test_if")
 }
 
-func loadAndRun(t *testing.T, dirPath string, fn func(obj any)) {
+func TestProgramFunc(t *testing.T) {
+	loadAndRun(t, "../programs/test_func")
+}
+
+func loadAndRun(t *testing.T, dirPath string) {
 	fset := token.NewFileSet()
 
 	cfg := &packages.Config{
@@ -60,14 +52,40 @@ func loadAndRun(t *testing.T, dirPath string, fn func(obj any)) {
 		t.Fatal("no packages found")
 	}
 
+	b := builder{}
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
-			obj := stx.Scope.Lookup("main")
-			if obj != nil {
-				fn(obj.Decl)
-			} else {
-				log.Printf("no main function found")
+			for _, decl := range stx.Decls {
+				b.Visit(decl)
 			}
 		}
+	}
+	runWithBuilder(b)
+}
+func runWithBuilder(b builder) {
+	first := b.first()
+	if first == nil {
+		return
+	}
+	here := first
+	vm := newVM()
+	// builtin
+	vm.env.set("print", reflect.ValueOf(func(args ...any) {
+		for _, a := range args {
+			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
+				fmt.Print(rv.Elem())
+			} else {
+				fmt.Print(a)
+			}
+		}
+	}))
+	for here != nil {
+		hereVal := here.Eval(vm)
+		if hereVal.IsValid() && hereVal.CanInterface() {
+			fmt.Println(here, "->", hereVal.Interface())
+		} else {
+			fmt.Println(here, "->", hereVal)
+		}
+		here = here.next
 	}
 }
