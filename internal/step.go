@@ -3,24 +3,31 @@ package internal
 import "reflect"
 
 type Step interface {
-	AddStep(substep Step)
-	SetParent(parent Step)
 	Eval(env *Env) reflect.Value
+	Next(n Step)
+	Prev(p Step)
 }
 
 type step struct {
-	parent Step
-	steps  []Step
+	prev Step
+	next Step
 }
 
 func (s step) Eval(env *Env) reflect.Value {
 	return reflect.Value{}
 }
 
-func (s *step) AddStep(substep Step) {
-	substep.SetParent(s)
-	s.steps = append(s.steps, substep)
+func (s *step) Next(n Step) {
+	if s.next == n {
+		return
+	}
+	s.next = n
+	n.Prev(s)
 }
-func (s *step) SetParent(parent Step) {
-	s.parent = parent
+func (s *step) Prev(p Step) {
+	if s.prev == p {
+		return
+	}
+	s.prev = p
+	p.Next(s)
 }

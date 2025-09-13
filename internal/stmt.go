@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"go/ast"
 )
 
@@ -12,4 +13,7 @@ type Stmt struct {
 
 func (s Stmt) Perform(vm *VM) {
 	s.X.Eval(vm.env)
+}
+func (s Stmt) String() string {
+	return fmt.Sprintf("Stmt(%v)", s.X)
 }

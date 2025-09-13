@@ -1,18 +1,19 @@
 package internal
 
 import (
+	"fmt"
 	"go/ast"
 	"reflect"
 )
 
-type Call struct {
-	Step
-	Fun  Ident
+type CallExpr struct {
+	step
+	Fun  Expr
 	Args []Expr
 	*ast.CallExpr
 }
 
-func (c Call) Perform(vm *VM) {
+func (c CallExpr) Perform(vm *VM) {
 	f := c.Fun.Eval(vm.env)
 	args := make([]reflect.Value, len(c.Args))
 	for i, arg := range c.Args {
@@ -23,4 +24,10 @@ func (c Call) Perform(vm *VM) {
 	top.returnValues = vals
 	vm.callStack.push(top)
 }
-func (c Call) Eval(env *Env) reflect.Value { return reflect.Value{} }
+func (c CallExpr) Eval(env *Env) reflect.Value { return reflect.Value{} }
+
+func (c CallExpr) Assign(env *Env, value reflect.Value) {}
+
+func (c CallExpr) String() string {
+	return fmt.Sprintf("CallExpr(%v, %d)", c.Fun, len(c.Args))
+}

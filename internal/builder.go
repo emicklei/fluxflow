@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"go/ast"
-	"log"
 )
 
 var _ ast.Visitor = (*builder)(nil)
@@ -13,9 +12,14 @@ type builder struct {
 }
 
 func (b *builder) push(s any) {
-	fmt.Printf("%T\n", s)
+	if str, ok := s.(fmt.Stringer); ok {
+		fmt.Printf("%v\n", str.String())
+	} else {
+		fmt.Printf("%T\n", s)
+	}
 	b.stack = append(b.stack, s)
 }
+
 func (b *builder) pop() any {
 	top := b.stack[len(b.stack)-1]
 	b.stack = b.stack[0 : len(b.stack)-1]
@@ -30,6 +34,10 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.ExprStmt:
 		s := &Stmt{ExprStmt: n}
+		b.Visit(n.X)
+		e := b.pop()
+		s.X = e.(Expr)
+		s.step = b.linked(s.step)
 		b.push(s)
 	case *ast.Ident:
 		s := &Ident{Ident: n}
@@ -50,6 +58,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			e := b.pop()
 			s.Rhs = append(s.Rhs, e.(Expr))
 		}
+		s.step = b.linked(s.step)
 		b.push(s)
 	case *ast.ImportSpec:
 	case *ast.BasicLit:
@@ -64,8 +73,40 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		e = b.pop()
 		s.Y = e.(Expr)
 		b.push(s)
+	case *ast.CallExpr:
+		s := &CallExpr{CallExpr: n}
+		b.Visit(n.Fun)
+		e := b.pop()
+		s.Fun = e.(Expr)
+		for _, arg := range n.Args {
+			b.Visit(arg)
+			e := b.pop()
+			s.Args = append(s.Args, e.(Expr))
+		}
+		b.push(s)
+	case *ast.SelectorExpr:
+		s := &SelectorExpr{SelectorExpr: n}
+		b.Visit(n.X)
+		e := b.pop()
+		s.X = e.(Expr)
+		b.push(s)
+	case *ast.StarExpr:
+		s := &StarExpr{StarExpr: n}
+		b.Visit(n.X)
+		e := b.pop()
+		s.X = e.(Expr)
+		b.push(s)
 	default:
-		log.Println("unvisited", fmt.Sprintf("%T", n))
+		fmt.Println("unvisited", fmt.Sprintf("%T", n))
 	}
 	return b
+}
+
+func (b *builder) linked(s step) step {
+	if len(b.stack) == 0 {
+		return s
+	}
+	top := b.stack[len(b.stack)-1]
+	s.Prev(top.(Step))
+	return s
 }

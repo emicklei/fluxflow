@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"reflect"
@@ -21,6 +22,10 @@ func (s BinaryExpr) Eval(env *Env) reflect.Value {
 		right: s.Y.Eval(env),
 	}
 	return v.Eval()
+}
+
+func (s BinaryExpr) String() string {
+	return fmt.Sprintf("BinaryExpr(%v %v %v)", s.X, s.Op, s.Y)
 }
 
 type BinaryExprValue struct {

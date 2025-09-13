@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"reflect"
@@ -28,4 +29,10 @@ func (s BasicLit) Eval(env *Env) reflect.Value {
 		return reflect.ValueOf(s.Value)
 	}
 	panic("not implemented")
+}
+func (s BasicLit) Loc(f *token.File) string {
+	return fmt.Sprintf("%v:BasicLit(%v)", f.Position(s.Pos()), s.Value)
+}
+func (s BasicLit) String() string {
+	return fmt.Sprintf("BasicLit(%v)", s.Value)
 }

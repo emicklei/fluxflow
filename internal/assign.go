@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"go/ast"
 	"reflect"
 )
@@ -18,4 +19,8 @@ func (a Assign) Eval(env *Env) reflect.Value {
 		a.Lhs[i].Assign(env, v)
 	}
 	return reflect.Value{}
+}
+
+func (a Assign) String() string {
+	return fmt.Sprintf("Assign(%v %s)", a.Lhs, a.AssignStmt.Tok)
 }
