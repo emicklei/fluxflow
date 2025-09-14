@@ -23,5 +23,9 @@ func (f *ForStmt) Eval(vm *VM) reflect.Value {
 	if f.Init != nil {
 		f.Init.stmtStep().Eval(vm)
 	}
+	for f.Cond.Eval(vm).Bool() {
+		f.Post.stmtStep().Eval(vm)
+		f.Body.stmtStep().Eval(vm)
+	}
 	return reflect.Value{}
 }

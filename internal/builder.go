@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"go/ast"
+	"os"
 )
 
 var _ ast.Visitor = (*builder)(nil)
@@ -13,9 +14,9 @@ type builder struct {
 
 func (b *builder) push(s Evaluable) {
 	if str, ok := s.(fmt.Stringer); ok {
-		fmt.Printf("%v\n", str.String())
+		fmt.Fprintf(os.Stderr, "%v\n", str.String())
 	} else {
-		fmt.Printf("%T\n", s)
+		fmt.Fprintf(os.Stderr, "%T\n", s)
 	}
 	step := new(step)
 	step.Evaluable = s
@@ -184,7 +185,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 	case *ast.GenDecl:
 		// IMPORT, CONST, TYPE, or VAR
 	default:
-		fmt.Println("unvisited", fmt.Sprintf("%T", n))
+		fmt.Fprintf(os.Stderr, "unvisited %T\n", n)
 	}
 	return b
 }

@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"go/token"
+	"os"
 	"reflect"
 	"testing"
 
@@ -48,20 +49,34 @@ func runWithBuilder(b builder) {
 	vm := newVM()
 	// builtin
 	vm.env.set("print", reflect.ValueOf(func(args ...any) {
+		params := make([]any, len(args))
 		for _, a := range args {
 			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
-				fmt.Print(rv.Elem())
+				params = append(params, rv.Elem())
 			} else {
-				fmt.Print(a)
+				params = append(params, a)
 			}
 		}
+		fmt.Print(params...)
+
+	}))
+	vm.env.set("println", reflect.ValueOf(func(args ...any) {
+		params := make([]any, len(args))
+		for _, a := range args {
+			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
+				params = append(params, rv.Elem())
+			} else {
+				params = append(params, a)
+			}
+		}
+		fmt.Println(params...)
 	}))
 	for here != nil {
 		hereVal := here.Eval(vm)
 		if hereVal.IsValid() && hereVal.CanInterface() {
-			fmt.Println(here, "->", hereVal.Interface())
+			fmt.Fprintln(os.Stderr, here, "->", hereVal.Interface())
 		} else {
-			fmt.Println(here, "->", hereVal)
+			fmt.Fprintln(os.Stderr, here, "->", hereVal)
 		}
 		here = here.next
 	}
