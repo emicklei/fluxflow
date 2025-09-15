@@ -1,12 +1,15 @@
 package internal
 
+import "bytes"
+
 type VM struct {
 	callStack stack
 	env       *Env
+	output    *bytes.Buffer
 }
 
 func newVM() *VM {
-	return &VM{env: newEnv()}
+	return &VM{env: newEnv(), output: new(bytes.Buffer)}
 }
 
 func (vm *VM) localEnv() *Env {

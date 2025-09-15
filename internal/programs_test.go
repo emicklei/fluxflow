@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"os"
 	"testing"
 )
 
@@ -29,8 +28,6 @@ func TestProgramFunc(t *testing.T) {
 }
 
 func TestProgramFor(t *testing.T) {
-	stdout, _ := os.Create("stdout.txt")
-	os.Stdout = stdout
-	defer stdout.Close()
-	loadAndRun(t, "../programs/test_for")
+	out := loadAndRun(t, "../programs/test_for")
+	t.Log(out)
 }

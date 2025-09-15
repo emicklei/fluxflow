@@ -3,14 +3,13 @@ package internal
 import (
 	"fmt"
 	"go/token"
-	"os"
 	"reflect"
 	"testing"
 
 	"golang.org/x/tools/go/packages"
 )
 
-func loadAndRun(t *testing.T, dirPath string) {
+func loadAndRun(t *testing.T, dirPath string) string {
 	fset := token.NewFileSet()
 
 	cfg := &packages.Config{
@@ -38,14 +37,9 @@ func loadAndRun(t *testing.T, dirPath string) {
 			}
 		}
 	}
-	runWithBuilder(b)
+	return runWithBuilder(b)
 }
-func runWithBuilder(b builder) {
-	first := b.first()
-	if first == nil {
-		return
-	}
-	here := first
+func runWithBuilder(b builder) string {
 	vm := newVM()
 	// builtin
 	vm.env.set("print", reflect.ValueOf(func(args ...any) {
@@ -57,7 +51,7 @@ func runWithBuilder(b builder) {
 				params = append(params, a)
 			}
 		}
-		fmt.Print(params...)
+		fmt.Fprint(vm.output, params...)
 
 	}))
 	vm.env.set("println", reflect.ValueOf(func(args ...any) {
@@ -69,15 +63,11 @@ func runWithBuilder(b builder) {
 				params = append(params, a)
 			}
 		}
-		fmt.Println(params...)
+		fmt.Fprintln(vm.output, params...)
 	}))
-	for here != nil {
-		hereVal := here.Eval(vm)
-		if hereVal.IsValid() && hereVal.CanInterface() {
-			fmt.Fprintln(os.Stderr, here, "->", hereVal.Interface())
-		} else {
-			fmt.Fprintln(os.Stderr, here, "->", hereVal)
-		}
-		here = here.next
+	main := vm.env.lookUp("main")
+	if !main.IsValid() {
+		return "main not found"
 	}
+	return vm.output.String()
 }
