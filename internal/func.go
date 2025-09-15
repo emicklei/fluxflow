@@ -7,10 +7,11 @@ import (
 )
 
 type FuncDecl struct {
+	*ast.FuncDecl
 	Name *Ident
+	Recv *FieldList
 	Body *BlockStmt
 	Type *FuncType
-	*ast.FuncDecl
 }
 
 func (f *FuncDecl) Eval(vm *VM) {
@@ -27,3 +28,5 @@ type FuncType struct {
 	Params     *FieldList
 	Returns    *FieldList
 }
+
+func (t *FuncType) Eval(vm *VM) {}

@@ -20,7 +20,7 @@ func (s BinaryExpr) Eval(vm *VM) {
 		op:    s.Op,
 		right: vm.ReturnsEval(s.Y),
 	}
-	vm.expressionValue = v.Eval()
+	vm.Returns(v.Eval())
 }
 
 func (s BinaryExpr) String() string {
@@ -35,7 +35,7 @@ type BinaryExprValue struct {
 
 func (b BinaryExprValue) Eval() reflect.Value {
 	switch b.left.Kind() {
-	case reflect.Int:
+	case reflect.Int, reflect.Int64:
 		return b.IntEval(b.left.Int())
 	case reflect.Float64:
 		return b.FloatEval(b.left.Float())
@@ -44,16 +44,16 @@ func (b BinaryExprValue) Eval() reflect.Value {
 			return reflect.ValueOf(b.left.String() + b.right.String())
 		}
 	}
-	panic("not implemented:" + b.left.Kind().String())
+	panic("not implemented: BinaryExprValue.Eval:" + b.left.Kind().String())
 }
 func (b BinaryExprValue) IntEval(left int64) reflect.Value {
 	switch b.right.Kind() {
-	case reflect.Int:
+	case reflect.Int, reflect.Int64:
 		return b.IntOpInt(left, b.right.Int())
 	case reflect.Float64:
 		return b.FloatOpFloat(float64(left), b.right.Float())
 	}
-	panic("not implemented:" + b.right.Kind().String())
+	panic("not implemented: BinaryExprValue.IntEval:" + b.right.Kind().String())
 }
 
 func (b BinaryExprValue) FloatEval(left float64) reflect.Value {
@@ -63,7 +63,7 @@ func (b BinaryExprValue) FloatEval(left float64) reflect.Value {
 	case reflect.Int:
 		return b.FloatOpFloat(left, float64(b.right.Int()))
 	}
-	panic("not implemented:" + b.right.Kind().String())
+	panic("not implemented: BinaryExprValue.FloatEval:" + b.right.Kind().String())
 }
 
 func (b BinaryExprValue) FloatOpFloat(left float64, right float64) reflect.Value {
@@ -77,7 +77,7 @@ func (b BinaryExprValue) FloatOpFloat(left float64, right float64) reflect.Value
 	case token.QUO:
 		return reflect.ValueOf(left / right)
 	}
-	panic("not implemented:" + b.op.String())
+	panic("not implemented: BinaryExprValue.FloatOpFloat:" + b.op.String())
 }
 
 func (b BinaryExprValue) IntOpInt(left int64, right int64) reflect.Value {
@@ -105,7 +105,7 @@ func (b BinaryExprValue) IntOpInt(left int64, right int64) reflect.Value {
 	case token.GEQ:
 		return reflect.ValueOf(left >= right)
 	}
-	panic("not implemented:" + b.op.String())
+	panic("not implemented: BinaryExprValue.IntOpInt:" + b.op.String())
 }
 
 var _ Expr = &operatorUnimplemented{}
@@ -113,5 +113,5 @@ var _ Expr = &operatorUnimplemented{}
 type operatorUnimplemented struct{ step }
 
 func (*operatorUnimplemented) Assign(env *Env, value reflect.Value) {
-	panic("not implemented")
+	panic("not implemented: operatorUnimplemented.Assign")
 }

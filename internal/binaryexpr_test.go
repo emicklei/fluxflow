@@ -48,8 +48,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 					BinaryExpr: &ast.BinaryExpr{Op: tt.op},
 				}
 				vm := newVM()
-				expr.Eval(vm)
-				result := vm.expressionValue
+				result := vm.ReturnsEval(expr)
 				switch expected := tt.expected.(type) {
 				case int64:
 					if result.Int() != expected {
@@ -87,7 +86,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 				}
 				vm := newVM()
 				expr.Eval(vm)
-				result := vm.expressionValue
+				result := vm.ReturnsEval(expr)
 				if math.Abs(result.Float()-tt.expected) > 1e-9 {
 					t.Errorf("expected %f, got %f", tt.expected, result.Float())
 				}
@@ -105,7 +104,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 		}
 		vm := newVM()
 		expr.Eval(vm)
-		result := vm.expressionValue
+		result := vm.ReturnsEval(expr)
 		if result.Kind() != reflect.Float64 {
 			t.Fatalf("expected float64 result, got %v", result.Kind())
 		}
@@ -124,7 +123,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 		}
 		vm := newVM()
 		expr.Eval(vm)
-		result := vm.expressionValue
+		result := vm.ReturnsEval(expr)
 		if result.Kind() != reflect.Float64 {
 			t.Fatalf("expected float64 result, got %v", result.Kind())
 		}
@@ -143,7 +142,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 		}
 		vm := newVM()
 		expr.Eval(newVM())
-		result := vm.expressionValue
+		result := vm.ReturnsEval(expr)
 		if result.Kind() != reflect.String {
 			t.Fatalf("expected string result, got %v", result.Kind())
 		}
@@ -165,49 +164,49 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 				op:            token.ADD,
 				left:          &mockExpr{v: reflect.ValueOf(true)},
 				right:         &mockExpr{v: reflect.ValueOf(1)},
-				panicContains: "not implemented:bool",
+				panicContains: "not implemented:",
 			},
 			{
 				name:          "string sub",
 				op:            token.SUB,
 				left:          &mockExpr{v: reflect.ValueOf("a")},
 				right:         &mockExpr{v: reflect.ValueOf("b")},
-				panicContains: "not implemented:string",
+				panicContains: "not implemented:",
 			},
 			{
 				name:          "string add int",
 				op:            token.ADD,
 				left:          &mockExpr{v: reflect.ValueOf("a")},
 				right:         &mockExpr{v: reflect.ValueOf(1)},
-				panicContains: "not implemented:string",
+				panicContains: "not implemented:",
 			},
 			{
 				name:          "int add string",
 				op:            token.ADD,
 				left:          &mockExpr{v: reflect.ValueOf(1)},
 				right:         &mockExpr{v: reflect.ValueOf("a")},
-				panicContains: "not implemented:string",
+				panicContains: "not implemented:",
 			},
 			{
 				name:          "float add string",
 				op:            token.ADD,
 				left:          &mockExpr{v: reflect.ValueOf(1.0)},
 				right:         &mockExpr{v: reflect.ValueOf("a")},
-				panicContains: "not implemented:string",
+				panicContains: "not implemented:",
 			},
 			{
 				name:          "float rem float",
 				op:            token.REM,
 				left:          &mockExpr{v: reflect.ValueOf(1.0)},
 				right:         &mockExpr{v: reflect.ValueOf(2.0)},
-				panicContains: "not implemented:%",
+				panicContains: "not implemented:",
 			},
 			{
 				name:          "int and int",
 				op:            token.AND,
 				left:          &mockExpr{v: reflect.ValueOf(1)},
 				right:         &mockExpr{v: reflect.ValueOf(2)},
-				panicContains: "not implemented:&",
+				panicContains: "not implemented:",
 			},
 		}
 		for _, tt := range cases {

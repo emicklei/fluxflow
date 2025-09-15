@@ -17,7 +17,7 @@ func newVM() *VM {
 }
 
 func (vm *VM) localEnv() *Env {
-	return vm.env
+	return vm.callStack.top().env
 }
 
 // ReturnsEval evaluates the argument and returns its return value.

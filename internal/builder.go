@@ -15,11 +15,11 @@ type builder struct {
 }
 
 func (b *builder) push(s Evaluable) {
-	if str, ok := s.(fmt.Stringer); ok {
-		fmt.Fprintf(os.Stderr, "%v\n", str.String())
-	} else {
-		fmt.Fprintf(os.Stderr, "%T\n", s)
-	}
+	// if str, ok := s.(fmt.Stringer); ok {
+	// 	fmt.Fprintf(os.Stderr, "%v\n", str.String())
+	// } else {
+	// 	fmt.Fprintf(os.Stderr, "%T\n", s)
+	// }
 	step := new(step)
 	step.Evaluable = s
 	if len(b.stack) > 0 {
@@ -166,6 +166,11 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.Visit(n.Body)
 		e = b.pop()
 		s.Body = e.(*BlockStmt)
+		if n.Else != nil {
+			b.Visit(n.Else)
+			e = b.pop()
+			s.Else = e.(Stmt)
+		}
 		b.push(s)
 	case *ast.ReturnStmt:
 		s := &ReturnStmt{ReturnStmt: n}
@@ -177,15 +182,63 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.FuncDecl:
 		s := &FuncDecl{FuncDecl: n}
+		if n.Recv != nil {
+			b.Visit(n.Recv)
+			e := b.pop()
+			s.Recv = e.(*FieldList)
+		}
 		b.Visit(n.Name)
 		e := b.pop()
 		s.Name = e.(*Ident)
+
+		b.Visit(n.Type)
+		e = b.pop()
+		s.Type = e.(*FuncType)
+
 		b.Visit(n.Body)
 		e = b.pop()
 		s.Body = e.(*BlockStmt)
 		b.push(s)
 		// put in scope TODO
 		b.env.set(n.Name.Name, reflect.ValueOf(s))
+	case *ast.FuncType:
+		s := &FuncType{FuncType: n}
+		if n.TypeParams != nil {
+			b.Visit(n.TypeParams)
+			e := b.pop()
+			s.TypeParams = e.(*FieldList)
+		}
+		if n.Params != nil {
+			b.Visit(n.Params)
+			e := b.pop()
+			s.Params = e.(*FieldList)
+		}
+		if n.Results != nil {
+			b.Visit(n.Results)
+			e := b.pop()
+			s.Returns = e.(*FieldList)
+		}
+		b.push(s)
+	case *ast.FieldList:
+		s := &FieldList{FieldList: n}
+		for _, field := range n.List {
+			b.Visit(field)
+			e := b.pop()
+			s.List = append(s.List, e.(*Field))
+		}
+		b.push(s)
+	case *ast.Field:
+		s := &Field{Field: n}
+		for _, name := range n.Names {
+			b.Visit(name)
+			e := b.pop()
+			s.Names = append(s.Names, e.(*Ident))
+		}
+		b.Visit(n.Type)
+		e := b.pop()
+		s.Type = e.(Expr)
+		// TODO tag, comment
+		b.push(s)
 	case *ast.GenDecl:
 		// IMPORT, CONST, TYPE, or VAR
 	default:

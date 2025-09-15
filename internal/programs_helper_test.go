@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"go/token"
+	"io"
 	"reflect"
 	"testing"
 
@@ -43,34 +44,43 @@ func runWithBuilder(b builder) string {
 	vm := newVM()
 	vm.env = b.env
 	// builtin
+	vm.env.set("true", reflect.ValueOf(true))
+	vm.env.set("false", reflect.ValueOf(false))
 	vm.env.set("print", reflect.ValueOf(func(args ...any) {
-		params := make([]any, len(args))
 		for _, a := range args {
 			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
-				params = append(params, rv.Elem())
+				fmt.Fprintf(vm.output, "%v", rv.Elem())
 			} else {
-				params = append(params, a)
+				if s, ok := a.(string); ok {
+					io.WriteString(vm.output, s)
+					continue
+				} else {
+					fmt.Fprintf(vm.output, "%v", a)
+				}
 			}
 		}
-		fmt.Fprint(vm.output, params...)
-
 	}))
 	vm.env.set("println", reflect.ValueOf(func(args ...any) {
-		params := make([]any, len(args))
 		for _, a := range args {
 			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
-				params = append(params, rv.Elem())
+				fmt.Fprintf(vm.output, "%v", rv.Elem())
 			} else {
-				params = append(params, a)
+				if s, ok := a.(string); ok {
+					io.WriteString(vm.output, s)
+					continue
+				} else {
+					fmt.Fprintf(vm.output, "%v", a)
+				}
 			}
 		}
-		fmt.Fprintln(vm.output, params...)
+		fmt.Fprintln(vm.output)
 	}))
 	main := vm.env.lookUp("main")
 	if !main.IsValid() {
 		return "main not found"
 	}
 	// TODO
+	vm.callStack.push(stackFrame{env: vm.env.subEnv()})
 	fundecl := main.Interface().(*FuncDecl)
 	fundecl.Body.Eval(vm)
 	return vm.output.String()

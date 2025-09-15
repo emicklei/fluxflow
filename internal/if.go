@@ -10,7 +10,7 @@ type IfStmt struct {
 	Init Expr
 	Cond Expr
 	Body *BlockStmt
-	Else *IfStmt // else if ...
+	Else Stmt // else if ...
 }
 
 func (i *IfStmt) stmtStep() Evaluable { return i }
@@ -20,13 +20,16 @@ func (i *IfStmt) String() string {
 }
 
 func (i *IfStmt) Eval(vm *VM) {
+	if i.Init != nil {
+		i.Init.Eval(vm)
+	}
 	rv := vm.ReturnsEval(i.Cond)
 	if rv.Bool() {
 		i.Body.Eval(vm)
 		return
 	}
 	if i.Else != nil {
-		i.Else.Eval(vm)
+		i.Else.stmtStep().Eval(vm)
 		return
 	}
 }

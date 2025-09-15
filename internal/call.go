@@ -36,10 +36,23 @@ func (c CallExpr) Eval(vm *VM) {
 	if f.Kind() == reflect.Pointer { // reflect pointer to a funcdecl
 		lf := f.Interface().(*FuncDecl)
 
+		params := make([]reflect.Value, len(c.Args))
+		for i, arg := range c.Args {
+			params[i] = vm.ReturnsEval(arg)
+		}
 		fr := stackFrame{}
+		fr.funcArgs = params
 		fr.env = vm.env.subEnv()
 		vm.callStack.push(fr)
 
+		// take all parameters and put them in the env
+		p := 0
+		for _, field := range lf.Type.Params.List {
+			for _, name := range field.Names {
+				fr.env.set(name.Name, params[p])
+				p++
+			}
+		}
 		lf.Body.Eval(vm)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 type BasicLit struct {
@@ -19,7 +20,8 @@ func (s BasicLit) Eval(vm *VM) {
 		vm.Returns(reflect.ValueOf(i))
 		return
 	case token.STRING:
-		vm.Returns(reflect.ValueOf(s.Value))
+		unq := strings.Trim(s.Value, "`\"")
+		vm.Returns(reflect.ValueOf(unq))
 		return
 	case token.FLOAT:
 		f, _ := strconv.ParseFloat(s.Value, 64)
@@ -30,7 +32,7 @@ func (s BasicLit) Eval(vm *VM) {
 		vm.Returns(reflect.ValueOf(s.Value))
 		return
 	}
-	panic("not implemented")
+	panic("not implemented: BasicList.Eval:" + s.Kind.String())
 }
 func (s BasicLit) Loc(f *token.File) string {
 	return fmt.Sprintf("%v:BasicLit(%v)", f.Position(s.Pos()), s.Value)
