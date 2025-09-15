@@ -23,13 +23,6 @@ func (s *stack) pop() stackFrame {
 	return f
 }
 
-func (s stack) peek() (stackFrame, bool) {
-	if len(s) == 0 {
-		return stackFrame{}, false
-	}
-	return s[len(s)-1], true
-}
-
 // pre: stack not empty
 func (s stack) top() stackFrame {
 	return s[len(s)-1]

@@ -20,13 +20,24 @@ func (c CallExpr) Eval(vm *VM) reflect.Value {
 		for i, arg := range c.Args {
 			args[i] = arg.Eval(vm)
 		}
+		fr := stackFrame{}
+		fr.env = vm.env.subEnv()
+		vm.callStack.push(fr)
+
 		vals := f.Call(args)
+
+		// replace with returns
 		top := vm.callStack.pop()
 		top.returnValues = vals
 		vm.callStack.push(top)
 	}
 	if f.Kind() == reflect.Pointer { // reflect pointer to a funcdecl
 		lf := f.Interface().(*FuncDecl)
+
+		fr := stackFrame{}
+		fr.env = vm.env.subEnv()
+		vm.callStack.push(fr)
+
 		return lf.Body.Eval(vm)
 	}
 	return reflect.Value{}

@@ -18,6 +18,13 @@ func (r *ReturnStmt) String() string {
 }
 
 func (r *ReturnStmt) Eval(vm *VM) reflect.Value {
-	// put values on the top stack frame
+	results := make([]reflect.Value, len(r.Results))
+	for i, each := range r.Results {
+		results[i] = each.Eval(vm)
+	}
+	frame := vm.callStack.pop()
+	frame.returnValues = results
+	vm.callStack.push(frame)
+
 	return reflect.Value{}
 }

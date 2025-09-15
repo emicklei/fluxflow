@@ -4,7 +4,7 @@ import "bytes"
 
 type VM struct {
 	callStack stack
-	env       *Env
+	env       *Env // global or package level?
 	output    *bytes.Buffer
 }
 
