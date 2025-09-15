@@ -1,11 +1,15 @@
 package internal
 
-import "bytes"
+import (
+	"bytes"
+	"reflect"
+)
 
 type VM struct {
-	callStack stack
-	env       *Env // global or package level?
-	output    *bytes.Buffer
+	expressionValue reflect.Value
+	callStack       stack
+	env             *Env // global or package level?
+	output          *bytes.Buffer
 }
 
 func newVM() *VM {
@@ -14,4 +18,13 @@ func newVM() *VM {
 
 func (vm *VM) localEnv() *Env {
 	return vm.env
+}
+
+// ReturnsEval evaluates the argument and returns its return value.
+func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
+	e.Eval(vm)
+	return vm.expressionValue
+}
+func (vm *VM) Returns(v reflect.Value) {
+	vm.expressionValue = v
 }

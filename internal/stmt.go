@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"go/ast"
-	"reflect"
 )
 
 type ExprStmt struct {
@@ -13,8 +12,8 @@ type ExprStmt struct {
 
 func (s *ExprStmt) stmtStep() Evaluable { return s }
 
-func (s ExprStmt) Eval(vm *VM) reflect.Value {
-	return s.X.Eval(vm)
+func (s ExprStmt) Eval(vm *VM) {
+	s.X.Eval(vm)
 }
 
 func (s ExprStmt) String() string {

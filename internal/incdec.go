@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"go/ast"
-	"reflect"
 )
 
 type IncDecStmt struct {
@@ -16,6 +15,5 @@ func (i *IncDecStmt) stmtStep() Evaluable { return i }
 func (i *IncDecStmt) String() string {
 	return fmt.Sprintf("IncDecStmt(%v)", i.X)
 }
-func (i *IncDecStmt) Eval(vm *VM) reflect.Value {
-	return reflect.Value{}
+func (i *IncDecStmt) Eval(vm *VM) {
 }

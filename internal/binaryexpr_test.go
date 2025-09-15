@@ -47,7 +47,9 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 					Y:          right,
 					BinaryExpr: &ast.BinaryExpr{Op: tt.op},
 				}
-				result := expr.Eval(newVM())
+				vm := newVM()
+				expr.Eval(vm)
+				result := vm.expressionValue
 				switch expected := tt.expected.(type) {
 				case int64:
 					if result.Int() != expected {
@@ -83,7 +85,9 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 					Y:          right,
 					BinaryExpr: &ast.BinaryExpr{Op: tt.op},
 				}
-				result := expr.Eval(newVM())
+				vm := newVM()
+				expr.Eval(vm)
+				result := vm.expressionValue
 				if math.Abs(result.Float()-tt.expected) > 1e-9 {
 					t.Errorf("expected %f, got %f", tt.expected, result.Float())
 				}
@@ -99,7 +103,9 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 			Y:          right,
 			BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 		}
-		result := expr.Eval(newVM())
+		vm := newVM()
+		expr.Eval(vm)
+		result := vm.expressionValue
 		if result.Kind() != reflect.Float64 {
 			t.Fatalf("expected float64 result, got %v", result.Kind())
 		}
@@ -116,7 +122,9 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 			Y:          right,
 			BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 		}
-		result := expr.Eval(newVM())
+		vm := newVM()
+		expr.Eval(vm)
+		result := vm.expressionValue
 		if result.Kind() != reflect.Float64 {
 			t.Fatalf("expected float64 result, got %v", result.Kind())
 		}
@@ -133,7 +141,9 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 			Y:          right,
 			BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 		}
-		result := expr.Eval(newVM())
+		vm := newVM()
+		expr.Eval(newVM())
+		result := vm.expressionValue
 		if result.Kind() != reflect.String {
 			t.Fatalf("expected string result, got %v", result.Kind())
 		}
@@ -227,7 +237,6 @@ type mockExpr struct {
 	v reflect.Value
 }
 
-func (m *mockExpr) Eval(vm *VM) reflect.Value {
-	return m.v
+func (m *mockExpr) Eval(vm *VM) {
 }
 func (m *mockExpr) String() string { return "mock" }

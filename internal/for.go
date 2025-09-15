@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"go/ast"
-	"reflect"
 )
 
 type ForStmt struct {
@@ -19,13 +18,12 @@ func (f *ForStmt) stmtStep() Evaluable { return f }
 func (f *ForStmt) String() string {
 	return fmt.Sprintf("ForStmt(%v)", f.Cond)
 }
-func (f *ForStmt) Eval(vm *VM) reflect.Value {
+func (f *ForStmt) Eval(vm *VM) {
 	if f.Init != nil {
 		f.Init.stmtStep().Eval(vm)
 	}
-	for f.Cond.Eval(vm).Bool() {
+	for vm.ReturnsEval(f.Cond).Bool() {
 		f.Post.stmtStep().Eval(vm)
 		f.Body.stmtStep().Eval(vm)
 	}
-	return reflect.Value{}
 }

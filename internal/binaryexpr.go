@@ -14,13 +14,13 @@ type BinaryExpr struct {
 	*ast.BinaryExpr
 }
 
-func (s BinaryExpr) Eval(vm *VM) reflect.Value {
+func (s BinaryExpr) Eval(vm *VM) {
 	v := BinaryExprValue{
-		left:  s.X.Eval(vm),
+		left:  vm.ReturnsEval(s.X),
 		op:    s.Op,
-		right: s.Y.Eval(vm),
+		right: vm.ReturnsEval(s.Y),
 	}
-	return v.Eval()
+	vm.expressionValue = v.Eval()
 }
 
 func (s BinaryExpr) String() string {

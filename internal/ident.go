@@ -13,13 +13,13 @@ type Ident struct {
 	*ast.Ident
 }
 
-func (i Ident) Eval(vm *VM) reflect.Value {
+func (i Ident) Eval(vm *VM) {
 	name := i.Name
 	// TODO why?
 	if i.Obj != nil {
 		name = i.Obj.Name
 	}
-	return vm.localEnv().lookUp(name)
+	vm.Returns(vm.localEnv().lookUp(name))
 }
 func (i Ident) Assign(env *Env, value reflect.Value) {
 	name := i.Name

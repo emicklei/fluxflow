@@ -12,19 +12,23 @@ type BasicLit struct {
 	*ast.BasicLit
 }
 
-func (s BasicLit) Eval(vm *VM) reflect.Value {
+func (s BasicLit) Eval(vm *VM) {
 	switch s.Kind {
 	case token.INT:
 		i, _ := strconv.Atoi(s.Value)
-		return reflect.ValueOf(i)
+		vm.Returns(reflect.ValueOf(i))
+		return
 	case token.STRING:
-		return reflect.ValueOf(s.Value)
+		vm.Returns(reflect.ValueOf(s.Value))
+		return
 	case token.FLOAT:
 		f, _ := strconv.ParseFloat(s.Value, 64)
-		return reflect.ValueOf(f)
+		vm.Returns(reflect.ValueOf(f))
+		return
 	case token.CHAR:
 		// a character literal is a rune, which is an alias for int32
-		return reflect.ValueOf(s.Value)
+		vm.Returns(reflect.ValueOf(s.Value))
+		return
 	}
 	panic("not implemented")
 }

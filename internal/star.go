@@ -11,13 +11,14 @@ type StarExpr struct {
 	*ast.StarExpr
 }
 
-func (s StarExpr) Eval(vm *VM) reflect.Value {
-	v := s.X.Eval(vm)
-	return v.Elem()
+func (s StarExpr) Eval(vm *VM) {
+	v := vm.ReturnsEval(s.X)
+	vm.Returns(v.Elem())
 }
 func (s StarExpr) Assign(vm *VM, value reflect.Value) {
-	v := s.X.Eval(vm)
-	v.Elem().Set(value)
+	// TODO
+	//v := vm.ReturnsEval(s.X)
+	//v.Elem().Set(value)
 }
 func (s StarExpr) String() string {
 	return fmt.Sprintf("StarExpr(%v)", s.X)

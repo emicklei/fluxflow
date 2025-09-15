@@ -12,18 +12,20 @@ type CallExpr struct {
 	*ast.CallExpr
 }
 
-func (c CallExpr) Eval(vm *VM) reflect.Value {
+func (c CallExpr) Eval(vm *VM) {
 	// function f is either an external or an interpreted one
-	f := c.Fun.Eval(vm)
+	f := vm.ReturnsEval(c.Fun)
 	if f.Kind() == reflect.Func {
-		args := make([]reflect.Value, len(c.Args))
-		for i, arg := range c.Args {
-			args[i] = arg.Eval(vm)
-		}
+
 		fr := stackFrame{}
 		fr.env = vm.env.subEnv()
-		vm.callStack.push(fr)
 
+		args := make([]reflect.Value, len(c.Args))
+		for i, arg := range c.Args {
+			args[i] = vm.ReturnsEval(arg)
+		}
+
+		vm.callStack.push(fr)
 		vals := f.Call(args)
 
 		// replace with returns
@@ -38,9 +40,8 @@ func (c CallExpr) Eval(vm *VM) reflect.Value {
 		fr.env = vm.env.subEnv()
 		vm.callStack.push(fr)
 
-		return lf.Body.Eval(vm)
+		lf.Body.Eval(vm)
 	}
-	return reflect.Value{}
 }
 
 func (c CallExpr) Assign(env *Env, value reflect.Value) {}

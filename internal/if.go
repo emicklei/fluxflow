@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"go/ast"
-	"reflect"
 )
 
 type IfStmt struct {
@@ -20,13 +19,14 @@ func (i *IfStmt) String() string {
 	return fmt.Sprintf("IfStmt(%v, %v, %v, %v)", i.Init, i.Cond, i.Body, i.Else)
 }
 
-func (i *IfStmt) Eval(vm *VM) reflect.Value {
-	rv := i.Cond.Eval(vm)
+func (i *IfStmt) Eval(vm *VM) {
+	rv := vm.ReturnsEval(i.Cond)
 	if rv.Bool() {
-		return i.Body.Eval(vm)
+		i.Body.Eval(vm)
+		return
 	}
 	if i.Else != nil {
-		return i.Else.Eval(vm)
+		i.Else.Eval(vm)
+		return
 	}
-	return reflect.Value{}
 }

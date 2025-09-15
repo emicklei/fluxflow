@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"go/ast"
-	"reflect"
 )
 
 type BlockStmt struct {
@@ -17,9 +16,8 @@ func (b *BlockStmt) String() string {
 	return fmt.Sprintf("BlockStmt(len=%d)", len(b.List))
 }
 
-func (b *BlockStmt) Eval(vm *VM) reflect.Value {
+func (b *BlockStmt) Eval(vm *VM) {
 	for _, stmt := range b.List {
 		stmt.stmtStep().Eval(vm)
 	}
-	return reflect.Value{}
 }

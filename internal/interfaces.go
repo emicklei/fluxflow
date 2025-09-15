@@ -3,7 +3,7 @@ package internal
 import "reflect"
 
 type Evaluable interface {
-	Eval(vm *VM) reflect.Value
+	Eval(vm *VM)
 }
 
 type CanAssign interface {
@@ -13,7 +13,7 @@ type CanAssign interface {
 type Statement interface{}
 
 type Expr interface {
-	Eval(vm *VM) reflect.Value
+	Eval(vm *VM)
 }
 
 // All statement nodes implement the Stmt interface.
