@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"go/ast"
 	"os"
+	"reflect"
 )
 
 var _ ast.Visitor = (*builder)(nil)
 
 type builder struct {
 	stack []*step
+	env   *Env
 }
 
 func (b *builder) push(s Evaluable) {
@@ -182,6 +184,8 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		e = b.pop()
 		s.Body = e.(*BlockStmt)
 		b.push(s)
+		// put in scope TODO
+		b.env.set(n.Name.Name, reflect.ValueOf(s))
 	case *ast.GenDecl:
 		// IMPORT, CONST, TYPE, or VAR
 	default:

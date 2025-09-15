@@ -29,7 +29,7 @@ func loadAndRun(t *testing.T, dirPath string) string {
 		t.Fatal("no packages found")
 	}
 
-	b := builder{}
+	b := builder{env: newEnv()}
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
 			for _, decl := range stx.Decls {
@@ -41,6 +41,7 @@ func loadAndRun(t *testing.T, dirPath string) string {
 }
 func runWithBuilder(b builder) string {
 	vm := newVM()
+	vm.env = b.env
 	// builtin
 	vm.env.set("print", reflect.ValueOf(func(args ...any) {
 		params := make([]any, len(args))
@@ -69,5 +70,8 @@ func runWithBuilder(b builder) string {
 	if !main.IsValid() {
 		return "main not found"
 	}
+	// TODO
+	fundecl := main.Interface().(*FuncDecl)
+	fundecl.Body.Eval(vm)
 	return vm.output.String()
 }

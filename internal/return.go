@@ -18,5 +18,6 @@ func (r *ReturnStmt) String() string {
 }
 
 func (r *ReturnStmt) Eval(vm *VM) reflect.Value {
+	// put values on the top stack frame
 	return reflect.Value{}
 }
