@@ -29,4 +29,8 @@ type FuncType struct {
 	Returns    *FieldList
 }
 
+func (t *FuncType) String() string {
+	return fmt.Sprintf("FuncType(%v,%v,%v)", t.TypeParams, t.Params, t.Returns)
+}
+
 func (t *FuncType) Eval(vm *VM) {}

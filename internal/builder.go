@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 	"os"
 	"reflect"
 )
@@ -15,11 +16,13 @@ type builder struct {
 }
 
 func (b *builder) push(s Evaluable) {
-	// if str, ok := s.(fmt.Stringer); ok {
-	// 	fmt.Fprintf(os.Stderr, "%v\n", str.String())
-	// } else {
-	// 	fmt.Fprintf(os.Stderr, "%T\n", s)
-	// }
+	if os.Getenv("STEPS") != "" {
+		if str, ok := s.(fmt.Stringer); ok {
+			fmt.Fprintf(os.Stderr, "%v\n", str.String())
+		} else {
+			fmt.Fprintf(os.Stderr, "%T\n", s)
+		}
+	}
 	step := new(step)
 	step.Evaluable = s
 	if len(b.stack) > 0 {
@@ -30,6 +33,9 @@ func (b *builder) push(s Evaluable) {
 }
 
 func (b *builder) pop() Evaluable {
+	if len(b.stack) == 0 {
+		panic("builder.stack is empty")
+	}
 	top := b.stack[len(b.stack)-1]
 	b.stack = b.stack[0 : len(b.stack)-1]
 	return top.Evaluable
@@ -241,6 +247,18 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.GenDecl:
 		// IMPORT, CONST, TYPE, or VAR
+		switch n.Tok {
+		case token.VAR:
+			for _, each := range n.Specs {
+				b.Visit(each)
+			}
+		}
+	case *ast.DeclStmt:
+		s := &DeclStmt{DeclStmt: n}
+		b.Visit(n.Decl)
+		e := b.pop()
+		s.Decl = e.(Decl)
+		b.push(s)
 	default:
 		fmt.Fprintf(os.Stderr, "unvisited %T\n", n)
 	}

@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"os"
 	"testing"
 )
 
@@ -51,6 +52,14 @@ func TestProgramGeneric(t *testing.T) {
 	loadAndRun(t, "../programs/test_generic")
 }
 func TestProgramTypeAssert(t *testing.T) {
+	out := loadAndRun(t, "../programs/test_builtin_type_convert")
+	if got, want := out, "3"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestProgramNil(t *testing.T) {
 	t.Skip()
-	loadAndRun(t, "../programs/test_typeassert")
+	os.Setenv("STEPS", "1")
+	loadAndRun(t, "../programs/test_nil")
 }

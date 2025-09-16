@@ -44,6 +44,9 @@ func runWithBuilder(b builder) string {
 	vm := newVM()
 	vm.env = b.env
 	// builtin
+	vm.env.set("int32", reflect.ValueOf(func(i int) int32 {
+		return int32(i)
+	}))
 	vm.env.set("true", reflect.ValueOf(true))
 	vm.env.set("false", reflect.ValueOf(false))
 	vm.env.set("print", reflect.ValueOf(func(args ...any) {

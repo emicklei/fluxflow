@@ -56,5 +56,5 @@ func (c CallExpr) Eval(vm *VM) {
 func (c CallExpr) Assign(env *Env, value reflect.Value) {}
 
 func (c CallExpr) String() string {
-	return fmt.Sprintf("CallExpr(%v, %d)", c.Fun, len(c.Args))
+	return fmt.Sprintf("CallExpr(%v, len=%d)", c.Fun, len(c.Args))
 }

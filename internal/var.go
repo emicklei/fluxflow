@@ -5,13 +5,15 @@ import (
 	"reflect"
 )
 
-// For both variable and constant for now
 type Var struct {
 	step
 	spec *ast.ValueSpec
 }
 
+func (v *Var) declStep() Evaluable { return v }
+
 func (v *Var) Assign(env *Env, value reflect.Value) {
+	// TODO value->values?
 	env.set(v.spec.Names[0].Name, value)
 }
 func (v *Var) Eval(vm *VM) {
