@@ -29,8 +29,8 @@ func loadAndRun(t *testing.T, dirPath string) string {
 	if len(pkgs) == 0 {
 		t.Fatal("no packages found")
 	}
-
-	b := builder{env: newEnv()}
+	builtins := &Env{symbolTable: builtinsMap}
+	b := builder{env: builtins}
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
 			for _, decl := range stx.Decls {
@@ -43,12 +43,6 @@ func loadAndRun(t *testing.T, dirPath string) string {
 func runWithBuilder(b builder) string {
 	vm := newVM()
 	vm.env = b.env
-	// builtin
-	vm.env.set("int32", reflect.ValueOf(func(i int) int32 {
-		return int32(i)
-	}))
-	vm.env.set("true", reflect.ValueOf(true))
-	vm.env.set("false", reflect.ValueOf(false))
 	vm.env.set("print", reflect.ValueOf(func(args ...any) {
 		for _, a := range args {
 			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
@@ -62,21 +56,6 @@ func runWithBuilder(b builder) string {
 				}
 			}
 		}
-	}))
-	vm.env.set("println", reflect.ValueOf(func(args ...any) {
-		for _, a := range args {
-			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
-				fmt.Fprintf(vm.output, "%v", rv.Elem())
-			} else {
-				if s, ok := a.(string); ok {
-					io.WriteString(vm.output, s)
-					continue
-				} else {
-					fmt.Fprintf(vm.output, "%v", a)
-				}
-			}
-		}
-		fmt.Fprintln(vm.output)
 	}))
 	main := vm.env.lookUp("main")
 	if !main.IsValid() {
