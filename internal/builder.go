@@ -259,6 +259,18 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		e := b.pop()
 		s.Decl = e.(Decl)
 		b.push(s)
+	case *ast.CompositeLit:
+		s := &CompositeLit{CompositeLit: n}
+		if n.Elts != nil {
+			for _, elt := range n.Elts {
+				b.Visit(elt)
+				e := b.pop()
+				s.Elts = append(s.Elts, e.(Expr))
+			}
+		}
+		b.push(s)
+	case nil:
+		// end of a branch
 	default:
 		fmt.Fprintf(os.Stderr, "unvisited %T\n", n)
 	}

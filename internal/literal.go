@@ -40,3 +40,14 @@ func (s BasicLit) Loc(f *token.File) string {
 func (s BasicLit) String() string {
 	return fmt.Sprintf("BasicLit(%v)", s.Value)
 }
+
+type CompositeLit struct {
+	*ast.CompositeLit
+	Elts []Expr
+}
+
+func (s CompositeLit) Eval(vm *VM) {}
+
+func (s CompositeLit) String() string {
+	return fmt.Sprintf("CompositeLit(%v)", s.Elts)
+}

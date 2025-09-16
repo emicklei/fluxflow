@@ -63,3 +63,8 @@ func TestProgramNil(t *testing.T) {
 	os.Setenv("STEPS", "1")
 	loadAndRun(t, "../programs/test_nil")
 }
+
+func TestProgramAppend(t *testing.T) {
+	os.Setenv("STEPS", "1")
+	loadAndRun(t, "../programs/test_append")
+}
