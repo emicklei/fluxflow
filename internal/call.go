@@ -17,18 +17,13 @@ func (c CallExpr) Eval(vm *VM) {
 	f := vm.ReturnsEval(c.Fun)
 	if f.Kind() == reflect.Func {
 
-		fr := stackFrame{}
-		fr.env = vm.env.subEnv()
-
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
 			args[i] = vm.ReturnsEval(arg)
 		}
-
-		vm.callStack.push(fr)
 		vals := f.Call(args)
 
-		// replace with returns
+		// set return values on top of stack
 		top := vm.callStack.pop()
 		top.returnValues = vals
 		vm.callStack.push(top)
@@ -54,6 +49,7 @@ func (c CallExpr) Eval(vm *VM) {
 			}
 		}
 		lf.Body.Eval(vm)
+		vm.callStack.pop()
 	}
 }
 

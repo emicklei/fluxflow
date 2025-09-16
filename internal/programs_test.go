@@ -18,15 +18,6 @@ func TestProgramMulitAssign(t *testing.T) {
 	}
 }
 
-func TestProgramGeneric(t *testing.T) {
-	t.Skip()
-	loadAndRun(t, "../programs/test_generic")
-}
-func TestProgramTypeAssert(t *testing.T) {
-	t.Skip()
-	loadAndRun(t, "../programs/test_typeassert")
-}
-
 func TestProgramIfElse(t *testing.T) {
 	out := loadAndRun(t, "../programs/test_if_else")
 	if got, want := out, "fluxflow"; got != want {
@@ -49,9 +40,17 @@ func TestProgramFunc(t *testing.T) {
 }
 
 func TestProgramFor(t *testing.T) {
-	t.Skip()
 	out := loadAndRun(t, "../programs/test_for")
 	if got, want := out, "12345678910"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
+}
+
+func TestProgramGeneric(t *testing.T) {
+	t.Skip()
+	loadAndRun(t, "../programs/test_generic")
+}
+func TestProgramTypeAssert(t *testing.T) {
+	t.Skip()
+	loadAndRun(t, "../programs/test_typeassert")
 }
