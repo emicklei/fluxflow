@@ -28,8 +28,11 @@ func (c CallExpr) Eval(vm *VM) {
 		top.returnValues = vals
 		vm.callStack.push(top)
 	}
-	if f.Kind() == reflect.Pointer { // reflect pointer to a funcdecl
-		lf := f.Interface().(*FuncDecl)
+	if f.Kind() == reflect.Struct {
+		lf, ok := f.Interface().(FuncDecl)
+		if !ok {
+			panic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
+		}
 
 		params := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {

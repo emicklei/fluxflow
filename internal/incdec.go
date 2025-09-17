@@ -12,12 +12,12 @@ type IncDecStmt struct {
 	X Expr
 }
 
-func (i *IncDecStmt) stmtStep() Evaluable { return i }
+func (i IncDecStmt) stmtStep() Evaluable { return i }
 
-func (i *IncDecStmt) String() string {
+func (i IncDecStmt) String() string {
 	return fmt.Sprintf("IncDecStmt(%v)", i.X)
 }
-func (i *IncDecStmt) Eval(vm *VM) {
+func (i IncDecStmt) Eval(vm *VM) {
 	current := vm.ReturnsEval(i.X)
 	if i.Tok == token.INC {
 		switch current.Kind() {

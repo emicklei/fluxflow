@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"os"
 	"testing"
 )
 
@@ -83,7 +82,22 @@ func main() {
 		print(i)
 	}
 }`)
-	if got, want := out, "12345678910"; got != want {
+	if got, want := out, "0123456789"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+func TestProgramForScope(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+func main() {
+	j := 1
+	for i := 0; i < 3; i++ {
+		j = i
+		print(i)
+	}
+	print(j)
+}`)
+	if got, want := out, "0122"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
@@ -125,7 +139,7 @@ func main() {
 
 func TestProgramNil(t *testing.T) {
 	t.Skip()
-	os.Setenv("STEPS", "1")
+	printSteps()
 	parseAndRun(t, `package main
 
 func main() {
@@ -137,7 +151,7 @@ func main() {
 
 func TestProgramSlice(t *testing.T) {
 	t.Skip()
-	os.Setenv("STEPS", "1")
+	printSteps()
 	out := parseAndRun(t, `package main
 
 func main() {
@@ -151,7 +165,7 @@ func main() {
 
 func TestProgramAppend(t *testing.T) {
 	t.Skip()
-	os.Setenv("STEPS", "1")
+	printSteps()
 	parseAndRun(t, `package main
 
 func main() {

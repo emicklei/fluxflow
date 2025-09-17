@@ -8,6 +8,7 @@ type Evaluable interface {
 
 type CanAssign interface {
 	Assign(env *Env, value reflect.Value)
+	Define(env *Env, value reflect.Value)
 }
 
 type Statement interface{}

@@ -14,11 +14,11 @@ type FuncDecl struct {
 	Type *FuncType
 }
 
-func (f *FuncDecl) Eval(vm *VM) {
+func (f FuncDecl) Eval(vm *VM) {
 	v := reflect.ValueOf(f)
 	vm.env.set(f.Name.Name, v)
 }
-func (f *FuncDecl) String() string {
+func (f FuncDecl) String() string {
 	return fmt.Sprintf("FuncDecl(%s)", f.Name.Name)
 }
 
@@ -29,8 +29,8 @@ type FuncType struct {
 	Returns    *FieldList
 }
 
-func (t *FuncType) String() string {
+func (t FuncType) String() string {
 	return fmt.Sprintf("FuncType(%v,%v,%v)", t.TypeParams, t.Params, t.Returns)
 }
 
-func (t *FuncType) Eval(vm *VM) {}
+func (t FuncType) Eval(vm *VM) {}

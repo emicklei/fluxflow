@@ -47,6 +47,10 @@ func parseAndRun(t *testing.T, source string) string {
 	return runWithBuilder(b)
 }
 
+func printSteps() {
+	os.Setenv("STEPS", "1")
+}
+
 func loadAndRun(t *testing.T, dirPath string) string {
 	fset := token.NewFileSet()
 
@@ -103,7 +107,7 @@ func runWithBuilder(b builder) string {
 	}
 	// TODO
 	vm.callStack.push(stackFrame{env: vm.env.subEnv()})
-	fundecl := main.Interface().(*FuncDecl)
+	fundecl := main.Interface().(FuncDecl)
 	fundecl.Body.Eval(vm)
 	return vm.output.String()
 }

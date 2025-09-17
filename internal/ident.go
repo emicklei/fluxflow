@@ -22,12 +22,10 @@ func (i Ident) Eval(vm *VM) {
 	vm.Returns(vm.localEnv().lookUp(name))
 }
 func (i Ident) Assign(env *Env, value reflect.Value) {
-	name := i.Name
-	// TODO why?
-	if i.Obj != nil {
-		name = i.Obj.Name
-	}
-	env.set(name, value)
+	env.ownerOf(i.Name).set(i.Name, value)
+}
+func (i Ident) Define(env *Env, value reflect.Value) {
+	env.set(i.Name, value)
 }
 func (i Ident) String() string {
 	if i.Obj == nil {

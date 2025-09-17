@@ -5,7 +5,7 @@ import "reflect"
 type stackFrame struct {
 	returnStep   *step
 	env          *Env
-	localVars    map[string]Var
+	localVars    map[string]ConstOrVar
 	funcArgs     []reflect.Value
 	returnValues []reflect.Value
 }

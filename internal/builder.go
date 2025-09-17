@@ -82,7 +82,8 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.Visit(n.Body)
 		e := b.pop()
-		s.Body = e.(*BlockStmt)
+		blk := e.(BlockStmt)
+		s.Body = &blk
 		b.push(s)
 	case *ast.UnaryExpr:
 		s := &UnaryExpr{UnaryExpr: n}
@@ -91,19 +92,19 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s.X = e.(Expr)
 		b.push(s)
 	case *ast.ValueSpec:
-		s := &Var{spec: n}
+		s := ConstOrVar{spec: n}
 		b.push(s)
 	case *ast.ExprStmt:
-		s := &ExprStmt{ExprStmt: n}
+		s := ExprStmt{ExprStmt: n}
 		b.Visit(n.X)
 		e := b.pop()
 		s.X = e.(Expr)
 		b.push(s)
 	case *ast.Ident:
-		s := &Ident{Ident: n}
+		s := Ident{Ident: n}
 		b.push(s)
 	case *ast.BlockStmt:
-		s := &BlockStmt{BlockStmt: n}
+		s := BlockStmt{BlockStmt: n}
 		for _, stmt := range n.List {
 			b.Visit(stmt)
 			e := b.pop()
@@ -111,7 +112,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.AssignStmt:
-		s := &AssignStmt{AssignStmt: n}
+		s := AssignStmt{AssignStmt: n}
 		for _, l := range n.Lhs {
 			b.Visit(l)
 			e := b.pop()
@@ -125,10 +126,10 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.ImportSpec:
 	case *ast.BasicLit:
-		s := &BasicLit{BasicLit: n}
+		s := BasicLit{BasicLit: n}
 		b.push(s)
 	case *ast.BinaryExpr:
-		s := &BinaryExpr{BinaryExpr: n}
+		s := BinaryExpr{BinaryExpr: n}
 		b.Visit(n.X)
 		e := b.pop()
 		s.X = e.(Expr)
@@ -137,7 +138,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s.Y = e.(Expr)
 		b.push(s)
 	case *ast.CallExpr:
-		s := &CallExpr{CallExpr: n}
+		s := CallExpr{CallExpr: n}
 		b.Visit(n.Fun)
 		e := b.pop()
 		s.Fun = e.(Expr)
@@ -148,19 +149,19 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.SelectorExpr:
-		s := &SelectorExpr{SelectorExpr: n}
+		s := SelectorExpr{SelectorExpr: n}
 		b.Visit(n.X)
 		e := b.pop()
 		s.X = e.(Expr)
 		b.push(s)
 	case *ast.StarExpr:
-		s := &StarExpr{StarExpr: n}
+		s := StarExpr{StarExpr: n}
 		b.Visit(n.X)
 		e := b.pop()
 		s.X = e.(Expr)
 		b.push(s)
 	case *ast.IfStmt:
-		s := &IfStmt{IfStmt: n}
+		s := IfStmt{IfStmt: n}
 		if n.Init != nil {
 			b.Visit(n.Init)
 			e := b.pop()
@@ -171,7 +172,8 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s.Cond = e.(Expr)
 		b.Visit(n.Body)
 		e = b.pop()
-		s.Body = e.(*BlockStmt)
+		blk := e.(BlockStmt)
+		s.Body = &blk
 		if n.Else != nil {
 			b.Visit(n.Else)
 			e = b.pop()
@@ -179,7 +181,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.ReturnStmt:
-		s := &ReturnStmt{ReturnStmt: n}
+		s := ReturnStmt{ReturnStmt: n}
 		for _, r := range n.Results {
 			b.Visit(r)
 			e := b.pop()
@@ -187,28 +189,32 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.FuncDecl:
-		s := &FuncDecl{FuncDecl: n}
+		s := FuncDecl{FuncDecl: n}
 		if n.Recv != nil {
 			b.Visit(n.Recv)
 			e := b.pop()
-			s.Recv = e.(*FieldList)
+			f := e.(FieldList)
+			s.Recv = &f
 		}
 		b.Visit(n.Name)
 		e := b.pop()
-		s.Name = e.(*Ident)
+		i := e.(Ident)
+		s.Name = &i
 
 		b.Visit(n.Type)
 		e = b.pop()
-		s.Type = e.(*FuncType)
+		f := e.(FuncType)
+		s.Type = &f
 
 		b.Visit(n.Body)
 		e = b.pop()
-		s.Body = e.(*BlockStmt)
+		blk := e.(BlockStmt)
+		s.Body = &blk
 		b.push(s)
 		// put in scope TODO
 		b.env.set(n.Name.Name, reflect.ValueOf(s))
 	case *ast.FuncType:
-		s := &FuncType{FuncType: n}
+		s := FuncType{FuncType: n}
 		if n.TypeParams != nil {
 			b.Visit(n.TypeParams)
 			e := b.pop()
@@ -217,28 +223,32 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		if n.Params != nil {
 			b.Visit(n.Params)
 			e := b.pop()
-			s.Params = e.(*FieldList)
+			f := e.(FieldList)
+			s.Params = &f
 		}
 		if n.Results != nil {
 			b.Visit(n.Results)
 			e := b.pop()
-			s.Returns = e.(*FieldList)
+			f := e.(FieldList)
+			s.Returns = &f
 		}
 		b.push(s)
 	case *ast.FieldList:
-		s := &FieldList{FieldList: n}
+		s := FieldList{FieldList: n}
 		for _, field := range n.List {
 			b.Visit(field)
 			e := b.pop()
-			s.List = append(s.List, e.(*Field))
+			f := e.(Field)
+			s.List = append(s.List, &f)
 		}
 		b.push(s)
 	case *ast.Field:
-		s := &Field{Field: n}
+		s := Field{Field: n}
 		for _, name := range n.Names {
 			b.Visit(name)
 			e := b.pop()
-			s.Names = append(s.Names, e.(*Ident))
+			i := e.(Ident)
+			s.Names = append(s.Names, &i)
 		}
 		b.Visit(n.Type)
 		e := b.pop()
@@ -254,13 +264,13 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			}
 		}
 	case *ast.DeclStmt:
-		s := &DeclStmt{DeclStmt: n}
+		s := DeclStmt{DeclStmt: n}
 		b.Visit(n.Decl)
 		e := b.pop()
 		s.Decl = e.(Decl)
 		b.push(s)
 	case *ast.CompositeLit:
-		s := &CompositeLit{CompositeLit: n}
+		s := CompositeLit{CompositeLit: n}
 		if n.Elts != nil {
 			for _, elt := range n.Elts {
 				b.Visit(elt)

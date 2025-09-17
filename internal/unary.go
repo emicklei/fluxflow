@@ -10,10 +10,10 @@ type UnaryExpr struct {
 	X Expr
 }
 
-func (u *UnaryExpr) String() string {
+func (u UnaryExpr) String() string {
 	return fmt.Sprintf("UnaryExpr(%s %s)", u.Op, u.X)
 }
 
-func (u *UnaryExpr) Eval(vm *VM) {
+func (u UnaryExpr) Eval(vm *VM) {
 	u.X.Eval(vm)
 }

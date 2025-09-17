@@ -10,13 +10,13 @@ type BlockStmt struct {
 	List []Stmt
 }
 
-func (b *BlockStmt) stmtStep() Evaluable { return b }
+func (b BlockStmt) stmtStep() Evaluable { return b }
 
-func (b *BlockStmt) String() string {
+func (b BlockStmt) String() string {
 	return fmt.Sprintf("BlockStmt(len=%d)", len(b.List))
 }
 
-func (b *BlockStmt) Eval(vm *VM) {
+func (b BlockStmt) Eval(vm *VM) {
 	for _, stmt := range b.List {
 		stmt.stmtStep().Eval(vm)
 	}

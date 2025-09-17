@@ -11,13 +11,13 @@ type ReturnStmt struct {
 	Results []Expr
 }
 
-func (r *ReturnStmt) stmtStep() Evaluable { return r }
+func (r ReturnStmt) stmtStep() Evaluable { return r }
 
-func (r *ReturnStmt) String() string {
+func (r ReturnStmt) String() string {
 	return fmt.Sprintf("return(len=%d)", len(r.Results))
 }
 
-func (r *ReturnStmt) Eval(vm *VM) {
+func (r ReturnStmt) Eval(vm *VM) {
 	results := make([]reflect.Value, len(r.Results))
 	for i, each := range r.Results {
 		results[i] = vm.ReturnsEval(each)

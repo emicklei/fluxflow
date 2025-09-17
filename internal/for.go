@@ -13,12 +13,12 @@ type ForStmt struct {
 	Body *BlockStmt
 }
 
-func (f *ForStmt) stmtStep() Evaluable { return f }
+func (f ForStmt) stmtStep() Evaluable { return f }
 
-func (f *ForStmt) String() string {
+func (f ForStmt) String() string {
 	return fmt.Sprintf("ForStmt(%v)", f.Cond)
 }
-func (f *ForStmt) Eval(vm *VM) {
+func (f ForStmt) Eval(vm *VM) {
 
 	fr := stackFrame{env: vm.localEnv().subEnv()}
 	vm.callStack.push(fr)
@@ -27,8 +27,8 @@ func (f *ForStmt) Eval(vm *VM) {
 		f.Init.stmtStep().Eval(vm)
 	}
 	for vm.ReturnsEval(f.Cond).Bool() {
-		f.Post.stmtStep().Eval(vm)
 		f.Body.stmtStep().Eval(vm)
+		f.Post.stmtStep().Eval(vm)
 	}
 
 	vm.callStack.pop()
