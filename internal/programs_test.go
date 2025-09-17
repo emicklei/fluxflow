@@ -166,7 +166,7 @@ func main() {
 func TestProgramAppend(t *testing.T) {
 	t.Skip()
 	printSteps()
-	parseAndRun(t, `package main
+	out := parseAndRun(t, `package main
 
 func main() {
 	list := []int{}
@@ -174,4 +174,7 @@ func main() {
 	print(list)
 }
 `)
+	if got, want := out, "[4]"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
 }

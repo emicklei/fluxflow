@@ -271,6 +271,9 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.CompositeLit:
 		s := CompositeLit{CompositeLit: n}
+		b.Visit(n.Type)
+		e := b.pop()
+		s.Type = e.(Expr)
 		if n.Elts != nil {
 			for _, elt := range n.Elts {
 				b.Visit(elt)
@@ -278,6 +281,12 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 				s.Elts = append(s.Elts, e.(Expr))
 			}
 		}
+		b.push(s)
+	case *ast.ArrayType:
+		s := ArrayType{ArrayType: n}
+		b.Visit(n.Elt)
+		e := b.pop()
+		s.Elt = e.(Expr)
 		b.push(s)
 	case nil:
 		// end of a branch

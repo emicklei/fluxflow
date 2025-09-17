@@ -43,11 +43,14 @@ func (s BasicLit) String() string {
 
 type CompositeLit struct {
 	*ast.CompositeLit
+	Type Expr
 	Elts []Expr
 }
 
-func (s CompositeLit) Eval(vm *VM) {}
+func (s CompositeLit) Eval(vm *VM) {
+	vm.ReturnsEval(s.Type)
+}
 
 func (s CompositeLit) String() string {
-	return fmt.Sprintf("CompositeLit(%v)", s.Elts)
+	return fmt.Sprintf("CompositeLit(%v,%v)", s.Type, s.Elts)
 }
