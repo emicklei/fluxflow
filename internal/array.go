@@ -12,11 +12,9 @@ type ArrayType struct {
 }
 
 func (a ArrayType) Eval(vm *VM) {
-	// typeName := a.Elt.(Ident).Name
-	// TODO
-	var i []reflect.Value
-	rt := reflect.TypeOf(i)
-	vm.Returns(reflect.MakeSlice(rt, 0, 0))
+	rt := builtinTypesMap["int"]
+	st := reflect.SliceOf(rt)
+	vm.Returns(reflect.MakeSlice(st, 0, 0))
 }
 
 func (a ArrayType) String() string {

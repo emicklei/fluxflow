@@ -20,6 +20,7 @@ func (c CallExpr) Eval(vm *VM) {
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
 			args[i] = vm.ReturnsEval(arg)
+			fmt.Printf("%d %v %v %T\n", i, arg, args[i], args[i])
 		}
 		vals := f.Call(args)
 
