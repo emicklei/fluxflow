@@ -12,7 +12,22 @@ type CallExpr struct {
 	*ast.CallExpr
 }
 
+func (c CallExpr) evalAppend(vm *VM) {
+	args := make([]reflect.Value, len(c.Args))
+	for i, arg := range c.Args {
+		args[i] = vm.ReturnsEval(arg)
+	}
+	result := reflect.Append(args[0], args[1:]...)
+	vm.Returns(result)
+}
+
 func (c CallExpr) Eval(vm *VM) {
+	if i, ok := c.Fun.(Ident); ok {
+		if i.Name == "append" {
+			c.evalAppend(vm)
+			return
+		}
+	}
 	// function f is either an external or an interpreted one
 	f := vm.ReturnsEval(c.Fun)
 	if f.Kind() == reflect.Func {
@@ -20,7 +35,7 @@ func (c CallExpr) Eval(vm *VM) {
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
 			args[i] = vm.ReturnsEval(arg)
-			fmt.Printf("%d %v %v %T\n", i, arg, args[i], args[i])
+			// fmt.Printf("%d %v %v %T\n", i, arg, args[i], args[i])
 		}
 		vals := f.Call(args)
 

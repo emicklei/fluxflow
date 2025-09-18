@@ -90,7 +90,7 @@ func runWithBuilder(b builder) string {
 	vm.env.set("print", reflect.ValueOf(func(args ...any) {
 		for _, a := range args {
 			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
-				fmt.Fprintf(vm.output, "%v", rv.Elem())
+				fmt.Fprintf(vm.output, "%v", rv.Interface())
 			} else {
 				if s, ok := a.(string); ok {
 					io.WriteString(vm.output, s)
