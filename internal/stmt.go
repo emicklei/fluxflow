@@ -27,12 +27,14 @@ type DeclStmt struct {
 
 func (s DeclStmt) stmtStep() Evaluable { return s }
 
-func (s DeclStmt) Eval(vm *VM) {}
+func (s DeclStmt) Eval(vm *VM) {
+	s.Decl.declStep().Declare(vm.env)
+}
 
 func (s DeclStmt) String() string {
 	return fmt.Sprintf("DeclStmt(%v)", s.Decl)
 }
 
 type Decl interface {
-	declStep() Evaluable
+	declStep() CanDeclare
 }

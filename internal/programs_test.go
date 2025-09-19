@@ -178,16 +178,18 @@ func main() {
 	}
 }
 
-func TestProgramNil(t *testing.T) {
-	t.Skip()
+func TestProgramDeclare(t *testing.T) {
 	printSteps()
-	parseAndRun(t, `package main
+	out := parseAndRun(t, `package main
 
 func main() {
-	var s *string = nil
+	var s string
 	print(s)
 }
 `)
+	if got, want := out, ""; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
 }
 
 func TestProgramSlice(t *testing.T) {

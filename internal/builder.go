@@ -93,6 +93,14 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.ValueSpec:
 		s := ConstOrVar{spec: n}
+		b.Visit(n.Type)
+		e := b.pop()
+		s.Type = e.(Expr)
+		for _, each := range n.Values {
+			b.Visit(each)
+			e = b.pop()
+			s.Values = append(s.Values, e.(Expr))
+		}
 		b.push(s)
 	case *ast.ExprStmt:
 		s := ExprStmt{ExprStmt: n}

@@ -35,7 +35,7 @@ func parseAndRun(t *testing.T, source string) string {
 	if len(pkgs) == 0 {
 		t.Fatal("no packages found")
 	}
-	builtins := &Env{symbolTable: builtinsMap}
+	builtins := &Env{valueTable: builtinsMap}
 	b := builder{env: builtins}
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
@@ -73,7 +73,7 @@ func loadAndRun(t *testing.T, dirPath string) string {
 	if len(pkgs) == 0 {
 		t.Fatal("no packages found")
 	}
-	builtins := &Env{symbolTable: builtinsMap}
+	builtins := &Env{valueTable: builtinsMap}
 	b := builder{env: builtins}
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
@@ -101,7 +101,7 @@ func runWithBuilder(b builder) string {
 			}
 		}
 	}))
-	main := vm.env.lookUp("main")
+	main := vm.env.valueLookUp("main")
 	if !main.IsValid() {
 		return "main not found"
 	}
