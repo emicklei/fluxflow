@@ -18,21 +18,18 @@ func (s BasicLit) Eval(vm *VM) {
 	case token.INT:
 		i, _ := strconv.Atoi(s.Value)
 		vm.Returns(reflect.ValueOf(i))
-		return
 	case token.STRING:
 		unq := strings.Trim(s.Value, "`\"")
 		vm.Returns(reflect.ValueOf(unq))
-		return
 	case token.FLOAT:
 		f, _ := strconv.ParseFloat(s.Value, 64)
 		vm.Returns(reflect.ValueOf(f))
-		return
 	case token.CHAR:
 		// a character literal is a rune, which is an alias for int32
 		vm.Returns(reflect.ValueOf(s.Value))
-		return
+	default:
+		panic("not implemented: BasicList.Eval:" + s.Kind.String())
 	}
-	panic("not implemented: BasicList.Eval:" + s.Kind.String())
 }
 func (s BasicLit) Loc(f *token.File) string {
 	return fmt.Sprintf("%v:BasicLit(%v)", f.Position(s.Pos()), s.Value)
@@ -48,7 +45,17 @@ type CompositeLit struct {
 }
 
 func (s CompositeLit) Eval(vm *VM) {
-	vm.ReturnsEval(s.Type)
+	if c, ok := s.Type.(CanCompose); ok {
+		composite := vm.ReturnsEval(s.Type)
+		values := make([]reflect.Value, len(s.Elts))
+		for i, elt := range s.Elts {
+			values[i] = vm.ReturnsEval(elt)
+		}
+		result := c.LiteralCompose(composite, values...)
+		vm.Returns(result)
+		return
+	}
+	panic("not implemented: CompositeLit.Eval for " + fmt.Sprintf("%T", s.Type))
 }
 
 func (s CompositeLit) String() string {

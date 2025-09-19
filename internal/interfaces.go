@@ -21,3 +21,7 @@ type Expr interface {
 type Stmt interface {
 	stmtStep() Evaluable
 }
+
+type CanCompose interface {
+	LiteralCompose(composite reflect.Value, values ...reflect.Value) reflect.Value
+}
