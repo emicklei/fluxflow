@@ -24,10 +24,18 @@ func (v ConstOrVar) Define(env *Env, value reflect.Value) {
 	// TODO value->values?
 	env.set(v.spec.Names[0].Name, value)
 }
-func (v ConstOrVar) Declare(env *Env) {
-	// TODO value->values?
+func (v ConstOrVar) Declare(vm *VM) {
+	if len(v.Values) > 0 {
+		for i, val := range v.Values {
+			vm.env.set(v.spec.Names[i].Name, vm.ReturnsEval(val))
+		}
+		return
+	}
 	if z, ok := v.Type.(HasZeroValue); ok {
-		env.set(v.spec.Names[0].Name, z.ZeroValue(env))
+		zv := z.ZeroValue(vm.env)
+		for _, name := range v.spec.Names {
+			vm.env.set(name.Name, zv)
+		}
 	}
 }
 

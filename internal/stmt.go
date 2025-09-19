@@ -28,7 +28,7 @@ type DeclStmt struct {
 func (s DeclStmt) stmtStep() Evaluable { return s }
 
 func (s DeclStmt) Eval(vm *VM) {
-	s.Decl.declStep().Declare(vm.env)
+	s.Decl.declStep().Declare(vm)
 }
 
 func (s DeclStmt) String() string {

@@ -155,7 +155,7 @@ func main() {
 **/
 `)
 }
-func TestProgramTypeAssert(t *testing.T) {
+func TestProgramTypeConvert(t *testing.T) {
 	tests := []struct {
 		typeName string
 	}{
@@ -192,6 +192,19 @@ func main() {
 	}
 }
 
+func TestProgramDeclareAndInit(t *testing.T) {
+	printSteps()
+	out := parseAndRun(t, `package main
+
+func main() {
+	var s string = "fluxflow"
+	print(s)
+}
+`)
+	if got, want := out, "fluxflow"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
 func TestProgramSlice(t *testing.T) {
 	out := parseAndRun(t, `package main
 

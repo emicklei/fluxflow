@@ -16,7 +16,7 @@ type CanDefine interface {
 }
 
 type CanDeclare interface {
-	Declare(env *Env)
+	Declare(vm *VM)
 }
 
 type Statement interface{}
