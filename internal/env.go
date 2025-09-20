@@ -2,13 +2,24 @@ package internal
 
 import "reflect"
 
+// used?
+type environment interface {
+	valueLookUp(name string) reflect.Value
+	typeLookUp(name string) reflect.Type
+	valueOwnerOf(name string) environment
+	set(name string, value reflect.Value)
+}
+
 type Env struct {
 	parent     *Env
 	valueTable map[string]reflect.Value
+	pkgTable   map[string]ImportSpec
 }
 
 func newEnv() *Env {
-	return &Env{valueTable: map[string]reflect.Value{}}
+	return &Env{
+		valueTable: map[string]reflect.Value{},
+		pkgTable:   map[string]ImportSpec{}}
 }
 func (e *Env) subEnv() *Env {
 	child := newEnv()

@@ -5,6 +5,11 @@ import (
 	"testing"
 )
 
+func TestProgramEverything(t *testing.T) {
+	t.Skip()
+	t.Log(loadAndRun(t, "../programs"))
+}
+
 func TestProgramPrint(t *testing.T) {
 	out := parseAndRun(t, `package main
 
@@ -66,6 +71,18 @@ func main() {
 	print('e')
 }`)
 	if got, want := out, "'e'"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestProgramNumbers(t *testing.T) {
+	printSteps()
+	out := parseAndRun(t, `package main
+
+func main() {
+	print(-1,+3.14,0.1e10)
+}`)
+	if got, want := out, "-13.141e+09"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
@@ -179,7 +196,6 @@ func main() {
 }
 
 func TestProgramDeclare(t *testing.T) {
-	printSteps()
 	out := parseAndRun(t, `package main
 
 func main() {
@@ -193,7 +209,6 @@ func main() {
 }
 
 func TestProgramDeclareAndInit(t *testing.T) {
-	printSteps()
 	out := parseAndRun(t, `package main
 
 func main() {
@@ -228,6 +243,35 @@ func main() {
 }
 `)
 	if got, want := out, "[][4 5]"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestTimeConstant(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+import "time"
+
+func main() {
+	r := time.RFC1123
+	print(r)
+}
+`)
+	if got, want := out, "Mon, 02 Jan 2006 15:04:05 MST"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+func TestTimeAliasConstant(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+import t "time"
+
+func main() {
+	r := t.RFC1123
+	print(r)
+}
+`)
+	if got, want := out, "Mon, 02 Jan 2006 15:04:05 MST"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }

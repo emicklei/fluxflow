@@ -35,7 +35,14 @@ type BinaryExprValue struct {
 
 func (b BinaryExprValue) Eval() reflect.Value {
 	switch b.left.Kind() {
-	case reflect.Int, reflect.Int64:
+	case reflect.Int:
+		res := b.IntEval(b.left.Int())
+		if res.CanInt() {
+			return reflect.ValueOf(int(res.Int()))
+		} else {
+			return res
+		}
+	case reflect.Int64:
 		return b.IntEval(b.left.Int())
 	case reflect.Float64:
 		return b.FloatEval(b.left.Float())

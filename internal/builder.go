@@ -5,7 +5,9 @@ import (
 	"go/ast"
 	"go/token"
 	"os"
+	"path"
 	"reflect"
+	"strconv"
 )
 
 var _ ast.Visitor = (*builder)(nil)
@@ -39,19 +41,6 @@ func (b *builder) pop() Evaluable {
 	top := b.stack[len(b.stack)-1]
 	b.stack = b.stack[0 : len(b.stack)-1]
 	return top.Evaluable
-}
-
-func (b *builder) last() *step {
-	if len(b.stack) == 0 {
-		return nil
-	}
-	return b.stack[len(b.stack)-1]
-}
-func (b *builder) first() *step {
-	if len(b.stack) == 0 {
-		return nil
-	}
-	return b.stack[0]
 }
 
 // Visit implements the ast.Visitor interface
@@ -133,6 +122,15 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.ImportSpec:
+		unq, _ := strconv.Unquote(n.Path.Value)
+		p := Package{Path: unq}
+		if n.Name != nil {
+			p.Name = n.Name.Name
+		} else {
+			// derive name from path
+			p.Name = path.Base(unq)
+		}
+		b.env.set(p.Name, reflect.ValueOf(p))
 	case *ast.BasicLit:
 		s := BasicLit{BasicLit: n}
 		b.push(s)
@@ -267,6 +265,10 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		// IMPORT, CONST, TYPE, or VAR
 		switch n.Tok {
 		case token.VAR:
+			for _, each := range n.Specs {
+				b.Visit(each)
+			}
+		case token.IMPORT:
 			for _, each := range n.Specs {
 				b.Visit(each)
 			}

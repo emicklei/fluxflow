@@ -7,19 +7,18 @@ import (
 )
 
 type SelectorExpr struct {
-	step
-	X Expr
 	*ast.SelectorExpr
+	X Expr
 }
 
-// return a function?
 func (s SelectorExpr) Eval(vm *VM) {
-	/**
-	look up X
-	apply selector Sel
-	**/
-	s.X.Eval(vm)
-	// obj.Select(s.SelectorExpr.Sel.Name)
+	recv := vm.ReturnsEval(s.X)
+	rec, ok := recv.Interface().(FieldSelectable)
+	if ok {
+		sel := rec.Select(s.Sel.Name)
+		vm.Returns(sel)
+		return
+	}
 }
 
 func (s SelectorExpr) Assign(env *Env, value reflect.Value) {

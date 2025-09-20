@@ -239,3 +239,24 @@ type mockExpr struct {
 func (m *mockExpr) Eval(vm *VM) {
 }
 func (m *mockExpr) String() string { return "mock" }
+
+func TestBinaryExprValue_IntOpInt(t *testing.T) {
+	bv := BinaryExprValue{
+		op:    token.ADD,
+		left:  reflect.ValueOf(int(1)),
+		right: reflect.ValueOf(int(2)),
+	}
+	br := bv.Eval()
+	if got, want := br.Kind(), reflect.Int; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+	bv = BinaryExprValue{
+		op:    token.ADD,
+		left:  reflect.ValueOf(int64(1)),
+		right: reflect.ValueOf(int64(2)),
+	}
+	br = bv.Eval()
+	if got, want := br.Kind(), reflect.Int64; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}

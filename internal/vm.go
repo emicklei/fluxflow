@@ -6,10 +6,10 @@ import (
 )
 
 type VM struct {
-	expressionValue reflect.Value
-	callStack       stack
-	env             *Env // global or package level?
-	output          *bytes.Buffer
+	lastOperand reflect.Value
+	callStack   stack
+	env         *Env // global or package level?
+	output      *bytes.Buffer
 }
 
 func newVM() *VM {
@@ -23,8 +23,8 @@ func (vm *VM) localEnv() *Env {
 // ReturnsEval evaluates the argument and returns its return value.
 func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
 	e.Eval(vm)
-	return vm.expressionValue
+	return vm.lastOperand
 }
 func (vm *VM) Returns(v reflect.Value) {
-	vm.expressionValue = v
+	vm.lastOperand = v
 }

@@ -3,6 +3,8 @@ package internal
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
+	"reflect"
 )
 
 type UnaryExpr struct {
@@ -15,5 +17,17 @@ func (u UnaryExpr) String() string {
 }
 
 func (u UnaryExpr) Eval(vm *VM) {
-	u.X.Eval(vm)
+	v := vm.ReturnsEval(u.X)
+	switch v.Kind() {
+	case reflect.Int:
+		switch u.Op {
+		case token.SUB:
+			vm.Returns(reflect.ValueOf(int(-v.Int())))
+		}
+	case reflect.Int64:
+		switch u.Op {
+		case token.SUB:
+			vm.Returns(reflect.ValueOf(-v.Int()))
+		}
+	}
 }

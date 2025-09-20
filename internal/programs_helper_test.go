@@ -35,7 +35,7 @@ func parseAndRun(t *testing.T, source string) string {
 	if len(pkgs) == 0 {
 		t.Fatal("no packages found")
 	}
-	builtins := &Env{valueTable: builtinsMap}
+	builtins := &Env{valueTable: builtinsMap, pkgTable: map[string]ImportSpec{}}
 	b := builder{env: builtins}
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
@@ -58,9 +58,6 @@ func loadAndRun(t *testing.T, dirPath string) string {
 		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles,
 		Fset: fset,
 		Dir:  dirPath,
-		Overlay: map[string][]byte{
-			"/Users/ernestmicklei/Projects/fluxflow/programs/test_print/main.go": []byte(`package main`),
-		},
 	}
 	pkgs, err := packages.Load(cfg, ".")
 	if err != nil {
