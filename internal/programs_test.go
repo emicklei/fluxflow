@@ -6,7 +6,6 @@ import (
 )
 
 func TestProgramEverything(t *testing.T) {
-	t.Skip()
 	t.Log(loadAndRun(t, "../programs"))
 }
 
