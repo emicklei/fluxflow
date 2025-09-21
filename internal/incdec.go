@@ -21,9 +21,21 @@ func (i IncDecStmt) Eval(vm *VM) {
 	current := vm.ReturnsEval(i.X)
 	if i.Tok == token.INC {
 		switch current.Kind() {
-		case reflect.Int, reflect.Int64:
+		case reflect.Int:
 			if a, ok := i.X.(CanAssign); ok {
-				a.Assign(vm.localEnv(), reflect.ValueOf(current.Int()+1))
+				a.Assign(vm.localEnv(), reflect.ValueOf(int(current.Int()+1)))
+			}
+		case reflect.Int32:
+			if a, ok := i.X.(CanAssign); ok {
+				a.Assign(vm.localEnv(), reflect.ValueOf(int32(current.Int()+1)))
+			}
+		case reflect.Int64:
+			if a, ok := i.X.(CanAssign); ok {
+				a.Assign(vm.localEnv(), reflect.ValueOf(int64(current.Int()+1)))
+			}
+		case reflect.Float32:
+			if a, ok := i.X.(CanAssign); ok {
+				a.Assign(vm.localEnv(), reflect.ValueOf(float32(current.Float()+1)))
 			}
 		case reflect.Float64:
 			if a, ok := i.X.(CanAssign); ok {
@@ -34,13 +46,25 @@ func (i IncDecStmt) Eval(vm *VM) {
 		}
 	} else { // DEC
 		switch current.Kind() {
-		case reflect.Int, reflect.Int64:
+		case reflect.Int:
+			if a, ok := i.X.(CanAssign); ok {
+				a.Assign(vm.localEnv(), reflect.ValueOf(int(current.Int()-1)))
+			}
+		case reflect.Int32:
+			if a, ok := i.X.(CanAssign); ok {
+				a.Assign(vm.localEnv(), reflect.ValueOf(int32(current.Int()-1)))
+			}
+		case reflect.Int64:
 			if a, ok := i.X.(CanAssign); ok {
 				a.Assign(vm.localEnv(), reflect.ValueOf(current.Int()-1))
 			}
 		case reflect.Float64:
 			if a, ok := i.X.(CanAssign); ok {
 				a.Assign(vm.localEnv(), reflect.ValueOf(current.Float()-1))
+			}
+		case reflect.Float32:
+			if a, ok := i.X.(CanAssign); ok {
+				a.Assign(vm.localEnv(), reflect.ValueOf(float32(current.Float()-1)))
 			}
 		default:
 			panic("unsupported type for -- :" + current.Kind().String())
