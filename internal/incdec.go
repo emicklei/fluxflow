@@ -26,18 +26,18 @@ func (i IncDecStmt) Eval(vm *VM) {
 				a.Assign(vm.localEnv(), reflect.ValueOf(current.Int()+1))
 			}
 		case reflect.Float64:
-			current.SetFloat(current.Float() + 1)
 		default:
 			panic("unsupported type for ++: " + current.Kind().String())
 		}
 	} else { // DEC
 		switch current.Kind() {
-		case reflect.Int:
-			current.SetInt(current.Int() - 1)
+		case reflect.Int, reflect.Int64:
+			if a, ok := i.X.(CanAssign); ok {
+				a.Assign(vm.localEnv(), reflect.ValueOf(current.Int()-1))
+			}
 		case reflect.Float64:
-			current.SetFloat(current.Float() - 1)
 		default:
-			panic("unsupported type for --: " + current.Kind().String())
+			panic("unsupported type for -- :" + current.Kind().String())
 		}
 	}
 }

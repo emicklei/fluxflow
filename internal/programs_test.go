@@ -128,8 +128,11 @@ func main() {
 	for i := 0; i < 10; i++ {
 		print(i)
 	}
+	for i := 9; i > 0; i-- {
+		print(i)
+	}		
 }`)
-	if got, want := out, "0123456789"; got != want {
+	if got, want := out, "0123456789987654321"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
@@ -272,6 +275,19 @@ func main() {
 }
 `)
 	if got, want := out, "Mon, 02 Jan 2006 15:04:05 MST"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestFloats(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+func main() {
+	f32, f64 := float32(3.14), 3.14
+	print(f32," ",f64)
+}
+`)
+	if got, want := out, "3.14 3.14"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
