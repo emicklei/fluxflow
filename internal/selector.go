@@ -26,7 +26,7 @@ func (s SelectorExpr) Eval(vm *VM) {
 }
 
 func (s SelectorExpr) Assign(env *Env, value reflect.Value) {
-	println("not implemented: SelectorExpr:Assign")
+	panic("not implemented: SelectorExpr:Assign")
 	//env.set(i.Obj.Name, value)
 }
 

@@ -25,6 +25,10 @@ func (s TypeSpec) Eval(vm *VM) {
 	vm.localEnv().set(s.Name.Name, actualType) // use the spec itself as value
 }
 
+func (s TypeSpec) LiteralCompose(comp reflect.Value, vals reflect.Value) reflect.Value {
+	return reflect.Value{}
+}
+
 type StructType struct {
 	*ast.StructType
 	Fields *FieldList
@@ -36,4 +40,9 @@ func (s StructType) String() string {
 
 func (s StructType) Eval(vm *VM) {
 	vm.Returns(reflect.ValueOf(s))
+}
+
+// first for struct
+type Instance struct {
+	Type StructType
 }

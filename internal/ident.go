@@ -39,7 +39,11 @@ func (i Ident) String() string {
 	return fmt.Sprintf("Ident(%v)", i.Obj.Name)
 }
 
-// The identifier refers to a composeable type
-func (i Ident) LiteralCompose(composite reflect.Value, values ...reflect.Value) reflect.Value {
-	return reflect.Value{}
+func (i Ident) LiteralCompose(compositeType reflect.Value, values ...reflect.Value) reflect.Value {
+	// Temporary
+	actual := compositeType.Interface()
+	if composer, ok := actual.(CanCompose); ok {
+		return composer.LiteralCompose(compositeType, values...)
+	}
+	panic("expected a CanCompose value:" + fmt.Sprintf("%v", actual))
 }

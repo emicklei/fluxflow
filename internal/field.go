@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"go/ast"
+	"strings"
 )
 
 type Field struct {
@@ -22,6 +23,12 @@ type FieldList struct {
 }
 
 func (l FieldList) String() string {
-	return fmt.Sprintf("FieldList(%v)", l.List)
+	names := []string{}
+	for _, each := range l.List {
+		for _, other := range each.Names {
+			names = append(names, other.Name)
+		}
+	}
+	return fmt.Sprintf("FieldList(%s)", strings.Join(names, ","))
 }
 func (l FieldList) Eval(vm *VM) {}
