@@ -272,6 +272,10 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			for _, each := range n.Specs {
 				b.Visit(each)
 			}
+		case token.TYPE:
+			for _, each := range n.Specs {
+				b.Visit(each)
+			}
 		}
 	case *ast.DeclStmt:
 		s := DeclStmt{DeclStmt: n}
@@ -306,6 +310,33 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.Visit(n.Value)
 		e = b.pop()
 		s.Value = e.(Expr)
+		b.push(s)
+	case *ast.TypeSpec:
+		s := TypeSpec{TypeSpec: n}
+		if n.Name != nil {
+			b.Visit(n.Name)
+			e := b.pop().(Ident)
+			s.Name = &e
+		}
+		if n.TypeParams != nil {
+			b.Visit(n.TypeParams)
+			e := b.pop().(FieldList)
+			s.TypeParams = &e
+		}
+		b.Visit(n.Type)
+		e := b.pop().(Expr)
+		s.Type = e
+		// b.push(s) ??
+		if s.Name != nil {
+			b.env.set(s.Name.Name, reflect.ValueOf(s))
+		}
+	case *ast.StructType:
+		s := StructType{StructType: n}
+		if n.Fields != nil {
+			b.Visit(n.Fields)
+			e := b.pop().(FieldList)
+			s.Fields = &e
+		}
 		b.push(s)
 	case nil:
 		// end of a branch

@@ -38,3 +38,8 @@ func (i Ident) String() string {
 	}
 	return fmt.Sprintf("Ident(%v)", i.Obj.Name)
 }
+
+// The identifier refers to a composeable type
+func (i Ident) LiteralCompose(composite reflect.Value, values ...reflect.Value) reflect.Value {
+	return reflect.Value{}
+}
