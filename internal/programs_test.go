@@ -290,3 +290,18 @@ func main() {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
+
+func TestNewType(t *testing.T) {
+	printSteps()
+	parseAndRun(t, `package main
+
+type Airplane struct {
+	Kind string
+}
+
+func main() {
+	heli := Airplane{Kind:"helicopter"}
+	print(heli.Kind)
+}
+`)
+}

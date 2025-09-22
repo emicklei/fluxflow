@@ -298,6 +298,15 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		e := b.pop()
 		s.Elt = e.(Expr)
 		b.push(s)
+	case *ast.KeyValueExpr:
+		s := KeyValueExpr{KeyValueExpr: n}
+		b.Visit(n.Key)
+		e := b.pop()
+		s.Key = e.(Expr)
+		b.Visit(n.Value)
+		e = b.pop()
+		s.Value = e.(Expr)
+		b.push(s)
 	case nil:
 		// end of a branch
 	default:
