@@ -332,10 +332,11 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.Visit(n.Type)
 		e := b.pop().(Expr)
 		s.Type = e
-		// b.push(s) ??
-		if s.Name != nil {
-			b.envSet(s.Name.Name, reflect.ValueOf(s))
-		}
+		b.push(s)
+		// if s.Name != nil {
+		// 	b.envSet(s.Name.Name, reflect.ValueOf(s))
+		// }
+		// e.Eval()
 	case *ast.StructType:
 		s := StructType{StructType: n}
 		if n.Fields != nil {

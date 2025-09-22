@@ -42,6 +42,10 @@ func (s StructType) Eval(vm *VM) {
 	vm.Returns(reflect.ValueOf(s))
 }
 
+func (s StructType) LiteralCompose(comp reflect.Value, vals reflect.Value) reflect.Value {
+	return reflect.Value{}
+}
+
 // first for struct
 type Instance struct {
 	Type StructType
