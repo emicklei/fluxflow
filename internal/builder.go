@@ -43,6 +43,13 @@ func (b *builder) pop() Evaluable {
 	return top.Evaluable
 }
 
+func (b *builder) envSet(name string, value reflect.Value) {
+	if os.Getenv("STEPS") != "" {
+		fmt.Fprintf(os.Stderr, "%s -> %v\n", name, value)
+	}
+	b.env.set(name, value)
+}
+
 // Visit implements the ast.Visitor interface
 func (b *builder) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
@@ -130,7 +137,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			// derive name from path
 			p.Name = path.Base(unq)
 		}
-		b.env.set(p.Name, reflect.ValueOf(p))
+		b.envSet(p.Name, reflect.ValueOf(p))
 	case *ast.BasicLit:
 		s := BasicLit{BasicLit: n}
 		b.push(s)
@@ -216,9 +223,8 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		e = b.pop()
 		blk := e.(BlockStmt)
 		s.Body = &blk
-		b.push(s)
-		// put in scope TODO
-		b.env.set(n.Name.Name, reflect.ValueOf(s))
+		b.push(s) // ??
+		b.envSet(n.Name.Name, reflect.ValueOf(s))
 	case *ast.FuncType:
 		s := FuncType{FuncType: n}
 		if n.TypeParams != nil {
@@ -272,6 +278,10 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			for _, each := range n.Specs {
 				b.Visit(each)
 			}
+		case token.TYPE:
+			for _, each := range n.Specs {
+				b.Visit(each)
+			}
 		}
 	case *ast.DeclStmt:
 		s := DeclStmt{DeclStmt: n}
@@ -302,6 +312,43 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.Visit(n.Elt)
 		e := b.pop()
 		s.Elt = e.(Expr)
+		b.push(s)
+	case *ast.KeyValueExpr:
+		s := KeyValueExpr{KeyValueExpr: n}
+		b.Visit(n.Key)
+		e := b.pop()
+		s.Key = e.(Expr)
+		b.Visit(n.Value)
+		e = b.pop()
+		s.Value = e.(Expr)
+		b.push(s)
+	case *ast.TypeSpec:
+		s := TypeSpec{TypeSpec: n}
+		if n.Name != nil {
+			b.Visit(n.Name)
+			e := b.pop().(Ident)
+			s.Name = &e
+		}
+		if n.TypeParams != nil {
+			b.Visit(n.TypeParams)
+			e := b.pop().(FieldList)
+			s.TypeParams = &e
+		}
+		b.Visit(n.Type)
+		e := b.pop().(Expr)
+		s.Type = e
+		b.push(s)
+		// if s.Name != nil {
+		// 	b.envSet(s.Name.Name, reflect.ValueOf(s))
+		// }
+		// e.Eval()
+	case *ast.StructType:
+		s := StructType{StructType: n}
+		if n.Fields != nil {
+			b.Visit(n.Fields)
+			e := b.pop().(FieldList)
+			s.Fields = &e
+		}
 		b.push(s)
 	case nil:
 		// end of a branch

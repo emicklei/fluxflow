@@ -13,15 +13,20 @@ type SelectorExpr struct {
 
 func (s SelectorExpr) Eval(vm *VM) {
 	recv := vm.ReturnsEval(s.X)
+	if !recv.IsValid() {
+		panic("not a valid receiver")
+	}
 	rec, ok := recv.Interface().(FieldSelectable)
 	if ok {
 		sel := rec.Select(s.Sel.Name)
 		vm.Returns(sel)
 		return
 	}
+	panic("not implemented: not FieldSelectable" + recv.String())
 }
 
 func (s SelectorExpr) Assign(env *Env, value reflect.Value) {
+	panic("not implemented: SelectorExpr:Assign")
 	//env.set(i.Obj.Name, value)
 }
 

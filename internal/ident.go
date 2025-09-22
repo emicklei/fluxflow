@@ -38,3 +38,12 @@ func (i Ident) String() string {
 	}
 	return fmt.Sprintf("Ident(%v)", i.Obj.Name)
 }
+
+func (i Ident) LiteralCompose(compositeType reflect.Value, values ...reflect.Value) reflect.Value {
+	// Temporary
+	actual := compositeType.Interface()
+	if composer, ok := actual.(CanCompose); ok {
+		return composer.LiteralCompose(compositeType, values...)
+	}
+	panic("expected a CanCompose value:" + fmt.Sprintf("%v", actual))
+}
