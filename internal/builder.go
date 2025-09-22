@@ -294,6 +294,11 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.ArrayType:
 		s := ArrayType{ArrayType: n}
+		if n.Len != nil {
+			b.Visit(n.Len)
+			e := b.pop()
+			s.Len = e.(Expr)
+		}
 		b.Visit(n.Elt)
 		e := b.pop()
 		s.Elt = e.(Expr)
