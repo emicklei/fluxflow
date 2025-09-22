@@ -68,10 +68,14 @@ func (c CallExpr) Eval(vm *VM) {
 			}
 		}
 		lf.Body.Eval(vm)
-		vm.callStack.pop()
+		top := vm.callStack.pop()
+		for _, each := range top.returnValues {
+			vm.Returns(each)
+		}
 	}
 }
 
+// used?
 func (c CallExpr) Assign(env *Env, value reflect.Value) {}
 
 func (c CallExpr) String() string {

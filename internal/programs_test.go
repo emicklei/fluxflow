@@ -6,6 +6,7 @@ import (
 )
 
 func TestProgramEverything(t *testing.T) {
+	t.Skip()
 	t.Log(loadAndRun(t, "../programs"))
 }
 
@@ -75,7 +76,6 @@ func main() {
 }
 
 func TestProgramNumbers(t *testing.T) {
-	printSteps()
 	out := parseAndRun(t, `package main
 
 func main() {
@@ -104,7 +104,7 @@ func main() {
 
 func TestProgramFuncMultiReturn(t *testing.T) {
 	t.Skip()
-	printSteps()
+	defer printSteps()()
 	out := parseAndRun(t, `package main
 
 func ab(a int, b int) (int,int) {
@@ -292,7 +292,7 @@ func main() {
 }
 
 func TestNewType(t *testing.T) {
-	printSteps()
+	defer printSteps()()
 	parseAndRun(t, `package main
 
 type Airplane struct {

@@ -35,9 +35,13 @@ type Stmt interface {
 }
 
 type CanCompose interface {
-	LiteralCompose(composite reflect.Value, values ...reflect.Value) reflect.Value
+	LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value
 }
 
 type FieldSelectable interface {
 	Select(name string) reflect.Value
+}
+
+type CanInstantiate interface {
+	Instantiate(vm *VM) reflect.Value // , typeArgs []reflect.Type) reflect.Value
 }

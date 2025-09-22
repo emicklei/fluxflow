@@ -22,7 +22,7 @@ func (s SelectorExpr) Eval(vm *VM) {
 		vm.Returns(sel)
 		return
 	}
-	panic("not implemented: not FieldSelectable" + recv.String())
+	panic("expected FieldSelectable: " + recv.String())
 }
 
 func (s SelectorExpr) Assign(env *Env, value reflect.Value) {

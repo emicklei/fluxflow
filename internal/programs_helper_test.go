@@ -47,8 +47,11 @@ func parseAndRun(t *testing.T, source string) string {
 	return runWithBuilder(b)
 }
 
-func printSteps() {
+func printSteps() func() {
 	os.Setenv("STEPS", "1")
+	return func() {
+		os.Unsetenv("STEPS")
+	}
 }
 
 func loadAndRun(t *testing.T, dirPath string) string {

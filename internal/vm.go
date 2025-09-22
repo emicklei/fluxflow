@@ -5,11 +5,17 @@ import (
 	"reflect"
 )
 
+type stackFrame struct {
+	env          *Env
+	funcArgs     []reflect.Value
+	returnValues []reflect.Value
+}
+
 type VM struct {
-	lastOperand reflect.Value
-	callStack   stack
-	env         *Env // global or package level?
-	output      *bytes.Buffer
+	operandStack stack[reflect.Value]
+	callStack    stack[stackFrame]
+	env          *Env // global or package level?
+	output       *bytes.Buffer
 }
 
 func newVM() *VM {
@@ -23,8 +29,8 @@ func (vm *VM) localEnv() *Env {
 // ReturnsEval evaluates the argument and returns its return value.
 func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
 	e.Eval(vm)
-	return vm.lastOperand
+	return vm.operandStack.pop()
 }
 func (vm *VM) Returns(v reflect.Value) {
-	vm.lastOperand = v
+	vm.operandStack.push(v)
 }

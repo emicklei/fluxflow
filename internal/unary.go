@@ -29,5 +29,14 @@ func (u UnaryExpr) Eval(vm *VM) {
 		case token.SUB:
 			vm.Returns(reflect.ValueOf(-v.Int()))
 		}
+	case reflect.Float64:
+		switch u.Op {
+		case token.SUB:
+			vm.Returns(reflect.ValueOf(-v.Float()))
+		case token.ADD:
+			vm.Returns(reflect.ValueOf(v.Float()))
+		}
+	default:
+		panic("not implemented: UnaryExpr.Eval:" + v.Kind().String())
 	}
 }

@@ -45,17 +45,22 @@ type CompositeLit struct {
 }
 
 func (s CompositeLit) Eval(vm *VM) {
-	if c, ok := s.Type.(CanCompose); ok {
-		composite := vm.ReturnsEval(s.Type)
-		values := make([]reflect.Value, len(s.Elts))
-		for i, elt := range s.Elts {
-			values[i] = vm.ReturnsEval(elt)
-		}
-		result := c.LiteralCompose(composite, values...)
-		vm.Returns(result)
-		return
+	instance := vm.ReturnsEval(s.Type)
+	i, ok := instance.Interface().(CanInstantiate)
+	if !ok {
+		panic("expected CanInstantiate: " + instance.String())
 	}
-	panic("not implemented: CompositeLit.Eval for " + fmt.Sprintf("%T", s.Type))
+	composite := i.Instantiate(vm)
+	composer, ok := s.Type.(CanCompose)
+	if !ok {
+		panic("expected CanCompose: " + instance.String())
+	}
+	values := make([]reflect.Value, len(s.Elts))
+	for i, elt := range s.Elts {
+		values[i] = vm.ReturnsEval(elt)
+	}
+	result := composer.LiteralCompose(composite, values)
+	vm.Returns(result)
 }
 
 func (s CompositeLit) String() string {

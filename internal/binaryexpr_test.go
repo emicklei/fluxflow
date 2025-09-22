@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"math"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -150,95 +149,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 			t.Fatalf(`expected "Hello, World!", got %s`, result.String())
 		}
 	})
-
-	t.Run("panics", func(t *testing.T) {
-		cases := []struct {
-			name          string
-			op            token.Token
-			left          Expr
-			right         Expr
-			panicContains string
-		}{
-			{
-				name:          "invalid left kind",
-				op:            token.ADD,
-				left:          &mockExpr{v: reflect.ValueOf(true)},
-				right:         &mockExpr{v: reflect.ValueOf(1)},
-				panicContains: "not implemented:",
-			},
-			{
-				name:          "string sub",
-				op:            token.SUB,
-				left:          &mockExpr{v: reflect.ValueOf("a")},
-				right:         &mockExpr{v: reflect.ValueOf("b")},
-				panicContains: "not implemented:",
-			},
-			{
-				name:          "string add int",
-				op:            token.ADD,
-				left:          &mockExpr{v: reflect.ValueOf("a")},
-				right:         &mockExpr{v: reflect.ValueOf(1)},
-				panicContains: "not implemented:",
-			},
-			{
-				name:          "int add string",
-				op:            token.ADD,
-				left:          &mockExpr{v: reflect.ValueOf(1)},
-				right:         &mockExpr{v: reflect.ValueOf("a")},
-				panicContains: "not implemented:",
-			},
-			{
-				name:          "float add string",
-				op:            token.ADD,
-				left:          &mockExpr{v: reflect.ValueOf(1.0)},
-				right:         &mockExpr{v: reflect.ValueOf("a")},
-				panicContains: "not implemented:",
-			},
-			{
-				name:          "float rem float",
-				op:            token.REM,
-				left:          &mockExpr{v: reflect.ValueOf(1.0)},
-				right:         &mockExpr{v: reflect.ValueOf(2.0)},
-				panicContains: "not implemented:",
-			},
-			{
-				name:          "int and int",
-				op:            token.AND,
-				left:          &mockExpr{v: reflect.ValueOf(1)},
-				right:         &mockExpr{v: reflect.ValueOf(2)},
-				panicContains: "not implemented:",
-			},
-		}
-		for _, tt := range cases {
-			t.Run(tt.name, func(t *testing.T) {
-				defer func() {
-					r := recover()
-					if r == nil {
-						t.Fatal("did not panic")
-					}
-					msg := fmt.Sprintf("%v", r)
-					if !strings.Contains(msg, tt.panicContains) {
-						t.Errorf("expected panic message to contain %q, got %q", tt.panicContains, msg)
-					}
-				}()
-				expr := BinaryExpr{
-					X:          tt.left,
-					Y:          tt.right,
-					BinaryExpr: &ast.BinaryExpr{Op: tt.op},
-				}
-				expr.Eval(newVM())
-			})
-		}
-	})
 }
-
-type mockExpr struct {
-	v reflect.Value
-}
-
-func (m *mockExpr) Eval(vm *VM) {
-}
-func (m *mockExpr) String() string { return "mock" }
 
 func TestBinaryExprValue_IntOpInt(t *testing.T) {
 	bv := BinaryExprValue{

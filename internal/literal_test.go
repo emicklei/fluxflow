@@ -47,7 +47,7 @@ func TestCompositeArrayLit_Eval(t *testing.T) {
 		vm := newVM()
 		vm.callStack.push(stackFrame{env: vm.env})
 		// mock array type
-		at := &ArrayType{
+		at := ArrayType{
 			ArrayType: &ast.ArrayType{
 				Len: &ast.BasicLit{Kind: token.INT, Value: "2"},
 			},
@@ -84,7 +84,7 @@ func TestCompositeSliceLit_Eval(t *testing.T) {
 		vm := newVM()
 		vm.callStack.push(stackFrame{env: vm.env})
 		// mock array type
-		at := &ArrayType{
+		at := ArrayType{
 			ArrayType: &ast.ArrayType{
 				Len: nil,
 			},

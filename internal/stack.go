@@ -1,29 +1,19 @@
 package internal
 
-import "reflect"
+type stack[T any] []T
 
-type stackFrame struct {
-	returnStep   *step
-	env          *Env
-	localVars    map[string]ConstOrVar
-	funcArgs     []reflect.Value
-	returnValues []reflect.Value
-}
-
-type stack []stackFrame
-
-func (s *stack) push(f stackFrame) {
+func (s *stack[T]) push(f T) {
 	*s = append(*s, f)
 }
 
 // pre: stack not empty
-func (s *stack) pop() stackFrame {
+func (s *stack[T]) pop() T {
 	f := (*s)[len(*s)-1]
 	*s = (*s)[:len(*s)-1]
 	return f
 }
 
 // pre: stack not empty
-func (s stack) top() stackFrame {
+func (s stack[T]) top() T {
 	return s[len(s)-1]
 }
