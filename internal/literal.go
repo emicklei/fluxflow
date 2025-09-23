@@ -45,6 +45,7 @@ type CompositeLit struct {
 }
 
 func (s CompositeLit) Eval(vm *VM) {
+	Show(vm)
 	internalType := vm.ReturnsEval(s.Type).Interface()
 	i, ok := internalType.(CanInstantiate)
 	if !ok {

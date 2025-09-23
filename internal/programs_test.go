@@ -292,7 +292,7 @@ func main() {
 }
 
 func TestNewType(t *testing.T) {
-	t.Skip()
+	//t.Skip()
 	defer printSteps()()
 	parseAndRun(t, `package main
 
