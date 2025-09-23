@@ -40,7 +40,11 @@ func (s TypeSpec) LiteralCompose(composite reflect.Value, values []reflect.Value
 	if c, ok := s.Type.(CanCompose); ok {
 		return c.LiteralCompose(composite, values)
 	}
-	panic(fmt.Sprintf("expected a CanCompose value:%v", s.Type))
+	return expected(s.Type, "a CanCompose value")
+}
+
+func expected(value any, expectation string) reflect.Value {
+	panic(fmt.Sprintf("expected %s : %v (%T)", expectation, value, value))
 }
 
 type StructType struct {
@@ -56,9 +60,9 @@ func (s StructType) Eval(vm *VM) {
 	vm.Returns(reflect.ValueOf(s))
 }
 
-// func (s StructType) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
-// 	return reflect.ValueOf(NewInstance(s))
-// }
+func (s StructType) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
+	return composite
+}
 
 func (s StructType) Instantiate(vm *VM) reflect.Value {
 	return reflect.ValueOf(NewInstance(vm, s))
@@ -89,6 +93,6 @@ func (i Instance) Select(name string) reflect.Value {
 	}
 	panic("no such field: " + name)
 }
-func (i Instance) LiteralCompose(values []reflect.Value) reflect.Value {
+func (i Instance) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
 	return reflect.ValueOf("todo")
 }

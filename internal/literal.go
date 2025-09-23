@@ -45,15 +45,15 @@ type CompositeLit struct {
 }
 
 func (s CompositeLit) Eval(vm *VM) {
-	instance := vm.ReturnsEval(s.Type)
-	i, ok := instance.Interface().(CanInstantiate)
+	internalType := vm.ReturnsEval(s.Type).Interface()
+	i, ok := internalType.(CanInstantiate)
 	if !ok {
-		panic("expected CanInstantiate: " + instance.String())
+		panic(fmt.Sprintf("expected CanInstantiate:%v (%T)", internalType, internalType))
 	}
 	composite := i.Instantiate(vm)
-	composer, ok := s.Type.(CanCompose)
+	composer, ok := internalType.(CanCompose)
 	if !ok {
-		panic("expected CanCompose: " + instance.String())
+		panic(fmt.Sprintf("expected CanCompose:%v (%T)", s.Type, s.Type))
 	}
 	values := make([]reflect.Value, len(s.Elts))
 	for i, elt := range s.Elts {

@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"go/ast"
+	"reflect"
 )
 
 type KeyValueExpr struct {
@@ -16,5 +17,12 @@ func (e KeyValueExpr) String() string {
 }
 
 func (e KeyValueExpr) Eval(vm *VM) {
+	key := vm.ReturnsEval(e.Key)
+	value := vm.ReturnsEval(e.Value)
+	vm.Returns(reflect.ValueOf(KeyValue{Key: key, Value: value}))
+}
 
+type KeyValue struct {
+	Key   reflect.Value
+	Value reflect.Value
 }
