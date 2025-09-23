@@ -30,6 +30,8 @@ func (c CallExpr) Eval(vm *VM) {
 	}
 	// function f is either an external or an interpreted one
 	f := vm.ReturnsEval(c.Fun)
+
+	// todo: make a switch
 	if f.Kind() == reflect.Func {
 
 		args := make([]reflect.Value, len(c.Args))
@@ -40,9 +42,13 @@ func (c CallExpr) Eval(vm *VM) {
 		vals := f.Call(args)
 
 		// set return values on top of stack
-		top := vm.callStack.pop()
-		top.returnValues = vals
-		vm.callStack.push(top)
+		for _, each := range vals {
+			vm.Returns(each)
+		}
+		return
+		// top := vm.callStack.pop()
+		// top.returnValues = vals
+		// vm.callStack.push(top)
 	}
 	if f.Kind() == reflect.Struct {
 		lf, ok := f.Interface().(FuncDecl)
