@@ -61,7 +61,11 @@ func (s StructType) Eval(vm *VM) {
 }
 
 func (s StructType) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
-	return composite
+	i, ok := composite.Interface().(CanCompose)
+	if !ok {
+		expected(composite, "CanCompose")
+	}
+	return i.LiteralCompose(composite, values)
 }
 
 func (s StructType) Instantiate(vm *VM) reflect.Value {
@@ -93,6 +97,12 @@ func (i Instance) Select(name string) reflect.Value {
 	}
 	panic("no such field: " + name)
 }
+
+// composite is (a reflect on) an Instance
 func (i Instance) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
-	return reflect.ValueOf("todo")
+	fmt.Printf("%v (%T)", composite, composite)
+	for _, each := range values {
+		fmt.Printf("%v (%T)", each, each)
+	}
+	return composite
 }

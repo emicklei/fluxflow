@@ -34,6 +34,7 @@ func (a ArrayType) String() string {
 	return fmt.Sprintf("ArrayType(%v,slice=%v)", a.Elt, a.ArrayType.Len == nil)
 }
 
+// composite is (a reflect on) a Go array or slice
 func (a ArrayType) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
 	if a.ArrayType.Len == nil { // slice
 		for _, v := range values {
