@@ -17,7 +17,9 @@ func (e KeyValueExpr) String() string {
 }
 
 func (e KeyValueExpr) Eval(vm *VM) {
-	key := vm.ReturnsEval(e.Key)
+	// TODO we need the name of the key
+	//key := vm.ReturnsEval(e.Key)
+	key := reflect.ValueOf("Kind")
 	value := vm.ReturnsEval(e.Value)
 	vm.Returns(reflect.ValueOf(KeyValue{Key: key, Value: value}))
 }
@@ -25,4 +27,8 @@ func (e KeyValueExpr) Eval(vm *VM) {
 type KeyValue struct {
 	Key   reflect.Value
 	Value reflect.Value
+}
+
+func (k KeyValue) String() string {
+	return fmt.Sprintf("KeyValue(%v,%v)", k.Key, k.Value)
 }

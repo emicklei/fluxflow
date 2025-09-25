@@ -294,7 +294,7 @@ func main() {
 func TestNewType(t *testing.T) {
 	//t.Skip()
 	defer printSteps()()
-	parseAndRun(t, `package main
+	out := parseAndRun(t, `package main
 
 type Airplane struct {
 	Kind string
@@ -305,4 +305,7 @@ func main() {
 	print(heli.Kind)
 }
 `)
+	if got, want := out, "helicopter"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
 }

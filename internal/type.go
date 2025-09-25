@@ -102,7 +102,24 @@ func (i Instance) Select(name string) reflect.Value {
 func (i Instance) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
 	fmt.Printf("%v (%T)", composite, composite)
 	for _, each := range values {
-		fmt.Printf("%v (%T)", each, each)
+		fmt.Printf("%v (%T)\n", each, each)
+		if kv, ok := each.Interface().(KeyValue); ok {
+			i.fields[mustString(kv.Key)] = kv.Value
+		}
 	}
 	return composite
+}
+
+func mustString(v reflect.Value) string {
+	if !v.IsValid() {
+		panic("value not valid")
+	}
+	if !v.CanInterface() {
+		panic("cannot get interface")
+	}
+	s, ok := v.Interface().(string)
+	if !ok {
+		panic(fmt.Sprintf("expected string but got %T", v.Interface()))
+	}
+	return s
 }
