@@ -23,11 +23,18 @@ func (u UnaryExpr) Eval(vm *VM) {
 		switch u.Op {
 		case token.SUB:
 			vm.Returns(reflect.ValueOf(int(-v.Int())))
+		case token.AND:
+			actual := v.Interface()
+			vm.Returns(reflect.ValueOf(&actual))
+		default:
+			panic("missing unary operation on int:" + u.Op.String())
 		}
 	case reflect.Int64:
 		switch u.Op {
 		case token.SUB:
 			vm.Returns(reflect.ValueOf(-v.Int()))
+		default:
+			panic("missing unary operation on int64:" + u.Op.String())
 		}
 	case reflect.Float64:
 		switch u.Op {
@@ -35,6 +42,16 @@ func (u UnaryExpr) Eval(vm *VM) {
 			vm.Returns(reflect.ValueOf(-v.Float()))
 		case token.ADD:
 			vm.Returns(reflect.ValueOf(v.Float()))
+		default:
+			panic("missing unary operation on float64:" + u.Op.String())
+		}
+	case reflect.Struct:
+		switch u.Op {
+		case token.AND:
+			actual := v.Interface()
+			vm.Returns(reflect.ValueOf(&actual))
+		default:
+			panic("missing unary operation on struct:" + u.Op.String())
 		}
 	default:
 		panic("not implemented: UnaryExpr.Eval:" + v.Kind().String())

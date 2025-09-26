@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -305,5 +306,35 @@ func main() {
 `)
 	if got, want := out, "helicopter"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+func TestPointerToType(t *testing.T) {
+	t.Skip()
+	out := parseAndRun(t, `package main
+
+type Airplane struct {
+	Kind string
+}
+
+func main() {
+	heli := &Airplane{Kind:"helicopter"}
+	print(heli.Kind)
+}
+`)
+	if got, want := out, "helicopter"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestAddressOfInt(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+func main() {
+	i := 42
+	print(&i)
+}
+`)
+	if got, want := strings.HasPrefix(out, "0x"), true; got != want {
+		t.Errorf("got [%s %[2]v:%[2]T] want [%[3]v:%[3]T]", out, got, want)
 	}
 }
