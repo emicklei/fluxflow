@@ -17,9 +17,11 @@ func (e KeyValueExpr) String() string {
 }
 
 func (e KeyValueExpr) Eval(vm *VM) {
-	// TODO we need the name of the key
-	//key := vm.ReturnsEval(e.Key)
-	key := reflect.ValueOf("Kind")
+	id, ok := e.Key.(Ident)
+	if !ok {
+		panic("unhandled key type")
+	}
+	key := reflect.ValueOf(id.Name)
 	value := vm.ReturnsEval(e.Value)
 	vm.Returns(reflect.ValueOf(KeyValue{Key: key, Value: value}))
 }

@@ -27,10 +27,10 @@ func (s TypeSpec) Eval(vm *VM) {
 
 func (s TypeSpec) Instantiate(vm *VM) reflect.Value {
 	actualType := vm.ReturnsEval(s.Type).Interface()
-	fmt.Println(actualType)
+	// fmt.Println(actualType)
 	if i, ok := actualType.(CanInstantiate); ok {
 		instance := i.Instantiate(vm)
-		fmt.Println(instance)
+		// fmt.Println(instance)
 		return instance
 	}
 	panic(fmt.Sprintf("expected a CanInstantiate value:%v", s.Type))
@@ -100,9 +100,9 @@ func (i Instance) Select(name string) reflect.Value {
 
 // composite is (a reflect on) an Instance
 func (i Instance) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
-	fmt.Printf("%v (%T)", composite, composite)
+	// fmt.Printf("%v (%T)", composite, composite)
 	for _, each := range values {
-		fmt.Printf("%v (%T)\n", each, each)
+		// fmt.Printf("%v (%T)\n", each, each)
 		if kv, ok := each.Interface().(KeyValue); ok {
 			i.fields[mustString(kv.Key)] = kv.Value
 		}

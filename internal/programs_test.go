@@ -292,8 +292,6 @@ func main() {
 }
 
 func TestNewType(t *testing.T) {
-	//t.Skip()
-	defer printSteps()()
 	out := parseAndRun(t, `package main
 
 type Airplane struct {
