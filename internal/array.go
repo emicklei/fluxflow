@@ -35,6 +35,9 @@ func identName(e Expr) string {
 	if id, ok := e.(Ident); ok {
 		return id.Name
 	}
+	if id, ok := e.(*Ident); ok {
+		return id.Name
+	}
 	panic(fmt.Sprintf("expected Ident but got %T", e))
 }
 
