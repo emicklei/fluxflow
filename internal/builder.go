@@ -351,6 +351,34 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			s.Fields = &e
 		}
 		b.push(s)
+	case *ast.RangeStmt:
+		s := RangeStmt{RangeStmt: n}
+		if n.Key != nil {
+			b.Visit(n.Key)
+			e := b.pop()
+			s.Key = e.(Expr)
+		}
+		if n.Value != nil {
+			b.Visit(n.Value)
+			e := b.pop()
+			s.Value = e.(Expr)
+		}
+		b.Visit(n.X)
+		e := b.pop()
+		s.X = e.(Expr)
+		b.Visit(n.Body)
+		bs := b.pop().(BlockStmt)
+		s.Body = &bs
+		b.push(s)
+	case *ast.IndexExpr:
+		s := IndexExpr{IndexExpr: n}
+		b.Visit(n.X)
+		e := b.pop()
+		s.X = e.(Expr)
+		b.Visit(n.Index)
+		e = b.pop()
+		s.Index = e.(Expr)
+		b.push(s)
 	case nil:
 		// end of a branch
 	default:

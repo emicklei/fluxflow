@@ -18,7 +18,8 @@ func (a ArrayType) Eval(vm *VM) {
 }
 
 func (a ArrayType) Instantiate(vm *VM) reflect.Value {
-	rt := builtinTypesMap["int"] // TODO support other types than int
+	typeName := identName(a.Elt)
+	rt := builtinTypesMap[typeName]
 	if a.ArrayType.Len == nil {
 		st := reflect.SliceOf(rt)
 		return reflect.MakeSlice(st, 0, 4)
@@ -28,6 +29,13 @@ func (a ArrayType) Instantiate(vm *VM) reflect.Value {
 		pArray := reflect.New(st)
 		return pArray.Elem()
 	}
+}
+
+func identName(e Expr) string {
+	if id, ok := e.(Ident); ok {
+		return id.Name
+	}
+	panic(fmt.Sprintf("expected Ident but got %T", e))
 }
 
 func (a ArrayType) String() string {

@@ -11,6 +11,11 @@ func TestProgramEverything(t *testing.T) {
 	t.Log(loadAndRun(t, "../programs"))
 }
 
+func TestProgramReal(t *testing.T) {
+	t.Skip()
+	t.Log(loadAndRun(t, "/Users/ernestmicklei/Projects/sandr"))
+}
+
 func TestProgramPrint(t *testing.T) {
 	out := parseAndRun(t, `package main
 
@@ -336,5 +341,20 @@ func main() {
 `)
 	if got, want := strings.HasPrefix(out, "0x"), true; got != want {
 		t.Errorf("got [%s %[2]v:%[2]T] want [%[3]v:%[3]T]", out, got, want)
+	}
+}
+
+func TestRangeOfStrings(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+func main() {
+	strings := []string{"hello", "world"}
+	for i,s := range strings {
+		print(i,s)
+	}
+}
+`)
+	if got, want := out, "0hello1world"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
