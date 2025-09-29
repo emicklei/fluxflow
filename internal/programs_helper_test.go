@@ -101,6 +101,9 @@ func runWithBuilder(b builder) string {
 			}
 		}
 	}))
+	// TODO first run vars and consts
+	// TODO first run inits
+
 	main := vm.env.valueLookUp("main")
 	if !main.IsValid() {
 		return "main not found"

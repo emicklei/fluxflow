@@ -9,40 +9,37 @@ import (
 var _ CanAssign = ConstOrVar{}
 
 type ConstOrVar struct {
-	spec   *ast.ValueSpec
-	Type   Expr
-	Values []Expr
+	*ast.ValueSpec
+	// for each Name in ValueSpec there is a ConstOrVar
+	Name  *Ident
+	Type  Expr
+	Value Expr
 }
 
 func (v ConstOrVar) declStep() CanDeclare { return v }
 
 func (v ConstOrVar) Assign(env *Env, value reflect.Value) {
-	// TODO value->values?
-	env.valueOwnerOf(v.spec.Names[0].Name).set(v.spec.Names[0].Name, value)
+	env.valueOwnerOf(v.Name.Name).set(v.Name.Name, value)
 }
 func (v ConstOrVar) Define(env *Env, value reflect.Value) {
-	// TODO value->values?
-	env.set(v.spec.Names[0].Name, value)
+	env.set(v.Names[0].Name, value)
 }
 func (v ConstOrVar) Declare(vm *VM) {
-	if len(v.Values) > 0 {
-		for i, val := range v.Values {
-			vm.env.set(v.spec.Names[i].Name, vm.ReturnsEval(val))
-		}
+	if v.Value != nil {
+		vm.env.set(v.Name.Name, vm.ReturnsEval(v.Value))
 		return
 	}
+	// if nil then zero
 	if z, ok := v.Type.(HasZeroValue); ok {
 		zv := z.ZeroValue(vm.env)
-		for _, name := range v.spec.Names {
-			vm.env.set(name.Name, zv)
-		}
+		vm.env.set(v.Name.Name, zv)
 	}
 }
 
 func (v ConstOrVar) Eval(vm *VM) {
-	vv := vm.localEnv().valueLookUp(v.spec.Names[0].Name)
+	vv := vm.localEnv().valueLookUp(v.Name.Name)
 	vm.Returns(vv)
 }
 func (v ConstOrVar) String() string {
-	return fmt.Sprintf("Var(%v)", v.spec.Names)
+	return fmt.Sprintf("ConstOrVar(%v)", v.Name.Name)
 }

@@ -88,16 +88,21 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s.X = e.(Expr)
 		b.push(s)
 	case *ast.ValueSpec:
-		s := ConstOrVar{spec: n}
-		b.Visit(n.Type)
-		e := b.pop()
-		s.Type = e.(Expr)
-		for _, each := range n.Values {
+		for i, each := range n.Names {
+			s := ConstOrVar{ValueSpec: n}
 			b.Visit(each)
-			e = b.pop()
-			s.Values = append(s.Values, e.(Expr))
+			e := b.pop().(Ident)
+			s.Name = &e
+			b.Visit(n.Type)
+			et := b.pop()
+			s.Type = et.(Expr)
+			if n.Values != nil {
+				b.Visit(n.Values[i])
+				ev := b.pop()
+				s.Value = ev.(Expr)
+			}
+			b.push(s)
 		}
-		b.push(s)
 	case *ast.ExprStmt:
 		s := ExprStmt{ExprStmt: n}
 		b.Visit(n.X)

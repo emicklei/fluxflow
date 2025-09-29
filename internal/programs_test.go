@@ -216,6 +216,26 @@ func main() {
 	}
 }
 
+func TestProgramConst(t *testing.T) {
+	t.Skip()
+	defer printSteps()()
+	out := parseAndRun(t, `package main
+
+const (
+	C = A
+	A = 0
+	B = 1	
+)
+
+func main() {	
+	print(A,B,C)
+}
+`)
+	if got, want := out, "01"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
 func TestProgramDeclareAndInit(t *testing.T) {
 	out := parseAndRun(t, `package main
 
