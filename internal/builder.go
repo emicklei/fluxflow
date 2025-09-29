@@ -43,6 +43,14 @@ func (b *builder) pop() Evaluable {
 	return top.Evaluable
 }
 
+func (b *builder) top() any {
+	if len(b.stack) == 0 {
+		panic("builder.stack is empty")
+	}
+	top := b.stack[len(b.stack)-1]
+	return top
+}
+
 func (b *builder) envSet(name string, value reflect.Value) {
 	if os.Getenv("STEPS") != "" {
 		fmt.Fprintf(os.Stderr, "%s -> %v\n", name, value)
@@ -93,9 +101,11 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			b.Visit(each)
 			e := b.pop().(Ident)
 			s.Name = &e
-			b.Visit(n.Type)
-			et := b.pop()
-			s.Type = et.(Expr)
+			if n.Type != nil {
+				b.Visit(n.Type)
+				et := b.pop()
+				s.Type = et.(Expr)
+			}
 			if n.Values != nil {
 				b.Visit(n.Values[i])
 				ev := b.pop()
@@ -275,6 +285,11 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 	case *ast.GenDecl:
 		// IMPORT, CONST, TYPE, or VAR
 		switch n.Tok {
+		case token.CONST:
+			for _, each := range n.Specs {
+				b.Visit(each)
+				// c := b.top().(Decl)
+			}
 		case token.VAR:
 			for _, each := range n.Specs {
 				b.Visit(each)

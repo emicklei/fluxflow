@@ -14,12 +14,15 @@ type Env struct {
 	parent     *Env
 	valueTable map[string]reflect.Value
 	pkgTable   map[string]ImportSpec
+	declTable  map[string]Decl
 }
 
 func newEnv() *Env {
 	return &Env{
 		valueTable: map[string]reflect.Value{},
-		pkgTable:   map[string]ImportSpec{}}
+		pkgTable:   map[string]ImportSpec{},
+		declTable:  map[string]Decl{},
+	}
 }
 func (e *Env) subEnv() *Env {
 	child := newEnv()
@@ -58,4 +61,8 @@ func (e *Env) valueOwnerOf(name string) *Env {
 
 func (e *Env) set(name string, value reflect.Value) {
 	e.valueTable[name] = value
+}
+
+func (e *Env) setDecl(name string, decl Decl) {
+	e.declTable[name] = decl
 }
