@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"go/ast"
-	"reflect"
 )
 
 type FuncDecl struct {
@@ -15,8 +14,7 @@ type FuncDecl struct {
 }
 
 func (f FuncDecl) Eval(vm *VM) {
-	v := reflect.ValueOf(f)
-	vm.localEnv().set(f.Name.Name, v)
+	panic("todo")
 }
 func (f FuncDecl) String() string {
 	return fmt.Sprintf("FuncDecl(%s)", f.Name.Name)

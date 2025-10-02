@@ -18,7 +18,7 @@ func (a ArrayType) Eval(vm *VM) {
 }
 
 func (a ArrayType) Instantiate(vm *VM) reflect.Value {
-	typeName := identName(a.Elt)
+	typeName := mustIdentName(a.Elt)
 	rt := builtinTypesMap[typeName]
 	if a.ArrayType.Len == nil {
 		st := reflect.SliceOf(rt)
@@ -31,7 +31,7 @@ func (a ArrayType) Instantiate(vm *VM) reflect.Value {
 	}
 }
 
-func identName(e Expr) string {
+func mustIdentName(e Expr) string {
 	if id, ok := e.(Ident); ok {
 		return id.Name
 	}

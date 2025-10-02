@@ -110,15 +110,20 @@ func runWithBuilder(b builder) string {
 			}
 		}
 	}
-	// TODO first run inits
+	for _, each := range pkgEnv.inits {
+		vm.pushNewFrame()
+		each.Body.Eval(vm)
+		vm.popFrame()
+	}
 
 	main := vm.localEnv().valueLookUp("main")
 	if !main.IsValid() {
 		return "main not found"
 	}
 	// TODO
-	vm.callStack.push(stackFrame{env: vm.localEnv().newChildEnvironment()})
+	vm.pushNewFrame()
 	fundecl := main.Interface().(FuncDecl)
 	fundecl.Body.Eval(vm)
+	vm.popFrame()
 	return vm.output.String()
 }

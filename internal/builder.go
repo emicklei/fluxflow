@@ -245,7 +245,15 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		blk := e.(BlockStmt)
 		s.Body = &blk
 		b.push(s) // ??
+
+		if pe, ok := b.env.(*PkgEnvironment); ok {
+			if n.Name.Name == "init" {
+				pe.addInit(s)
+				break
+			}
+		}
 		b.envSet(n.Name.Name, reflect.ValueOf(s))
+
 	case *ast.FuncType:
 		s := FuncType{FuncType: n}
 		if n.TypeParams != nil {

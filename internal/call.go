@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"reflect"
-
-	"github.com/emicklei/structexplorer"
 )
 
 type CallExpr struct {
@@ -24,7 +22,7 @@ func (c CallExpr) evalAppend(vm *VM) {
 }
 
 func (c CallExpr) Eval(vm *VM) {
-	structexplorer.Break("vm", vm)
+	// structexplorer.Break("vm", vm)
 	if i, ok := c.Fun.(Ident); ok {
 		if i.Name == "append" {
 			c.evalAppend(vm)

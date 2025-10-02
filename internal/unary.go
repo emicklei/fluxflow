@@ -18,6 +18,11 @@ func (u UnaryExpr) String() string {
 
 func (u UnaryExpr) Eval(vm *VM) {
 	v := vm.ReturnsEval(u.X)
+	// propagate invalid value
+	if !v.IsValid() {
+		vm.Returns(v)
+		return
+	}
 	switch v.Kind() {
 	case reflect.Int:
 		switch u.Op {

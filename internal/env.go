@@ -28,6 +28,9 @@ func newPkgEnvironment(parent Env) Env {
 		declTable: map[string]CanDeclare{},
 	}
 }
+func (p *PkgEnvironment) addInit(f FuncDecl) {
+	p.inits = append(p.inits, f)
+}
 
 func (p *PkgEnvironment) addConstOrVar(cv ConstOrVar) {
 	p.declTable[cv.Name.Name] = CanDeclare(cv)
@@ -49,7 +52,7 @@ func (e *Environment) depth() int {
 	if e.parent == nil {
 		return 0
 	}
-	return e.parent.(*Environment).depth()
+	return e.parent.(*Environment).depth() + 1
 }
 
 func (e *Environment) String() string {

@@ -35,3 +35,9 @@ func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
 func (vm *VM) Returns(v reflect.Value) {
 	vm.operandStack.push(v)
 }
+func (vm *VM) pushNewFrame() {
+	vm.callStack.push(stackFrame{env: vm.localEnv().newChildEnvironment()})
+}
+func (vm *VM) popFrame() stackFrame {
+	return vm.callStack.pop()
+}

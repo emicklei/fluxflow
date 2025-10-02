@@ -395,7 +395,6 @@ func main() {
 }
 
 func TestInit(t *testing.T) {
-	t.Skip()
 	out := parseAndRun(t, `package main
 func init() {
 	print("0")
@@ -405,7 +404,7 @@ func init() {
 }
 func main() {}
 `)
-	if got, want := out, "init"; got != want {
+	if got, want := out, "01"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
