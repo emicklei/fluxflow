@@ -7,7 +7,6 @@ import (
 
 type stackFrame struct {
 	env          Env
-	funcArgs     []reflect.Value
 	returnValues []reflect.Value
 }
 

@@ -43,6 +43,18 @@ func newEnvironment(parentOrNil Env) Env {
 		valueTable: map[string]reflect.Value{},
 	}
 }
+
+func (e *Environment) depth() int {
+	if e.parent == nil {
+		return 0
+	}
+	return e.parent.(*Environment).depth()
+}
+
+func (e *Environment) String() string {
+	return fmt.Sprintf("Env(%d,values=%d)", e.depth(), len(e.valueTable))
+}
+
 func (e *Environment) newChildEnvironment() Env {
 	return newEnvironment(e)
 }
@@ -77,10 +89,8 @@ func (e *Environment) valueOwnerOf(name string) Env {
 }
 
 func (e *Environment) set(name string, value reflect.Value) {
+	fmt.Println(e, name, "=", value.Interface())
 	e.valueTable[name] = value
 }
 
-func (e *Environment) addConstOrVar(cv ConstOrVar) {
-	//e.valueTable[cv.Name.Name] =
-	fmt.Println(cv)
-}
+func (e *Environment) addConstOrVar(cv ConstOrVar) {}

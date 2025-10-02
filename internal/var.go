@@ -24,16 +24,21 @@ func (v ConstOrVar) Assign(env Env, value reflect.Value) {
 func (v ConstOrVar) Define(env Env, value reflect.Value) {
 	env.set(v.Names[0].Name, value)
 }
-func (v ConstOrVar) Declare(vm *VM) {
+func (v ConstOrVar) Declare(vm *VM) bool {
 	if v.Value != nil {
-		vm.localEnv().set(v.Name.Name, vm.ReturnsEval(v.Value))
-		return
+		actual := vm.ReturnsEval(v.Value)
+		if !actual.IsValid() {
+			return false
+		}
+		vm.localEnv().set(v.Name.Name, actual)
+		return true
 	}
 	// if nil then zero
 	if z, ok := v.Type.(HasZeroValue); ok {
 		zv := z.ZeroValue(vm.localEnv())
 		vm.localEnv().set(v.Name.Name, zv)
 	}
+	return true
 }
 
 func (v ConstOrVar) Eval(vm *VM) {

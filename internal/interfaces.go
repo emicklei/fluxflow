@@ -16,7 +16,7 @@ type CanDefine interface {
 }
 
 type CanDeclare interface {
-	Declare(vm *VM)
+	Declare(vm *VM) bool
 }
 
 type Statement interface{}

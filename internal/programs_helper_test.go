@@ -102,8 +102,12 @@ func runWithBuilder(b builder) string {
 	// first run const and vars
 	// TODO first run inits
 	pkgEnv := vm.localEnv().(*PkgEnvironment)
-	for _, each := range pkgEnv.declTable {
-		each.Declare(vm)
+	for len(pkgEnv.declTable) > 0 {
+		for key, each := range pkgEnv.declTable {
+			if each.Declare(vm) {
+				delete(pkgEnv.declTable, key)
+			}
+		}
 	}
 
 	main := vm.localEnv().valueLookUp("main")

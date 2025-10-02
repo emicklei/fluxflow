@@ -20,6 +20,11 @@ func (s BinaryExpr) Eval(vm *VM) {
 		op:    s.Op,
 		right: vm.ReturnsEval(s.Y),
 	}
+	// TODO
+	if !v.IsValid() {
+		vm.Returns(reflect.Value{})
+		return
+	}
 	vm.Returns(v.Eval())
 }
 
@@ -31,6 +36,10 @@ type BinaryExprValue struct {
 	left  reflect.Value
 	op    token.Token
 	right reflect.Value
+}
+
+func (b BinaryExprValue) IsValid() bool {
+	return b.left.IsValid() && b.right.IsValid()
 }
 
 func (b BinaryExprValue) Eval() reflect.Value {
