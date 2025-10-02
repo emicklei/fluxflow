@@ -100,7 +100,8 @@ func runWithBuilder(b builder) string {
 		}
 	}))
 	// first run const and vars
-	// TODO first run inits
+	// try declare all of them until none left
+	// a declare may refer to other unseen declares.
 	pkgEnv := vm.localEnv().(*PkgEnvironment)
 	for len(pkgEnv.declTable) > 0 {
 		for key, each := range pkgEnv.declTable {
@@ -109,6 +110,7 @@ func runWithBuilder(b builder) string {
 			}
 		}
 	}
+	// TODO first run inits
 
 	main := vm.localEnv().valueLookUp("main")
 	if !main.IsValid() {

@@ -18,6 +18,7 @@ type PkgEnvironment struct {
 	Env
 	pkgTable  map[string]ImportSpec
 	declTable map[string]CanDeclare
+	inits     []FuncDecl
 }
 
 func newPkgEnvironment(parent Env) Env {

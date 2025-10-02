@@ -217,8 +217,6 @@ func main() {
 }
 
 func TestProgramConst(t *testing.T) {
-	//t.Skip()
-	defer printSteps()()
 	out := parseAndRun(t, `package main
 
 const (
