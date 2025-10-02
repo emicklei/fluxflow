@@ -7,12 +7,12 @@ type Evaluable interface {
 }
 
 type CanAssign interface {
-	Assign(env *Env, value reflect.Value)
-	Define(env *Env, value reflect.Value) // needed?
+	Assign(env ienv, value reflect.Value)
+	Define(env ienv, value reflect.Value) // needed?
 }
 
 type CanDefine interface {
-	Define(env *Env, value reflect.Value)
+	Define(env ienv, value reflect.Value)
 }
 
 type CanDeclare interface {
@@ -26,7 +26,7 @@ type Expr interface {
 }
 
 type HasZeroValue interface {
-	ZeroValue(env *Env) reflect.Value
+	ZeroValue(env ienv) reflect.Value
 }
 
 // All statement nodes implement the Stmt interface.

@@ -14,7 +14,15 @@ var _ ast.Visitor = (*builder)(nil)
 
 type builder struct {
 	stack []*step
-	env   *Env
+	env   ienv
+	// these need to be resolved into an Env
+	declarations map[string]CanDeclare
+}
+
+func newBuilder() builder {
+	builtins := &Env{valueTable: builtinsMap, pkgTable: map[string]ImportSpec{}}
+	pkgenv := newPackageEnv(builtins)
+	return builder{env: pkgenv, declarations: map[string]CanDeclare{}}
 }
 
 func (b *builder) push(s Evaluable) {
@@ -285,14 +293,15 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 	case *ast.GenDecl:
 		// IMPORT, CONST, TYPE, or VAR
 		switch n.Tok {
-		case token.CONST:
+		case token.CONST, token.VAR:
 			for _, each := range n.Specs {
 				b.Visit(each)
-				// c := b.top().(Decl)
-			}
-		case token.VAR:
-			for _, each := range n.Specs {
-				b.Visit(each)
+				// here we know we are in pkg env
+				e := b.pop()
+				c := e.(ConstOrVar)
+				b.env.addConstOrVar(c)
+				// b.declarations[c.Name.Name] = e.(CanDeclare)
+				b.push(e)
 			}
 		case token.IMPORT:
 			for _, each := range n.Specs {

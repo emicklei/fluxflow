@@ -18,10 +18,10 @@ type ConstOrVar struct {
 
 func (v ConstOrVar) declStep() CanDeclare { return v }
 
-func (v ConstOrVar) Assign(env *Env, value reflect.Value) {
+func (v ConstOrVar) Assign(env ienv, value reflect.Value) {
 	env.valueOwnerOf(v.Name.Name).set(v.Name.Name, value)
 }
-func (v ConstOrVar) Define(env *Env, value reflect.Value) {
+func (v ConstOrVar) Define(env ienv, value reflect.Value) {
 	env.set(v.Names[0].Name, value)
 }
 func (v ConstOrVar) Declare(vm *VM) {

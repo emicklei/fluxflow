@@ -1,31 +1,53 @@
 package internal
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
-// used?
-type environment interface {
+type ienv interface {
 	valueLookUp(name string) reflect.Value
 	typeLookUp(name string) reflect.Type
-	valueOwnerOf(name string) environment
+	valueOwnerOf(name string) ienv
 	set(name string, value reflect.Value)
+	subEnv() ienv
+	addConstOrVar(cv ConstOrVar)
+}
+
+type PackageEnv struct {
+	*Env
+	pkgTable  map[string]ImportSpec
+	declTable map[string]CanDeclare
+}
+
+func newPackageEnv(parent ienv) ienv {
+	env := newEnv().(*Env)
+	env.parent = parent
+	return &PackageEnv{
+		Env:       env,
+		pkgTable:  map[string]ImportSpec{},
+		declTable: map[string]CanDeclare{},
+	}
+}
+
+func (p *PackageEnv) addConstOrVar(cv ConstOrVar) {
+	p.declTable[cv.Name.Name] = CanDeclare(cv)
 }
 
 type Env struct {
-	parent     *Env
+	parent     ienv
 	valueTable map[string]reflect.Value
-	pkgTable   map[string]ImportSpec
-	declTable  map[string]Decl
+	pkgTable   map[string]ImportSpec // only relevant on package level
 }
 
-func newEnv() *Env {
+func newEnv() ienv {
 	return &Env{
 		valueTable: map[string]reflect.Value{},
 		pkgTable:   map[string]ImportSpec{},
-		declTable:  map[string]Decl{},
 	}
 }
-func (e *Env) subEnv() *Env {
-	child := newEnv()
+func (e *Env) subEnv() ienv {
+	child := newEnv().(*Env)
 	child.parent = e
 	return child
 }
@@ -48,7 +70,7 @@ func (e *Env) typeLookUp(name string) reflect.Type {
 	return v
 }
 
-func (e *Env) valueOwnerOf(name string) *Env {
+func (e *Env) valueOwnerOf(name string) ienv {
 	_, ok := e.valueTable[name]
 	if !ok {
 		if e.parent == nil {
@@ -63,6 +85,7 @@ func (e *Env) set(name string, value reflect.Value) {
 	e.valueTable[name] = value
 }
 
-func (e *Env) setDecl(name string, decl Decl) {
-	e.declTable[name] = decl
+func (e *Env) addConstOrVar(cv ConstOrVar) {
+	//e.valueTable[cv.Name.Name] =
+	fmt.Println(cv)
 }

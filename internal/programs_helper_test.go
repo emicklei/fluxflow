@@ -35,8 +35,7 @@ func parseAndRun(t *testing.T, source string) string {
 	if len(pkgs) == 0 {
 		t.Fatal("no packages found")
 	}
-	builtins := &Env{valueTable: builtinsMap, pkgTable: map[string]ImportSpec{}}
-	b := builder{env: builtins}
+	b := newBuilder()
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
 			for _, decl := range stx.Decls {
@@ -101,8 +100,12 @@ func runWithBuilder(b builder) string {
 			}
 		}
 	}))
-	// TODO first run vars and consts
+	// first run const and vars
 	// TODO first run inits
+	for name, decl := range b.declarations {
+		fmt.Println(name)
+		decl.Declare(vm)
+	}
 
 	main := vm.env.valueLookUp("main")
 	if !main.IsValid() {
