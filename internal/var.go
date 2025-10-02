@@ -18,21 +18,21 @@ type ConstOrVar struct {
 
 func (v ConstOrVar) declStep() CanDeclare { return v }
 
-func (v ConstOrVar) Assign(env ienv, value reflect.Value) {
+func (v ConstOrVar) Assign(env Env, value reflect.Value) {
 	env.valueOwnerOf(v.Name.Name).set(v.Name.Name, value)
 }
-func (v ConstOrVar) Define(env ienv, value reflect.Value) {
+func (v ConstOrVar) Define(env Env, value reflect.Value) {
 	env.set(v.Names[0].Name, value)
 }
 func (v ConstOrVar) Declare(vm *VM) {
 	if v.Value != nil {
-		vm.env.set(v.Name.Name, vm.ReturnsEval(v.Value))
+		vm.localEnv().set(v.Name.Name, vm.ReturnsEval(v.Value))
 		return
 	}
 	// if nil then zero
 	if z, ok := v.Type.(HasZeroValue); ok {
-		zv := z.ZeroValue(vm.env)
-		vm.env.set(v.Name.Name, zv)
+		zv := z.ZeroValue(vm.localEnv())
+		vm.localEnv().set(v.Name.Name, zv)
 	}
 }
 

@@ -72,7 +72,7 @@ func loadAndRun(t *testing.T, dirPath string) string {
 	if len(pkgs) == 0 {
 		t.Fatal("no packages found")
 	}
-	builtins := &Env{valueTable: builtinsMap}
+	builtins := &Environment{valueTable: builtinsMap}
 	b := builder{env: builtins}
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
@@ -84,9 +84,8 @@ func loadAndRun(t *testing.T, dirPath string) string {
 	return runWithBuilder(b)
 }
 func runWithBuilder(b builder) string {
-	vm := newVM()
-	vm.env = b.env
-	vm.env.set("print", reflect.ValueOf(func(args ...any) {
+	vm := newVM(b.env)
+	vm.localEnv().set("print", reflect.ValueOf(func(args ...any) {
 		for _, a := range args {
 			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
 				fmt.Fprintf(vm.output, "%v", rv.Interface())
@@ -102,17 +101,17 @@ func runWithBuilder(b builder) string {
 	}))
 	// first run const and vars
 	// TODO first run inits
-	for name, decl := range b.declarations {
-		fmt.Println(name)
-		decl.Declare(vm)
+	pkgEnv := vm.localEnv().(*PkgEnvironment)
+	for _, each := range pkgEnv.declTable {
+		each.Declare(vm)
 	}
 
-	main := vm.env.valueLookUp("main")
+	main := vm.localEnv().valueLookUp("main")
 	if !main.IsValid() {
 		return "main not found"
 	}
 	// TODO
-	vm.callStack.push(stackFrame{env: vm.env.subEnv()})
+	vm.callStack.push(stackFrame{env: vm.localEnv().newChildEnvironment()})
 	fundecl := main.Interface().(FuncDecl)
 	fundecl.Body.Eval(vm)
 	return vm.output.String()

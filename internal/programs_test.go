@@ -204,7 +204,6 @@ func main() {
 }
 
 func TestProgramDeclare(t *testing.T) {
-	t.Skip()
 	out := parseAndRun(t, `package main
 
 func main() {

@@ -140,6 +140,6 @@ var _ Expr = &operatorUnimplemented{}
 
 type operatorUnimplemented struct{ step }
 
-func (*operatorUnimplemented) Assign(env *Env, value reflect.Value) {
+func (*operatorUnimplemented) Assign(env *Environment, value reflect.Value) {
 	panic("not implemented: operatorUnimplemented.Assign")
 }

@@ -21,7 +21,7 @@ func (r RangeStmt) stmtStep() Evaluable { return r }
 
 func (r RangeStmt) Eval(vm *VM) {
 	rangeable := vm.ReturnsEval(r.X)
-	frame := stackFrame{env: vm.env.subEnv()}
+	frame := stackFrame{env: vm.localEnv().newChildEnvironment()}
 	vm.callStack.push(frame)
 	for i := 0; i < rangeable.Len(); i++ {
 		if r.Key != nil {

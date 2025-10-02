@@ -62,7 +62,7 @@ func (c CallExpr) Eval(vm *VM) {
 		}
 		fr := stackFrame{}
 		fr.funcArgs = params
-		fr.env = vm.env.subEnv()
+		fr.env = vm.localEnv().newChildEnvironment()
 		vm.callStack.push(fr)
 
 		// take all parameters and put them in the env
@@ -82,7 +82,7 @@ func (c CallExpr) Eval(vm *VM) {
 }
 
 // used?
-func (c CallExpr) Assign(env *Env, value reflect.Value) {}
+func (c CallExpr) Assign(env *Environment, value reflect.Value) {}
 
 func (c CallExpr) String() string {
 	return fmt.Sprintf("CallExpr(%v, len=%d)", c.Fun, len(c.Args))

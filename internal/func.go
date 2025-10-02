@@ -16,7 +16,7 @@ type FuncDecl struct {
 
 func (f FuncDecl) Eval(vm *VM) {
 	v := reflect.ValueOf(f)
-	vm.env.set(f.Name.Name, v)
+	vm.localEnv().set(f.Name.Name, v)
 }
 func (f FuncDecl) String() string {
 	return fmt.Sprintf("FuncDecl(%s)", f.Name.Name)

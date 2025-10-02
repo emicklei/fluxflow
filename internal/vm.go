@@ -6,7 +6,7 @@ import (
 )
 
 type stackFrame struct {
-	env          ienv
+	env          Env
 	funcArgs     []reflect.Value
 	returnValues []reflect.Value
 }
@@ -14,15 +14,17 @@ type stackFrame struct {
 type VM struct {
 	operandStack stack[reflect.Value]
 	callStack    stack[stackFrame]
-	env          ienv
 	output       *bytes.Buffer
 }
 
-func newVM() *VM {
-	return &VM{env: newEnv(), output: new(bytes.Buffer)}
+func newVM(env Env) *VM {
+	vm := &VM{output: new(bytes.Buffer)}
+	frame := stackFrame{env: env}
+	vm.callStack.push(frame)
+	return vm
 }
 
-func (vm *VM) localEnv() ienv {
+func (vm *VM) localEnv() Env {
 	return vm.callStack.top().env
 }
 

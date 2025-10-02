@@ -6,7 +6,7 @@ import (
 )
 
 func TestZeroValueOfType(t *testing.T) {
-	env := newEnv()
+	env := newEnvironment(nil)
 	i := Ident{Ident: &ast.Ident{Name: "string"}}
 	v := i.ZeroValue(env)
 	if v.Interface() != "" {

@@ -46,7 +46,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 					Y:          right,
 					BinaryExpr: &ast.BinaryExpr{Op: tt.op},
 				}
-				vm := newVM()
+				vm := newVM(newEnvironment(nil))
 				result := vm.ReturnsEval(expr)
 				switch expected := tt.expected.(type) {
 				case int64:
@@ -83,7 +83,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 					Y:          right,
 					BinaryExpr: &ast.BinaryExpr{Op: tt.op},
 				}
-				vm := newVM()
+				vm := newVM(newEnvironment(nil))
 				expr.Eval(vm)
 				result := vm.ReturnsEval(expr)
 				if math.Abs(result.Float()-tt.expected) > 1e-9 {
@@ -101,7 +101,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 			Y:          right,
 			BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 		}
-		vm := newVM()
+		vm := newVM(newEnvironment(nil))
 		expr.Eval(vm)
 		result := vm.ReturnsEval(expr)
 		if result.Kind() != reflect.Float64 {
@@ -120,7 +120,7 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 			Y:          right,
 			BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 		}
-		vm := newVM()
+		vm := newVM(newEnvironment(nil))
 		expr.Eval(vm)
 		result := vm.ReturnsEval(expr)
 		if result.Kind() != reflect.Float64 {
@@ -139,8 +139,8 @@ func TestBinaryExprValue_Eval(t *testing.T) {
 			Y:          right,
 			BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
 		}
-		vm := newVM()
-		expr.Eval(newVM())
+		vm := newVM(newEnvironment(nil))
+		expr.Eval(vm)
 		result := vm.ReturnsEval(expr)
 		if result.Kind() != reflect.String {
 			t.Fatalf("expected string result, got %v", result.Kind())

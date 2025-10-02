@@ -5,53 +5,48 @@ import (
 	"reflect"
 )
 
-type ienv interface {
+type Env interface {
 	valueLookUp(name string) reflect.Value
 	typeLookUp(name string) reflect.Type
-	valueOwnerOf(name string) ienv
+	valueOwnerOf(name string) Env
 	set(name string, value reflect.Value)
-	subEnv() ienv
+	newChildEnvironment() Env
 	addConstOrVar(cv ConstOrVar)
 }
 
-type PackageEnv struct {
-	*Env
+type PkgEnvironment struct {
+	Env
 	pkgTable  map[string]ImportSpec
 	declTable map[string]CanDeclare
 }
 
-func newPackageEnv(parent ienv) ienv {
-	env := newEnv().(*Env)
-	env.parent = parent
-	return &PackageEnv{
-		Env:       env,
+func newPkgEnvironment(parent Env) Env {
+	return &PkgEnvironment{
+		Env:       newEnvironment(parent),
 		pkgTable:  map[string]ImportSpec{},
 		declTable: map[string]CanDeclare{},
 	}
 }
 
-func (p *PackageEnv) addConstOrVar(cv ConstOrVar) {
+func (p *PkgEnvironment) addConstOrVar(cv ConstOrVar) {
 	p.declTable[cv.Name.Name] = CanDeclare(cv)
 }
 
-type Env struct {
-	parent     ienv
+type Environment struct {
+	parent     Env
 	valueTable map[string]reflect.Value
-	pkgTable   map[string]ImportSpec // only relevant on package level
 }
 
-func newEnv() ienv {
-	return &Env{
+func newEnvironment(parentOrNil Env) Env {
+	return &Environment{
+		parent:     parentOrNil,
 		valueTable: map[string]reflect.Value{},
-		pkgTable:   map[string]ImportSpec{},
 	}
 }
-func (e *Env) subEnv() ienv {
-	child := newEnv().(*Env)
-	child.parent = e
-	return child
+func (e *Environment) newChildEnvironment() Env {
+	return newEnvironment(e)
 }
-func (e *Env) valueLookUp(name string) reflect.Value {
+func (e *Environment) valueLookUp(name string) reflect.Value {
 	v, ok := e.valueTable[name]
 	if !ok {
 		if e.parent == nil {
@@ -62,7 +57,7 @@ func (e *Env) valueLookUp(name string) reflect.Value {
 	return v
 }
 
-func (e *Env) typeLookUp(name string) reflect.Type {
+func (e *Environment) typeLookUp(name string) reflect.Type {
 	v, ok := builtinTypesMap[name]
 	if !ok {
 		return nil
@@ -70,7 +65,7 @@ func (e *Env) typeLookUp(name string) reflect.Type {
 	return v
 }
 
-func (e *Env) valueOwnerOf(name string) ienv {
+func (e *Environment) valueOwnerOf(name string) Env {
 	_, ok := e.valueTable[name]
 	if !ok {
 		if e.parent == nil {
@@ -81,11 +76,11 @@ func (e *Env) valueOwnerOf(name string) ienv {
 	return e
 }
 
-func (e *Env) set(name string, value reflect.Value) {
+func (e *Environment) set(name string, value reflect.Value) {
 	e.valueTable[name] = value
 }
 
-func (e *Env) addConstOrVar(cv ConstOrVar) {
+func (e *Environment) addConstOrVar(cv ConstOrVar) {
 	//e.valueTable[cv.Name.Name] =
 	fmt.Println(cv)
 }

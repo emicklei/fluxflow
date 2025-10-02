@@ -26,15 +26,14 @@ func TestIncDec(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.tok.String()+" "+tc.start.Kind().String(), func(t *testing.T) {
-			vm := newVM()
-			vm.callStack.push(stackFrame{env: vm.env})
-			vm.env.set("x", tc.start)
+			vm := newVM(newEnvironment(nil))
+			vm.localEnv().set("x", tc.start)
 			n := IncDecStmt{
 				IncDecStmt: &ast.IncDecStmt{Tok: tc.tok},
 				X:          Ident{Ident: &ast.Ident{Name: "x"}},
 			}
 			n.Eval(vm)
-			v := vm.env.valueLookUp("x")
+			v := vm.localEnv().valueLookUp("x")
 			if got, want := v.Interface(), tc.end.Interface(); got != want {
 				t.Errorf("got %v want %v", got, want)
 			}

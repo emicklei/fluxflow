@@ -25,7 +25,7 @@ func (s SelectorExpr) Eval(vm *VM) {
 	panic("expected FieldSelectable: " + recv.String())
 }
 
-func (s SelectorExpr) Assign(env *Env, value reflect.Value) {
+func (s SelectorExpr) Assign(env *Environment, value reflect.Value) {
 	panic("not implemented: SelectorExpr:Assign")
 	//env.set(i.Obj.Name, value)
 }

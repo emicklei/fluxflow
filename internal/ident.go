@@ -15,15 +15,15 @@ type Ident struct {
 func (i Ident) Eval(vm *VM) {
 	vm.Returns(vm.localEnv().valueLookUp(i.Name))
 }
-func (i Ident) Assign(env ienv, value reflect.Value) {
+func (i Ident) Assign(env Env, value reflect.Value) {
 	env.valueOwnerOf(i.Name).set(i.Name, value)
 }
-func (i Ident) Define(env ienv, value reflect.Value) {
+func (i Ident) Define(env Env, value reflect.Value) {
 	env.set(i.Name, value)
 }
 
 // ZeroValue returns the zero value iff the Ident represents a standard type.
-func (i Ident) ZeroValue(env ienv) reflect.Value {
+func (i Ident) ZeroValue(env Env) reflect.Value {
 	// TODO handle interpreted types.
 	rt := env.typeLookUp(i.Name)
 	if rt == nil { // invalid

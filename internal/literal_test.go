@@ -31,8 +31,7 @@ func TestBasicLit_Eval(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.lit.Kind.String(), func(t *testing.T) {
-			vm := newVM()
-			vm.callStack.push(stackFrame{env: vm.env})
+			vm := newVM(newEnvironment(nil))
 			bl := BasicLit{BasicLit: tt.lit}
 			result := vm.ReturnsEval(bl)
 			if result.Interface() != tt.expected {
@@ -44,8 +43,7 @@ func TestBasicLit_Eval(t *testing.T) {
 
 func TestCompositeArrayLit_Eval(t *testing.T) {
 	t.Run("array literal", func(t *testing.T) {
-		vm := newVM()
-		vm.callStack.push(stackFrame{env: vm.env})
+		vm := newVM(newEnvironment(nil))
 		// mock array type
 		at := ArrayType{
 			ArrayType: &ast.ArrayType{
@@ -81,8 +79,7 @@ func TestCompositeArrayLit_Eval(t *testing.T) {
 
 func TestCompositeSliceLit_Eval(t *testing.T) {
 	t.Run("array literal", func(t *testing.T) {
-		vm := newVM()
-		vm.callStack.push(stackFrame{env: vm.env})
+		vm := newVM(newEnvironment(nil))
 		// mock array type
 		at := ArrayType{
 			ArrayType: &ast.ArrayType{
