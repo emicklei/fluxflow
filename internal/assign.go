@@ -15,11 +15,17 @@ type AssignStmt struct {
 func (a AssignStmt) stmtStep() Evaluable { return a }
 
 func (a AssignStmt) Eval(vm *VM) {
-	for i, rhs := range a.Rhs {
-		v := vm.ReturnsEval(rhs)
-		target, ok_ := a.Lhs[i].(CanAssign)
+	for _, each := range a.Rhs {
+		// values are stacked operands
+		each.Eval(vm)
+	}
+	// operands are stacked in reverse order
+	for i := len(a.Lhs) - 1; i != -1; i-- {
+		each := a.Lhs[i]
+		v := vm.operandStack.pop()
+		target, ok_ := each.(CanAssign)
 		if !ok_ {
-			panic("cannot assign to " + fmt.Sprintf("%T", a.Lhs[i]))
+			panic("cannot assign to " + fmt.Sprintf("%T", each))
 		}
 		switch a.AssignStmt.Tok {
 		case token.DEFINE: // :=

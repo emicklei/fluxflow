@@ -22,6 +22,7 @@ type CanDeclare interface {
 type Statement interface{}
 
 type Expr interface {
+	// Eval performs the expression and push the value(s) on the operand stack.
 	Eval(vm *VM)
 }
 

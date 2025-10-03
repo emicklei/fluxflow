@@ -20,7 +20,7 @@ func (f ForStmt) String() string {
 }
 func (f ForStmt) Eval(vm *VM) {
 
-	fr := stackFrame{env: vm.localEnv().newChildEnvironment()}
+	fr := stackFrame{env: vm.localEnv().newChild()}
 	vm.callStack.push(fr)
 
 	if f.Init != nil {

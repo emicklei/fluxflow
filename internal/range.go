@@ -21,8 +21,7 @@ func (r RangeStmt) stmtStep() Evaluable { return r }
 
 func (r RangeStmt) Eval(vm *VM) {
 	rangeable := vm.ReturnsEval(r.X)
-	frame := stackFrame{env: vm.localEnv().newChildEnvironment()}
-	vm.callStack.push(frame)
+	vm.pushNewFrame()
 	for i := 0; i < rangeable.Len(); i++ {
 		if r.Key != nil {
 			if ca, ok := r.Key.(CanAssign); ok {
@@ -44,5 +43,5 @@ func (r RangeStmt) Eval(vm *VM) {
 		}
 		r.Body.Eval(vm)
 	}
-	vm.callStack.pop()
+	vm.popFrame()
 }

@@ -38,7 +38,7 @@ func (vm *VM) Returns(v reflect.Value) {
 	vm.operandStack.push(v)
 }
 func (vm *VM) pushNewFrame() stackFrame {
-	frame := stackFrame{env: vm.localEnv().newChildEnvironment()}
+	frame := stackFrame{env: vm.localEnv().newChild()}
 	vm.callStack.push(frame)
 	return frame
 }

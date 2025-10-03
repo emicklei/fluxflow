@@ -18,6 +18,7 @@ func (r ReturnStmt) String() string {
 }
 
 func (r ReturnStmt) Eval(vm *VM) {
+	// TODO optimize for empty results
 	results := make([]reflect.Value, len(r.Results))
 	for i, each := range r.Results {
 		results[i] = vm.ReturnsEval(each)

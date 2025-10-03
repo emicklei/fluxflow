@@ -2,15 +2,18 @@ package internal
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 )
+
+var trace = os.Getenv("TRACE") != ""
 
 type Env interface {
 	valueLookUp(name string) reflect.Value
 	typeLookUp(name string) reflect.Type
 	valueOwnerOf(name string) Env
 	set(name string, value reflect.Value)
-	newChildEnvironment() Env
+	newChild() Env
 	addConstOrVar(cv ConstOrVar)
 }
 
@@ -59,7 +62,7 @@ func (e *Environment) String() string {
 	return fmt.Sprintf("Env(%d,values=%d)", e.depth(), len(e.valueTable))
 }
 
-func (e *Environment) newChildEnvironment() Env {
+func (e *Environment) newChild() Env {
 	return newEnvironment(e)
 }
 func (e *Environment) valueLookUp(name string) reflect.Value {
@@ -93,7 +96,9 @@ func (e *Environment) valueOwnerOf(name string) Env {
 }
 
 func (e *Environment) set(name string, value reflect.Value) {
-	fmt.Println(e, name, "=", value.Interface())
+	if trace {
+		fmt.Println(e, name, "=", value.Interface())
+	}
 	e.valueTable[name] = value
 }
 

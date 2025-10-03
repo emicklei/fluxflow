@@ -376,7 +376,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			// what if nil?
 		}
 	case *ast.StructType:
-		s := StructType{StructType: n}
+		s := makeStructType(n)
 		if n.Fields != nil {
 			b.Visit(n.Fields)
 			e := b.pop().(FieldList)
@@ -410,6 +410,25 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.Visit(n.Index)
 		e = b.pop()
 		s.Index = e.(Expr)
+		b.push(s)
+	case *ast.LabeledStmt:
+		s := LabeledStmt{LabeledStmt: n}
+		if n.Label != nil {
+			b.Visit(n.Label)
+			e := b.pop().(Ident)
+			s.Label = &e
+		}
+		b.Visit(n.Stmt)
+		e := b.pop()
+		s.Stmt = e.(Stmt)
+		b.push(s)
+	case *ast.BranchStmt:
+		s := BranchStmt{BranchStmt: n}
+		if n.Label != nil {
+			b.Visit(n.Label)
+			e := b.pop().(Ident)
+			s.Label = &e
+		}
 		b.push(s)
 	case nil:
 		// end of a branch

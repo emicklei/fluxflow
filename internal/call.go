@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"reflect"
-
-	"github.com/emicklei/structexplorer"
 )
 
 type CallExpr struct {
@@ -60,11 +58,12 @@ func (c CallExpr) Eval(vm *VM) {
 			panic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
 		}
 
-		structexplorer.Break("vm", vm)
+		// structexplorer.Break("vm", vm)
 		// prepare arguments
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
-			args[i] = vm.ReturnsEval(arg)
+			val := vm.ReturnsEval(arg)
+			args[i] = val
 		}
 		frame := vm.pushNewFrame()
 

@@ -109,8 +109,6 @@ func main() {
 }
 
 func TestProgramFuncMultiReturn(t *testing.T) {
-	// t.Skip()
-	defer printSteps()()
 	out := parseAndRun(t, `package main
 
 func ab(a int, b int) (int,int) {
@@ -405,6 +403,41 @@ func init() {
 func main() {}
 `)
 	if got, want := out, "01"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestMethod(t *testing.T) {
+	t.Skip()
+	out := parseAndRun(t, `package main
+
+func (_ Airplane) S() string { return "airplane" }
+
+type Airplane struct {}
+
+func main() {
+	print(Airplane{}.S())
+}
+`)
+	if got, want := out, "airplane"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestGoto(t *testing.T) {
+	// t.Skip()
+	out := parseAndRun(t, `package main
+
+func main() {
+	i := 0
+here:
+	print("a")
+	if i < 2 {
+		i++
+		goto here
+	}
+}`)
+	if got, want := out, "aaa"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
