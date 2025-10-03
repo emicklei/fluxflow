@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"go/ast"
 	"reflect"
+
+	"github.com/emicklei/structexplorer"
 )
 
 type CallExpr struct {
@@ -37,8 +39,9 @@ func (c CallExpr) Eval(vm *VM) {
 
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
-			args[i] = vm.ReturnsEval(arg)
-			//fmt.Printf("%d %v %v %T\n", i, arg, args[i], args[i])
+			val := vm.ReturnsEval(arg)
+			assertValid(c.String(), val)
+			args[i] = val
 		}
 		vals := f.Call(args)
 
@@ -57,27 +60,33 @@ func (c CallExpr) Eval(vm *VM) {
 			panic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
 		}
 
-		params := make([]reflect.Value, len(c.Args))
+		structexplorer.Break("vm", vm)
+		// prepare arguments
+		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
-			params[i] = vm.ReturnsEval(arg)
+			args[i] = vm.ReturnsEval(arg)
 		}
-		fr := stackFrame{}
-		fr.env = vm.localEnv().newChildEnvironment()
-		vm.callStack.push(fr)
+		frame := vm.pushNewFrame()
 
-		// take all parameters and put them in the env
+		// take all parameters and put them in the env of the new frame
 		p := 0
 		for _, field := range lf.Type.Params.List {
 			for _, name := range field.Names {
-				fr.env.set(name.Name, params[p])
+				frame.env.set(name.Name, args[p])
 				p++
 			}
 		}
 		lf.Body.Eval(vm)
-		top := vm.callStack.pop()
+		top := vm.popFrame()
 		for _, each := range top.returnValues {
 			vm.Returns(each)
 		}
+	}
+}
+
+func assertValid(role string, v reflect.Value) {
+	if !v.IsValid() {
+		panic(fmt.Sprintf("%s: invalid value", role))
 	}
 }
 

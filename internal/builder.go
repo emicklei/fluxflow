@@ -58,9 +58,6 @@ func (b *builder) top() any {
 }
 
 func (b *builder) envSet(name string, value reflect.Value) {
-	if os.Getenv("STEPS") != "" {
-		fmt.Fprintf(os.Stderr, "%s -> %v\n", name, value)
-	}
 	b.env.set(name, value)
 }
 

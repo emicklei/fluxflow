@@ -109,7 +109,7 @@ func main() {
 }
 
 func TestProgramFuncMultiReturn(t *testing.T) {
-	t.Skip()
+	// t.Skip()
 	defer printSteps()()
 	out := parseAndRun(t, `package main
 
