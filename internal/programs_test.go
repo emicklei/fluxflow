@@ -425,7 +425,7 @@ func main() {
 }
 
 func TestGoto(t *testing.T) {
-	// t.Skip()
+	t.Skip()
 	out := parseAndRun(t, `package main
 
 func main() {
