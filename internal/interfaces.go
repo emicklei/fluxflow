@@ -43,3 +43,7 @@ type CanInstantiate interface {
 	Instantiate(vm *VM) reflect.Value // , typeArgs []reflect.Type) reflect.Value
 	LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value
 }
+
+type Decl interface {
+	declStep() CanDeclare
+}

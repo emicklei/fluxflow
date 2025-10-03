@@ -231,6 +231,23 @@ func main() {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
+func TestProgramVar(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+var (
+	a = 1
+	s string
+	b bool
+)
+
+func main() {	
+	print(a,s,b)
+}
+`)
+	if got, want := out, "1false"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
 
 func TestProgramConstScope(t *testing.T) {
 	t.Skip()
@@ -466,6 +483,28 @@ func main() {
 	print(m["a"] + m["b"])
 }`)
 	if got, want := out, "3"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestSwitch(t *testing.T) {
+	t.Skip()
+	out := parseAndRun(t, `package main
+
+func main() {
+	var a int
+	switch a = 1; a {
+	case 1:
+		print(a)
+	}
+	switch a {
+	case 2:
+	default:
+		print(2)
+	}
+}
+`)
+	if got, want := out, "12"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }

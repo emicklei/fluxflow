@@ -21,12 +21,12 @@ a Go interpreter that will serve a live code and debug experience
 | Basic literal types (int,string,...) | ✅ |
 | Composite type `array` | ✅ |
 | Composite type `slice` | ✅ |
-| Mulitple `init` | ✅ |
+| Package `init` | ✅ |
 | Binary and Unary Operators | ✅ |
 | Pointers | ⬜ |
 | Interfaces | ⬜ |
 | Composite type `struct` | ✅ |
-| Composite type `map` | ⬜ |
+| Composite type `map` | ✅ |
 | `switch` statement | ⬜ |
 | Goroutines `go` | ⬜ |
 | Channels `chan` | ⬜ |

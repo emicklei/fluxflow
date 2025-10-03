@@ -22,10 +22,13 @@ func (i IndexExpr) Eval(vm *VM) {
 	index := vm.ReturnsEval(i.Index)
 	if target.Kind() == reflect.Map {
 		vm.Returns(target.MapIndex(index))
+		return
 	}
 	if target.Kind() == reflect.Slice || target.Kind() == reflect.Array {
 		vm.Returns(target.Index(int(index.Int())))
+		return
 	}
+	expected(target, "map or slice or array")
 }
 
 func (i IndexExpr) Assign(vm *VM, value reflect.Value) {
@@ -33,10 +36,13 @@ func (i IndexExpr) Assign(vm *VM, value reflect.Value) {
 	index := vm.ReturnsEval(i.Index)
 	if target.Kind() == reflect.Map {
 		target.SetMapIndex(index, value)
+		return
 	}
 	if target.Kind() == reflect.Slice || target.Kind() == reflect.Array {
 		reflect.ValueOf(target.Interface()).Index(int(index.Int())).Set(value)
+		return
 	}
+	expected(target, "map or slice or array")
 }
 
 func (i IndexExpr) Define(vm *VM, value reflect.Value) {

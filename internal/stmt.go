@@ -35,10 +35,6 @@ func (s DeclStmt) String() string {
 	return fmt.Sprintf("DeclStmt(%v)", s.Decl)
 }
 
-type Decl interface {
-	declStep() CanDeclare
-}
-
 // LabeledStmt represents a labeled statement.
 type LabeledStmt struct {
 	*ast.LabeledStmt
@@ -69,3 +65,36 @@ func (s BranchStmt) String() string {
 }
 
 func (s BranchStmt) stmtStep() Evaluable { return s }
+
+// A SwitchStmt represents an expression switch statement.
+type SwitchStmt struct {
+	*ast.SwitchStmt
+	Init Stmt // initialization statement; or nil
+	Tag  Expr // tag expression; or nil
+	Body BlockStmt
+}
+
+func (s SwitchStmt) stmtStep() Evaluable { return s }
+
+func (s SwitchStmt) Eval(vm *VM) {
+	if s.Init != nil {
+		s.Init.stmtStep().Eval(vm)
+	}
+}
+func (s SwitchStmt) String() string {
+	return fmt.Sprintf("SwitchStmt(%v,%v,%v)", s.Init, s.Tag, s.Body)
+}
+
+// A CaseClause represents a case of an expression or type switch statement.
+type CaseClause struct {
+	*ast.CaseClause
+	List []Expr // list of expressions; nil means default case
+	Body []Stmt
+}
+
+func (c CaseClause) String() string {
+	return fmt.Sprintf("CaseClause(%v,%v)", c.List, c.Body)
+}
+func (c CaseClause) Eval(vm *VM) {}
+
+func (c CaseClause) stmtStep() Evaluable { return c }

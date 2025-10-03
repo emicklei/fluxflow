@@ -64,6 +64,32 @@ func (b *builder) envSet(name string, value reflect.Value) {
 // Visit implements the ast.Visitor interface
 func (b *builder) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
+	case *ast.SwitchStmt:
+		s := SwitchStmt{SwitchStmt: n}
+		b.Visit(n.Init)
+		s.Init = b.pop().(Stmt)
+		b.Visit(n.Tag)
+		e := b.pop()
+		s.Tag = e.(Expr)
+		if n.Body != nil {
+			b.Visit(n.Body)
+			blk := b.pop().(BlockStmt)
+			s.Body = blk
+		}
+		b.push(s)
+	case *ast.CaseClause:
+		s := CaseClause{CaseClause: n}
+		for _, expr := range n.List {
+			b.Visit(expr)
+			e := b.pop()
+			s.List = append(s.List, e.(Expr))
+		}
+		for _, stmt := range n.Body {
+			b.Visit(stmt)
+			e := b.pop()
+			s.Body = append(s.Body, e.(Stmt))
+		}
+		b.push(s)
 	case *ast.MapType:
 		s := MapType{MapType: n}
 		b.Visit(n.Key)
