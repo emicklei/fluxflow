@@ -21,6 +21,8 @@ a Go interpreter that will serve a live code and debug experience
 | Basic literal types (int,string,...) | ✅ |
 | Composite type `array` | ✅ |
 | Composite type `slice` | ✅ |
+| Mulitple `init` | ✅ |
+| Binary and Unary Operators | ✅ |
 | Pointers | ⬜ |
 | Interfaces | ⬜ |
 | Composite type `struct` | ✅ |
