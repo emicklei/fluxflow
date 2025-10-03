@@ -7,12 +7,8 @@ type Evaluable interface {
 }
 
 type CanAssign interface {
-	Assign(env Env, value reflect.Value)
-	Define(env Env, value reflect.Value) // needed?
-}
-
-type CanDefine interface {
-	Define(env Env, value reflect.Value)
+	Assign(vm *VM, value reflect.Value)
+	Define(vm *VM, value reflect.Value) // needed?
 }
 
 type CanDeclare interface {

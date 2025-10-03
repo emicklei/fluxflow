@@ -29,9 +29,9 @@ func (a AssignStmt) Eval(vm *VM) {
 		}
 		switch a.AssignStmt.Tok {
 		case token.DEFINE: // :=
-			target.Define(vm.localEnv(), v)
+			target.Define(vm, v)
 		case token.ASSIGN: // =
-			target.Assign(vm.localEnv(), v)
+			target.Assign(vm, v)
 		default:
 			panic("unsupported assignment " + a.AssignStmt.Tok.String())
 		}

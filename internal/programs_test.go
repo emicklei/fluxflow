@@ -273,6 +273,20 @@ func main() {
 	}
 }
 
+func TestProgramSliceAppendAndIndex(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+func main() {
+	list := []int{}
+	list = append(list, 1, 2)
+	print(list[0], list[1])
+}
+`)
+	if got, want := out, "12"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
 func TestProgramAppend(t *testing.T) {
 	out := parseAndRun(t, `package main
 
@@ -438,6 +452,20 @@ here:
 	}
 }`)
 	if got, want := out, "aaa"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestMap(t *testing.T) {
+	out := parseAndRun(t, `package main
+
+func main() {
+	m := map[string]int{}
+	m["a"] = 1
+	m["b"] = 2
+	print(m["a"] + m["b"])
+}`)
+	if got, want := out, "3"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }

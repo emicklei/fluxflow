@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bytes"
+	"fmt"
 	"reflect"
 )
 
@@ -29,6 +30,9 @@ func (vm *VM) localEnv() Env {
 
 // ReturnsEval evaluates the argument and returns its return value.
 func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
+	if trace {
+		fmt.Println("VM.ReturnsEval", e)
+	}
 	e.Eval(vm)
 	return vm.operandStack.pop()
 }

@@ -64,6 +64,15 @@ func (b *builder) envSet(name string, value reflect.Value) {
 // Visit implements the ast.Visitor interface
 func (b *builder) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
+	case *ast.MapType:
+		s := MapType{MapType: n}
+		b.Visit(n.Key)
+		e := b.pop()
+		s.Key = e.(Expr)
+		b.Visit(n.Value)
+		e = b.pop()
+		s.Value = e.(Expr)
+		b.push(s)
 	case *ast.IncDecStmt:
 		s := &IncDecStmt{IncDecStmt: n}
 		b.Visit(n.X)

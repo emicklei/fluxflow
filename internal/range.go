@@ -26,18 +26,18 @@ func (r RangeStmt) Eval(vm *VM) {
 		if r.Key != nil {
 			if ca, ok := r.Key.(CanAssign); ok {
 				if i == 0 {
-					ca.Define(vm.localEnv(), reflect.ValueOf(i))
+					ca.Define(vm, reflect.ValueOf(i))
 				} else {
-					ca.Assign(vm.localEnv(), reflect.ValueOf(i))
+					ca.Assign(vm, reflect.ValueOf(i))
 				}
 			}
 		}
 		if r.Value != nil {
 			if ca, ok := r.Value.(CanAssign); ok {
 				if i == 0 {
-					ca.Define(vm.localEnv(), rangeable.Index(i))
+					ca.Define(vm, rangeable.Index(i))
 				} else {
-					ca.Assign(vm.localEnv(), rangeable.Index(i))
+					ca.Assign(vm, rangeable.Index(i))
 				}
 			}
 		}

@@ -74,3 +74,37 @@ func (s StructType) LiteralCompose(composite reflect.Value, values []reflect.Val
 func (s StructType) Instantiate(vm *VM) reflect.Value {
 	return reflect.ValueOf(NewInstance(vm, s))
 }
+
+type MapType struct {
+	*ast.MapType
+	Key   Expr
+	Value Expr
+}
+
+func (m MapType) String() string {
+	return fmt.Sprintf("MapType(%v,%v)", m.Key, m.Value)
+}
+
+func (m MapType) Eval(vm *VM) {
+	vm.Returns(reflect.ValueOf(m))
+}
+
+func (m MapType) Instantiate(vm *VM) reflect.Value {
+	keyTypeName := mustIdentName(m.Key)
+	valueTypeName := mustIdentName(m.Value)
+	keyType := vm.localEnv().typeLookUp(keyTypeName)
+	valueType := vm.localEnv().typeLookUp(valueTypeName)
+	mapType := reflect.MapOf(keyType, valueType)
+	return reflect.MakeMap(mapType)
+}
+func (m MapType) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
+	if composite.Kind() != reflect.Map {
+		expected(composite, "map")
+	}
+	for i := 0; i < len(values); i += 2 {
+		k := values[i]
+		v := values[i+1]
+		composite.SetMapIndex(k, v)
+	}
+	return composite
+}
