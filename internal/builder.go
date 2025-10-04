@@ -66,11 +66,15 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.SwitchStmt:
 		s := SwitchStmt{SwitchStmt: n}
-		b.Visit(n.Init)
-		s.Init = b.pop().(Stmt)
-		b.Visit(n.Tag)
-		e := b.pop()
-		s.Tag = e.(Expr)
+		if n.Init != nil {
+			b.Visit(n.Init)
+			s.Init = b.pop().(Stmt)
+		}
+		if n.Tag != nil {
+			b.Visit(n.Tag)
+			e := b.pop()
+			s.Tag = e.(Expr)
+		}
 		if n.Body != nil {
 			b.Visit(n.Body)
 			blk := b.pop().(BlockStmt)

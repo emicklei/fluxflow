@@ -77,9 +77,15 @@ type SwitchStmt struct {
 func (s SwitchStmt) stmtStep() Evaluable { return s }
 
 func (s SwitchStmt) Eval(vm *VM) {
+	vm.pushNewFrame()
+	defer vm.popFrame() // to handle break statements
 	if s.Init != nil {
 		s.Init.stmtStep().Eval(vm)
 	}
+	if s.Tag != nil {
+		s.Tag.Eval(vm)
+	}
+	s.Body.Eval(vm)
 }
 func (s SwitchStmt) String() string {
 	return fmt.Sprintf("SwitchStmt(%v,%v,%v)", s.Init, s.Tag, s.Body)
@@ -95,6 +101,26 @@ type CaseClause struct {
 func (c CaseClause) String() string {
 	return fmt.Sprintf("CaseClause(%v,%v)", c.List, c.Body)
 }
-func (c CaseClause) Eval(vm *VM) {}
+func (c CaseClause) Eval(vm *VM) {
+	if c.List == nil {
+		// default case
+		for _, stmt := range c.Body {
+			stmt.stmtStep().Eval(vm)
+		}
+		return
+	}
+	left := vm.callStack.top().pop()
+	for _, expr := range c.List {
+		right := vm.ReturnsEval(expr)
+		if left.Equal(right) {
+			vm.pushNewFrame()
+			defer vm.popFrame()
+			for _, stmt := range c.Body {
+				stmt.stmtStep().Eval(vm)
+			}
+			return
+		}
+	}
+}
 
 func (c CaseClause) stmtStep() Evaluable { return c }

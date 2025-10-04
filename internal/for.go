@@ -19,10 +19,7 @@ func (f ForStmt) String() string {
 	return fmt.Sprintf("ForStmt(%v)", f.Cond)
 }
 func (f ForStmt) Eval(vm *VM) {
-
-	fr := stackFrame{env: vm.localEnv().newChild()}
-	vm.callStack.push(fr)
-
+	vm.pushNewFrame()
 	if f.Init != nil {
 		f.Init.stmtStep().Eval(vm)
 	}
@@ -30,6 +27,5 @@ func (f ForStmt) Eval(vm *VM) {
 		f.Body.stmtStep().Eval(vm)
 		f.Post.stmtStep().Eval(vm)
 	}
-
-	vm.callStack.pop()
+	vm.popFrame()
 }

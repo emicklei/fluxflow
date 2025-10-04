@@ -22,7 +22,7 @@ func (a AssignStmt) Eval(vm *VM) {
 	// operands are stacked in reverse order
 	for i := len(a.Lhs) - 1; i != -1; i-- {
 		each := a.Lhs[i]
-		v := vm.operandStack.pop()
+		v := vm.callStack.top().pop()
 		target, ok_ := each.(CanAssign)
 		if !ok_ {
 			panic("cannot assign to " + fmt.Sprintf("%T", each))
@@ -38,5 +38,5 @@ func (a AssignStmt) Eval(vm *VM) {
 	}
 }
 func (a AssignStmt) String() string {
-	return fmt.Sprintf("Assign(%v %s)", a.Lhs, a.AssignStmt.Tok)
+	return fmt.Sprintf("Assign(%v,%s, %v)", a.Lhs, a.AssignStmt.Tok, a.Rhs)
 }

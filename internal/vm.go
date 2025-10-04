@@ -8,18 +8,25 @@ import (
 
 type stackFrame struct {
 	env          Env
+	operandStack stack[reflect.Value]
 	returnValues []reflect.Value
 }
 
+func (f *stackFrame) push(v reflect.Value) {
+	f.operandStack.push(v)
+}
+func (f *stackFrame) pop() reflect.Value {
+	return f.operandStack.pop()
+}
+
 type VM struct {
-	operandStack stack[reflect.Value]
-	callStack    stack[stackFrame]
-	output       *bytes.Buffer
+	callStack stack[*stackFrame]
+	output    *bytes.Buffer
 }
 
 func newVM(env Env) *VM {
 	vm := &VM{output: new(bytes.Buffer)}
-	frame := stackFrame{env: env}
+	frame := &stackFrame{env: env}
 	vm.callStack.push(frame)
 	return vm
 }
@@ -34,18 +41,18 @@ func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
 		fmt.Println("VM.ReturnsEval", e)
 	}
 	e.Eval(vm)
-	return vm.operandStack.pop()
+	return vm.callStack.top().pop()
 }
 
 // Returns pushes a value onto the operand stack as the result of an evaluation.
 func (vm *VM) Returns(v reflect.Value) {
-	vm.operandStack.push(v)
+	vm.callStack.top().push(v)
 }
-func (vm *VM) pushNewFrame() stackFrame {
-	frame := stackFrame{env: vm.localEnv().newChild()}
+func (vm *VM) pushNewFrame() *stackFrame {
+	frame := &stackFrame{env: vm.localEnv().newChild()}
 	vm.callStack.push(frame)
 	return frame
 }
-func (vm *VM) popFrame() stackFrame {
+func (vm *VM) popFrame() *stackFrame {
 	return vm.callStack.pop()
 }

@@ -11,11 +11,6 @@ func TestProgramEverything(t *testing.T) {
 	t.Log(loadAndRun(t, "../programs"))
 }
 
-func TestProgramReal(t *testing.T) {
-	t.Skip()
-	t.Log(loadAndRun(t, "/Users/ernestmicklei/Projects/sandr"))
-}
-
 func TestProgramPrint(t *testing.T) {
 	out := parseAndRun(t, `package main
 
@@ -488,7 +483,8 @@ func main() {
 }
 
 func TestSwitch(t *testing.T) {
-	t.Skip()
+	// t.Skip()
+	defer printSteps()()
 	out := parseAndRun(t, `package main
 
 func main() {
@@ -501,6 +497,23 @@ func main() {
 	case 2:
 	default:
 		print(2)
+	}
+}
+`)
+	if got, want := out, "12"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+func TestSwitchOnBool(t *testing.T) {
+	t.Skip()
+	defer printSteps()()
+	out := parseAndRun(t, `package main
+
+func main() {
+	var a int = 1
+	switch {
+	case a == 1:
+		print(a)
 	}
 }
 `)
