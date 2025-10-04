@@ -6,39 +6,41 @@ import (
 	"testing"
 )
 
-func TestProgramEverything(t *testing.T) {
-	t.Skip()
-	t.Log(loadAndRun(t, "../programs"))
-}
-
-func TestProgramPrint(t *testing.T) {
-	out := parseAndRun(t, `package main
+func TestAllPrograms(t *testing.T) {
+	tests := []struct {
+		name    string
+		source  string
+		want    string
+		skip    bool
+		debug   bool
+		special func(string) bool // special check for output
+	}{
+		{
+			name: "print",
+			source: `
+package main
 
 func main() {
 	print("flux")
 	print("flow")
-}
-`)
-	if got, want := out, "fluxflow"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramMulitAssign(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "fluxflow",
+		},
+		{
+			name: "multi-assign",
+			source: `
+package main
 
 func main() {
 	in1, in2 := "flux", "flow"
 	print(in1, in2)
-}
-`)
-	if got, want := out, "fluxflow"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramIfElse(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "fluxflow",
+		},
+		{
+			name: "if-else",
+			source: `
+package main
 
 func main() {
 	if 1 == 2 {
@@ -46,81 +48,71 @@ func main() {
 	} else {
 		print("fluxflow")
 	}
-}
-`)
-	if got, want := out, "fluxflow"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramTrueFalse(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "fluxflow",
+		},
+		{
+			name: "true-false",
+			source: `
+package main
 
 func main() {
 	print(true, false)
-}
-`)
-	if got, want := out, "truefalse"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramRune(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "truefalse",
+		},
+		{
+			name: "rune",
+			source: `
+package main
 
 func main() {
 	print('e')
-}`)
-	if got, want := out, "'e'"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramNumbers(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "'e'",
+		},
+		{
+			name: "numbers",
+			source: `
+package main
 
 func main() {
 	print(-1,+3.14,0.1e10)
-}`)
-	if got, want := out, "-13.141e+09"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramFunc(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "-13.141e+09",
+		},
+		{
+			name: "func",
+			source: `
+package main
 
 func plus(a int, b int) int {
 	return a + b
 }
-
 func main() {
 	result := plus(2, 3)
 	print(result)
-}`)
-	if got, want := out, "5"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramFuncMultiReturn(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "5",
+		},
+		{
+			name: "func-multi-return",
+			source: `
+package main
 
 func ab(a int, b int) (int,int) {
 	return a,b
 }
-
 func main() {
 	a,b := ab(2, 3)
 	print(a,b)
-}`)
-	if got, want := out, "23"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramFor(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "23",
+		},
+		{
+			name: "for",
+			source: `
+package main
 
 func main() {
 	for i := 0; i < 10; i++ {
@@ -129,13 +121,13 @@ func main() {
 	for i := 9; i > 0; i-- {
 		print(i)
 	}		
-}`)
-	if got, want := out, "0123456789987654321"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-func TestProgramForScope(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "0123456789987654321",
+		},
+		{
+			name: "for-scope",
+			source: `
+package main
 
 func main() {
 	j := 1
@@ -144,315 +136,244 @@ func main() {
 		print(i)
 	}
 	print(j)
-}`)
-	if got, want := out, "0122"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramGeneric(t *testing.T) {
-	t.Skip()
-	parseAndRun(t, `package main
+}`,
+			want: "0122",
+		},
+		{
+			name: "generic",
+			skip: true,
+			source: `
+package main
 
 import "fmt"
-
 func Generic[T any](arg T) (*T, error) { return &arg, nil }
-
 func main() {
 	h, _ := Generic("hello")
 	fmt.Println(*h)
-}
-
-/**
-func Generic_string(arg string) (*string, error) { return &arg, nil }
-
-func main() {
-	h, _ := Generic_string("hello")
-	fmt.Println(*h)
-}
-**/
-`)
-}
-func TestProgramTypeConvert(t *testing.T) {
-	tests := []struct {
-		typeName string
-	}{
-		{"int8"},
-		{"int16"},
-		{"int32"},
-		{"int64"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.typeName, func(t *testing.T) {
-			out := parseAndRun(t, fmt.Sprintf(`package main
-func main() {
-	a := %s(1) + 2
-	print(a)
-}`, tt.typeName))
-			if got, want := out, "3"; got != want {
-				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-			}
-		})
-	}
-}
-
-func TestProgramDeclare(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+		},
+		{
+			name: "declare",
+			source: `
+package main
 
 func main() {
 	var s string
 	print(s)
-}
-`)
-	if got, want := out, ""; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramConst(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "",
+		},
+		{
+			name: "const",
+			source: `
+package main
 
 const (
 	C = A+1
 	A = 0
 	B = 1	
 )
-
 func main() {	
 	print(A,B,C)
-}
-`)
-	if got, want := out, "011"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-func TestProgramVar(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "011",
+		},
+		{
+			name: "var",
+			source: `
+package main
 
 var (
 	a = 1
 	s string
 	b bool
 )
-
 func main() {	
 	print(a,s,b)
-}
-`)
-	if got, want := out, "1false"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramConstScope(t *testing.T) {
-	t.Skip()
-	out := parseAndRun(t, `package main
+}`,
+			want: "1false",
+		},
+		{
+			name: "const-scope",
+			skip: true,
+			source: `
+package main
 
 var b = a
 const a = 1
-
 func main() {
 	var b = a
 	const a = 2
 	print(a, b)
-}`)
-	if got, want := out, "21"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramDeclareAndInit(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "21",
+		},
+		{
+			name: "declare-and-init",
+			source: `
+package main
 
 func main() {
 	var s string = "fluxflow"
 	print(s)
-}
-`)
-	if got, want := out, "fluxflow"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-func TestProgramSlice(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "fluxflow",
+		},
+		{
+			name: "slice",
+			source: `
+package main
 
 func main() {
 	print([]int{1, 2})
-}
-`)
-	if got, want := out, "[1 2]"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramSliceAppendAndIndex(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "[1 2]",
+		},
+		{
+			name: "slice-append-and-index",
+			source: `
+package main
 
 func main() {
 	list := []int{}
 	list = append(list, 1, 2)
 	print(list[0], list[1])
-}
-`)
-	if got, want := out, "12"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestProgramAppend(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "12",
+		},
+		{
+			name: "append",
+			source: `
+package main
 
 func main() {
 	list := []int{}
 	print(list)
 	list = append(list, 4, 5)
 	print(list)
-}
-`)
-	if got, want := out, "[][4 5]"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestTimeConstant(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "[][4 5]",
+		},
+		{
+			name: "time-constant",
+			source: `
+package main
 
 import "time"
-
 func main() {
 	r := time.RFC1123
 	print(r)
-}
-`)
-	if got, want := out, "Mon, 02 Jan 2006 15:04:05 MST"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-func TestTimeAliasConstant(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "Mon, 02 Jan 2006 15:04:05 MST",
+		},
+		{
+			name: "time-alias-constant",
+			source: `
+package main
 
 import t "time"
-
 func main() {
 	r := t.RFC1123
 	print(r)
-}
-`)
-	if got, want := out, "Mon, 02 Jan 2006 15:04:05 MST"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestFloats(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "Mon, 02 Jan 2006 15:04:05 MST",
+		},
+		{
+			name: "floats",
+			source: `
+package main
 
 func main() {
 	f32, f64 := float32(3.14), 3.14
 	print(f32," ",f64)
-}
-`)
-	if got, want := out, "3.14 3.14"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestNewType(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "3.14 3.14",
+		},
+		{
+			name: "new-type",
+			source: `
+package main
 
 type Airplane struct {
 	Kind string
 }
-
 func main() {
 	heli := Airplane{Kind:"helicopter"}
 	print(heli.Kind)
-}
-`)
-	if got, want := out, "helicopter"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-func TestPointerToType(t *testing.T) {
-	t.Skip()
-	out := parseAndRun(t, `package main
+}`,
+			want: "helicopter",
+		},
+		{
+			name: "pointer-to-type",
+			skip: true,
+			source: `
+package main
 
 type Airplane struct {
 	Kind string
 }
-
 func main() {
 	heli := &Airplane{Kind:"helicopter"}
 	print(heli.Kind)
-}
-`)
-	if got, want := out, "helicopter"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestAddressOfInt(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "helicopter",
+		},
+		{
+			name: "address-of-int",
+			source: `
+package main
 
 func main() {
 	i := 42
 	print(&i)
-}
-`)
-	if got, want := strings.HasPrefix(out, "0x"), true; got != want {
-		t.Errorf("got [%s %[2]v:%[2]T] want [%[3]v:%[3]T]", out, got, want)
-	}
-}
-
-func TestRangeOfStrings(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			special: func(out string) bool { return strings.HasPrefix(out, "0x") },
+		},
+		{
+			name: "range-of-strings",
+			source: `
+package main
 
 func main() {
 	strings := []string{"hello", "world"}
 	for i,s := range strings {
 		print(i,s)
 	}
-}
-`)
-	if got, want := out, "0hello1world"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
+}`,
+			want: "0hello1world",
+		},
+		{
+			name: "init",
+			source: `
+package main
 
-func TestInit(t *testing.T) {
-	out := parseAndRun(t, `package main
 func init() {
 	print("0")
 }
 func init() {
 	print("1")
 }
-func main() {}
-`)
-	if got, want := out, "01"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestMethod(t *testing.T) {
-	t.Skip()
-	out := parseAndRun(t, `package main
+func main() {}`,
+			want: "01",
+		},
+		{
+			name: "method",
+			skip: true,
+			source: `
+package main
 
 func (_ Airplane) S() string { return "airplane" }
-
 type Airplane struct {}
-
 func main() {
 	print(Airplane{}.S())
-}
-`)
-	if got, want := out, "airplane"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestGoto(t *testing.T) {
-	t.Skip()
-	out := parseAndRun(t, `package main
+}`,
+			want: "airplane",
+		},
+		{
+			name: "goto",
+			skip: true,
+			source: `
+package main
 
 func main() {
 	i := 0
@@ -462,28 +383,26 @@ here:
 		i++
 		goto here
 	}
-}`)
-	if got, want := out, "aaa"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestMap(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "aaa",
+		},
+		{
+			name: "map",
+			source: `
+package main
 
 func main() {
 	m := map[string]int{}
 	m["a"] = 1
 	m["b"] = 2
 	print(m["a"] + m["b"])
-}`)
-	if got, want := out, "3"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-
-func TestSwitch(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "3",
+		},
+		{
+			name: "switch",
+			source: `
+package main
 
 func main() {
 	var a int
@@ -496,14 +415,14 @@ func main() {
 	default:
 		print(2)
 	}
-}
-`)
-	if got, want := out, "12"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-	}
-}
-func TestSwitchOnBool(t *testing.T) {
-	out := parseAndRun(t, `package main
+}`,
+			want: "12",
+		},
+		{
+			name:  "switch-on-bool",
+			debug: !true,
+			source: `
+package main
 
 func main() {
 	var a int = 1
@@ -511,9 +430,57 @@ func main() {
 	case a == 1:
 		print(a)
 	}
+}`,
+			want: "1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.skip {
+				t.Skip()
+			}
+			if tt.debug {
+				t.Log("debug and trace on for", tt.name)
+				trace = true
+				// put a breakpoint here to inspect the test case
+				defer printSteps()()
+			}
+			out := parseAndRun(t, tt.source)
+			if tt.special != nil {
+				if !tt.special(out) {
+					t.Errorf("special check failed on output: %s", out)
+				}
+				return
+			}
+			if got, want := out, tt.want; got != want {
+				t.Errorf("got [%v] want [%v]", got, want)
+			}
+		})
+	}
 }
-`)
-	if got, want := out, "1"; got != want {
-		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+
+func TestProgramTypeConvert(t *testing.T) {
+	tests := []struct {
+		typeName string
+	}{
+		{"int8"},
+		{"int16"},
+		{"int32"},
+		{"int64"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.typeName, func(t *testing.T) {
+			out := parseAndRun(t, fmt.Sprintf(`
+package main
+
+func main() {
+	a := %s(1) + 2
+	print(a)
+}`, tt.typeName))
+			if got, want := out, "3"; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+		})
 	}
 }
