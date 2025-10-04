@@ -32,13 +32,16 @@ func (c CallExpr) Eval(vm *VM) {
 	// function f is either an external or an interpreted one
 	f := vm.ReturnsEval(c.Fun)
 
+	if !f.IsValid() {
+		vm.doPanic("call to invalid function")
+	}
+
 	// todo: make a switch
 	if f.Kind() == reflect.Func {
 
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
 			val := vm.ReturnsEval(arg)
-			assertValid(c.String(), val)
 			args[i] = val
 		}
 		vals := f.Call(args)
@@ -55,7 +58,7 @@ func (c CallExpr) Eval(vm *VM) {
 	if f.Kind() == reflect.Struct {
 		lf, ok := f.Interface().(FuncDecl)
 		if !ok {
-			panic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
+			vm.doPanic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
 		}
 
 		// structexplorer.Break("vm", vm)
@@ -80,12 +83,6 @@ func (c CallExpr) Eval(vm *VM) {
 		for _, each := range top.returnValues {
 			vm.Returns(each)
 		}
-	}
-}
-
-func assertValid(role string, v reflect.Value) {
-	if !v.IsValid() {
-		panic(fmt.Sprintf("%s: invalid value", role))
 	}
 }
 

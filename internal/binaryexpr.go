@@ -58,10 +58,24 @@ func (b BinaryExprValue) Eval() reflect.Value {
 		} else {
 			return res
 		}
+	case reflect.Uint8:
+		res := b.IntEval(b.left.Int())
+		if res.CanInt() {
+			return reflect.ValueOf(uint8(res.Int()))
+		} else {
+			return res
+		}
 	case reflect.Int16:
 		res := b.IntEval(b.left.Int())
 		if res.CanInt() {
 			return reflect.ValueOf(int16(res.Int()))
+		} else {
+			return res
+		}
+	case reflect.Uint16:
+		res := b.IntEval(b.left.Int())
+		if res.CanInt() {
+			return reflect.ValueOf(uint16(res.Int()))
 		} else {
 			return res
 		}
@@ -72,8 +86,18 @@ func (b BinaryExprValue) Eval() reflect.Value {
 		} else {
 			return res
 		}
+	case reflect.Uint32:
+		res := b.IntEval(b.left.Int())
+		if res.CanInt() {
+			return reflect.ValueOf(uint32(res.Int()))
+		} else {
+			return res
+		}
 	case reflect.Int64:
 		return b.IntEval(b.left.Int())
+	case reflect.Uint64:
+		return reflect.ValueOf(uint64(b.IntEval(b.left.Int()).Int()))
+	// non-ints
 	case reflect.Float64:
 		return b.FloatEval(b.left.Float())
 	case reflect.String:
