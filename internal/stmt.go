@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"go/ast"
+	"reflect"
 )
 
 type ExprStmt struct {
@@ -109,10 +110,22 @@ func (c CaseClause) Eval(vm *VM) {
 		}
 		return
 	}
-	left := vm.callStack.top().pop()
+	f := vm.callStack.top()
+	var left reflect.Value
+	if !f.operandStack.isEmpty() {
+		left = vm.callStack.top().pop()
+	}
 	for _, expr := range c.List {
 		right := vm.ReturnsEval(expr)
-		if left.Equal(right) {
+		var cond bool
+		if left.IsValid() {
+			// because value as on the operand stack we compare
+			cond = left.Equal(right)
+		} else {
+			// no operand on stack, treat as boolean expression
+			cond = right.Bool()
+		}
+		if cond {
 			vm.pushNewFrame()
 			defer vm.popFrame()
 			for _, stmt := range c.Body {

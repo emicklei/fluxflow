@@ -12,9 +12,12 @@ type stackFrame struct {
 	returnValues []reflect.Value
 }
 
+// push adds a value onto the operand stack.
 func (f *stackFrame) push(v reflect.Value) {
 	f.operandStack.push(v)
 }
+
+// pop removes and returns the top value from the operand stack.
 func (f *stackFrame) pop() reflect.Value {
 	return f.operandStack.pop()
 }

@@ -17,3 +17,6 @@ func (s *stack[T]) pop() T {
 func (s stack[T]) top() T {
 	return s[len(s)-1]
 }
+func (s stack[T]) isEmpty() bool {
+	return len(s) == 0
+}

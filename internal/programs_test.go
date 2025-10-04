@@ -483,8 +483,6 @@ func main() {
 }
 
 func TestSwitch(t *testing.T) {
-	// t.Skip()
-	defer printSteps()()
 	out := parseAndRun(t, `package main
 
 func main() {
@@ -505,8 +503,6 @@ func main() {
 	}
 }
 func TestSwitchOnBool(t *testing.T) {
-	t.Skip()
-	defer printSteps()()
 	out := parseAndRun(t, `package main
 
 func main() {
@@ -517,7 +513,7 @@ func main() {
 	}
 }
 `)
-	if got, want := out, "12"; got != want {
+	if got, want := out, "1"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
