@@ -466,15 +466,10 @@ func TestProgramTypeConvert(t *testing.T) {
 		typeName string
 	}{
 		{"int8"},
-		{"uint8"},
 		{"int16"},
-		{"uint16"},
 		{"int32"},
-		{"uint32"},
 		{"int64"},
-		{"uint64"},
 		{"int"},
-		{"uint"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.typeName, func(t *testing.T) {
@@ -485,6 +480,32 @@ func main() {
 	a := %s(1) + 2
 	print(a)
 }`, tt.typeName))
+			if got, want := out, "3"; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+		})
+	}
+}
+func TestProgramTypeUnsignedConvert(t *testing.T) {
+	// t.Skip()
+	tests := []struct {
+		typeName string
+	}{
+		{"uint8"},
+		{"uint16"},
+		{"uint32"},
+		{"uint64"},
+		{"uint"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.typeName, func(t *testing.T) {
+			out := parseAndRun(t, fmt.Sprintf(`
+package main
+
+func main() {
+	a := %s(1) + %s(2)
+	print(a)
+}`, tt.typeName, tt.typeName))
 			if got, want := out, "3"; got != want {
 				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 			}

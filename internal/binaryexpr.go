@@ -51,6 +51,13 @@ func (b BinaryExprValue) Eval() reflect.Value {
 		} else {
 			return res
 		}
+	case reflect.Uint:
+		res := b.UIntEval(b.left.Uint())
+		if res.CanInt() {
+			return reflect.ValueOf(uint(res.Int()))
+		} else {
+			return res
+		}
 	case reflect.Int8:
 		res := b.IntEval(b.left.Int())
 		if res.CanInt() {
@@ -59,7 +66,7 @@ func (b BinaryExprValue) Eval() reflect.Value {
 			return res
 		}
 	case reflect.Uint8:
-		res := b.IntEval(b.left.Int())
+		res := b.UIntEval(b.left.Uint())
 		if res.CanInt() {
 			return reflect.ValueOf(uint8(res.Int()))
 		} else {
@@ -73,7 +80,7 @@ func (b BinaryExprValue) Eval() reflect.Value {
 			return res
 		}
 	case reflect.Uint16:
-		res := b.IntEval(b.left.Int())
+		res := b.UIntEval(b.left.Uint())
 		if res.CanInt() {
 			return reflect.ValueOf(uint16(res.Int()))
 		} else {
@@ -87,7 +94,7 @@ func (b BinaryExprValue) Eval() reflect.Value {
 			return res
 		}
 	case reflect.Uint32:
-		res := b.IntEval(b.left.Int())
+		res := b.UIntEval(b.left.Uint())
 		if res.CanInt() {
 			return reflect.ValueOf(uint32(res.Int()))
 		} else {
@@ -96,7 +103,7 @@ func (b BinaryExprValue) Eval() reflect.Value {
 	case reflect.Int64:
 		return b.IntEval(b.left.Int())
 	case reflect.Uint64:
-		return reflect.ValueOf(uint64(b.IntEval(b.left.Int()).Int()))
+		return reflect.ValueOf(b.UIntEval(b.left.Uint()).Uint())
 	// non-ints
 	case reflect.Float64:
 		return b.FloatEval(b.left.Float())
@@ -109,12 +116,20 @@ func (b BinaryExprValue) Eval() reflect.Value {
 }
 func (b BinaryExprValue) IntEval(left int64) reflect.Value {
 	switch b.right.Kind() {
-	case reflect.Int, reflect.Int64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return b.IntOpInt(left, b.right.Int())
 	case reflect.Float64:
 		return b.FloatOpFloat(float64(left), b.right.Float())
 	}
 	panic("not implemented: BinaryExprValue.IntEval:" + b.right.Kind().String())
+}
+
+func (b BinaryExprValue) UIntEval(left uint64) reflect.Value {
+	switch b.right.Kind() {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return b.UIntOpUInt(left, b.right.Uint())
+	}
+	panic("not implemented: BinaryExprValue.UIntEval:" + b.right.Kind().String())
 }
 
 func (b BinaryExprValue) FloatEval(left float64) reflect.Value {
@@ -167,6 +182,34 @@ func (b BinaryExprValue) IntOpInt(left int64, right int64) reflect.Value {
 		return reflect.ValueOf(left >= right)
 	}
 	panic("not implemented: BinaryExprValue.IntOpInt:" + b.op.String())
+}
+
+func (b BinaryExprValue) UIntOpUInt(left uint64, right uint64) reflect.Value {
+	switch b.op {
+	case token.ADD:
+		return reflect.ValueOf(left + right)
+	case token.SUB:
+		return reflect.ValueOf(left - right)
+	case token.MUL:
+		return reflect.ValueOf(left * right)
+	case token.QUO:
+		return reflect.ValueOf(left / right)
+	case token.REM:
+		return reflect.ValueOf(left % right)
+	case token.EQL:
+		return reflect.ValueOf(left == right)
+	case token.NEQ:
+		return reflect.ValueOf(left != right)
+	case token.LSS:
+		return reflect.ValueOf(left < right)
+	case token.LEQ:
+		return reflect.ValueOf(left <= right)
+	case token.GTR:
+		return reflect.ValueOf(left > right)
+	case token.GEQ:
+		return reflect.ValueOf(left >= right)
+	}
+	panic("not implemented: BinaryExprValue.UIntOpUInt:" + b.op.String())
 }
 
 var _ Expr = &operatorUnimplemented{}

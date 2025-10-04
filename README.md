@@ -23,10 +23,11 @@ a Go interpreter that will serve a live code and debug experience
 | Composite type `slice` | ✅ |
 | Package `init` | ✅ |
 | Binary and Unary Operators | ✅ |
-| Pointers | ⬜ |
-| Interfaces | ⬜ |
 | Composite type `struct` | ✅ |
 | Composite type `map` | ✅ |
+| Unsigned integer arithmetic | ✅ |
+| Pointers | ⬜ |
+| Interfaces | ⬜ |
 | `switch` statement | ⬜ |
 | Goroutines `go` | ⬜ |
 | Channels `chan` | ⬜ |
@@ -35,4 +36,4 @@ a Go interpreter that will serve a live code and debug experience
 
 
 
-2025 MIT License
+&copy; 2025. https://ernestmicklei.com . MIT License

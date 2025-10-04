@@ -39,6 +39,10 @@ func (p *PkgEnvironment) addConstOrVar(cv ConstOrVar) {
 	p.declTable[cv.Name.Name] = CanDeclare(cv)
 }
 
+func (p *PkgEnvironment) String() string {
+	return fmt.Sprintf("PkgEnv(pkgs=%d)", len(p.pkgTable))
+}
+
 type Environment struct {
 	parent     Env
 	valueTable map[string]reflect.Value

@@ -63,10 +63,9 @@ func (vm *VM) popFrame() *stackFrame {
 }
 func (vm *VM) doPanic(err any) {
 	s := structexplorer.NewService("vm", vm)
-	// TOOD fix bug in structexplorer that panics on recursive structures
-	// for i, each := range vm.callStack {
-	// 	s.Explore(fmt.Sprintf("vm.callStack.%d", i), each, structexplorer.Column(1))
-	// }
+	for i, each := range vm.callStack {
+		s.Explore(fmt.Sprintf("vm.callStack.%d", i), each, structexplorer.Column(0))
+	}
 	s.Dump("vm-panic.html")
 	panic(err)
 }
