@@ -69,7 +69,12 @@ type FuncLit struct {
 	Body *BlockStmt
 }
 
-func (s FuncLit) Eval(vm *VM) {}
+func (s FuncLit) Eval(vm *VM) {
+	if s.Body == nil {
+		return
+	}
+	vm.ReturnsEval(s.Body)
+}
 
 func (s FuncLit) String() string {
 	return fmt.Sprintf("FuncLit(%v,%v)", s.Type, s.Body)

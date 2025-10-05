@@ -36,32 +36,24 @@ func (c CallExpr) Eval(vm *VM) {
 		vm.doPanic("call to invalid function")
 	}
 
-	// todo: make a switch
-	if f.Kind() == reflect.Func {
-
+	switch f.Kind() {
+	case reflect.Func:
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
 			val := vm.ReturnsEval(arg)
 			args[i] = val
 		}
 		vals := f.Call(args)
-
 		// set return values on top of stack
 		for _, each := range vals {
 			vm.Returns(each)
 		}
-		return
-		// top := vm.callStack.pop()
-		// top.returnValues = vals
-		// vm.callStack.push(top)
-	}
-	if f.Kind() == reflect.Struct {
+
+	case reflect.Struct:
 		lf, ok := f.Interface().(FuncDecl)
 		if !ok {
 			vm.doPanic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
 		}
-
-		// structexplorer.Break("vm", vm)
 		// prepare arguments
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
@@ -69,7 +61,6 @@ func (c CallExpr) Eval(vm *VM) {
 			args[i] = val
 		}
 		frame := vm.pushNewFrame()
-
 		// take all parameters and put them in the env of the new frame
 		p := 0
 		for _, field := range lf.Type.Params.List {
@@ -83,6 +74,8 @@ func (c CallExpr) Eval(vm *VM) {
 		for _, each := range top.returnValues {
 			vm.Returns(each)
 		}
+	default:
+		vm.doPanic("call to unknown function type")
 	}
 }
 
