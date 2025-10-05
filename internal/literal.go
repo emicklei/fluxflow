@@ -45,7 +45,6 @@ type CompositeLit struct {
 }
 
 func (s CompositeLit) Eval(vm *VM) {
-	//Show(vm)
 	internalType := vm.ReturnsEval(s.Type).Interface()
 	i, ok := internalType.(CanInstantiate)
 	if !ok {
@@ -62,4 +61,16 @@ func (s CompositeLit) Eval(vm *VM) {
 
 func (s CompositeLit) String() string {
 	return fmt.Sprintf("CompositeLit(%v,%v)", s.Type, s.Elts)
+}
+
+type FuncLit struct {
+	*ast.FuncLit
+	Type *FuncType
+	Body *BlockStmt
+}
+
+func (s FuncLit) Eval(vm *VM) {}
+
+func (s FuncLit) String() string {
+	return fmt.Sprintf("FuncLit(%v,%v)", s.Type, s.Body)
 }

@@ -19,13 +19,22 @@ func (f *stackFrame) push(v reflect.Value) {
 	f.operandStack.push(v)
 }
 
+func (f stackFrame) pushOperand(v reflect.Value) stackFrame {
+	f.operandStack.push(v)
+	return f
+}
+func (f stackFrame) pushReturnValue(v reflect.Value) stackFrame {
+	f.returnValues = append(f.returnValues, v)
+	return f
+}
+
 // pop removes and returns the top value from the operand stack.
 func (f *stackFrame) pop() reflect.Value {
 	return f.operandStack.pop()
 }
 
 type VM struct {
-	callStack stack[*stackFrame]
+	callStack stack[*stackFrame] // TODO use value io pointer?
 	output    *bytes.Buffer
 }
 
@@ -51,6 +60,7 @@ func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
 
 // Returns pushes a value onto the operand stack as the result of an evaluation.
 func (vm *VM) Returns(v reflect.Value) {
+	// TODO consider add pushOperand to callStack so stackFrame can be value that is replaced on top.
 	vm.callStack.top().push(v)
 }
 func (vm *VM) pushNewFrame() *stackFrame {

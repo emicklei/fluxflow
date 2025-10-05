@@ -433,6 +433,19 @@ func main() {
 }`,
 			want: "1",
 		},
+		{
+			name:  "function-literal",
+			skip:  true,
+			debug: true,
+			source: `
+package main
+
+func main() {
+	f := func(a int) int { return a } 
+	print(f(1))
+}`,
+			want: "1",
+		},
 	}
 
 	for _, tt := range tests {
@@ -442,9 +455,8 @@ func main() {
 			}
 			if tt.debug {
 				t.Log("debug and trace on for", tt.name)
-				trace = true
 				// put a breakpoint here to inspect the test case
-				defer printSteps()()
+				trace = true
 			}
 			out := parseAndRun(t, tt.source)
 			if tt.special != nil {

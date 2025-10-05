@@ -24,7 +24,7 @@ func newBuilder() builder {
 }
 
 func (b *builder) push(s Evaluable) {
-	if os.Getenv("STEPS") != "" {
+	if trace {
 		if str, ok := s.(fmt.Stringer); ok {
 			fmt.Fprintf(os.Stderr, "%v\n", str.String())
 		} else {
@@ -64,6 +64,19 @@ func (b *builder) envSet(name string, value reflect.Value) {
 // Visit implements the ast.Visitor interface
 func (b *builder) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
+	case *ast.FuncLit:
+		s := FuncLit{FuncLit: n}
+		if n.Type != nil {
+			b.Visit(n.Type)
+			e := b.pop().(FuncType)
+			s.Type = &e
+		}
+		if n.Body != nil {
+			b.Visit(n.Body)
+			e := b.pop().(BlockStmt)
+			s.Body = &e
+		}
+		b.push(s)
 	case *ast.SwitchStmt:
 		s := SwitchStmt{SwitchStmt: n}
 		if n.Init != nil {

@@ -13,78 +13,20 @@ import (
 )
 
 func parseAndRun(t *testing.T, source string) string {
-	fset := token.NewFileSet()
-
 	cwd, _ := os.Getwd()
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles,
-		Fset: fset,
-		Dir:  path.Join(cwd, "../programs"),
+		Fset: token.NewFileSet(),
+		Dir:  path.Join(cwd, "../examples"),
 		Overlay: map[string][]byte{
-			path.Join(cwd, "../programs/main.go"): []byte(source),
+			path.Join(cwd, "../examples/main.go"): []byte(source),
 		},
 	}
-	pkgs, err := packages.Load(cfg, ".")
+	prog, err := LoadProgram(cfg.Dir, cfg)
 	if err != nil {
 		t.Fatalf("failed to load package: %v", err)
 	}
-	if packages.PrintErrors(pkgs) > 0 {
-		t.Fatal("errors during package loading")
-	}
-
-	if len(pkgs) == 0 {
-		t.Fatal("no packages found")
-	}
-	b := newBuilder()
-	for _, pkg := range pkgs {
-		for _, stx := range pkg.Syntax {
-			for _, decl := range stx.Decls {
-				b.Visit(decl)
-			}
-		}
-	}
-	return runWithBuilder(b)
-}
-
-func printSteps() func() {
-	os.Setenv("STEPS", "1")
-	return func() {
-		os.Unsetenv("STEPS")
-	}
-}
-
-func loadAndRun(t *testing.T, dirPath string) string {
-	fset := token.NewFileSet()
-
-	cfg := &packages.Config{
-		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles,
-		Fset: fset,
-		Dir:  dirPath,
-	}
-	pkgs, err := packages.Load(cfg, ".")
-	if err != nil {
-		t.Fatalf("failed to load package: %v", err)
-	}
-	if packages.PrintErrors(pkgs) > 0 {
-		t.Fatal("errors during package loading")
-	}
-
-	if len(pkgs) == 0 {
-		t.Fatal("no packages found")
-	}
-	builtins := &Environment{valueTable: builtinsMap}
-	b := builder{env: builtins}
-	for _, pkg := range pkgs {
-		for _, stx := range pkg.Syntax {
-			for _, decl := range stx.Decls {
-				b.Visit(decl)
-			}
-		}
-	}
-	return runWithBuilder(b)
-}
-func runWithBuilder(b builder) string {
-	vm := newVM(b.env)
+	vm := newVM(prog.builder.env)
 	vm.localEnv().set("print", reflect.ValueOf(func(args ...any) {
 		for _, a := range args {
 			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
@@ -99,31 +41,8 @@ func runWithBuilder(b builder) string {
 			}
 		}
 	}))
-	// first run const and vars
-	// try declare all of them until none left
-	// a declare may refer to other unseen declares.
-	pkgEnv := vm.localEnv().(*PkgEnvironment)
-	for len(pkgEnv.declTable) > 0 {
-		for key, each := range pkgEnv.declTable {
-			if each.Declare(vm) {
-				delete(pkgEnv.declTable, key)
-			}
-		}
+	if err := RunProgram(prog, vm); err != nil {
+		panic(err)
 	}
-	for _, each := range pkgEnv.inits {
-		vm.pushNewFrame()
-		each.Body.Eval(vm)
-		vm.popFrame()
-	}
-
-	main := vm.localEnv().valueLookUp("main")
-	if !main.IsValid() {
-		return "main not found"
-	}
-	// TODO
-	vm.pushNewFrame()
-	fundecl := main.Interface().(FuncDecl)
-	fundecl.Body.Eval(vm)
-	vm.popFrame()
 	return vm.output.String()
 }

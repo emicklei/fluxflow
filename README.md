@@ -4,6 +4,30 @@
 
 a Go interpreter that will serve a live code and debug experience
 
+## install
+
+    go install github.com/emicklei/fluxflow/cmd/fluxflow@latest
+
+## Use CLI
+
+    fluxflow run .
+
+## Use as package
+
+    ```go
+    package main
+
+    import (
+        "github.com/emicklei/fluxflow"
+    )
+
+    func main() {
+        pkg, _ := fluxflow.LoadPackage(".")
+        time, _ := fluxflow.Call(pkg,"addDays",1)
+        fmt.Println(time)
+    }    
+    ```
+
 ## Features
 
 | Feature | Implemented |
@@ -26,13 +50,15 @@ a Go interpreter that will serve a live code and debug experience
 | Composite type `struct` | ✅ |
 | Composite type `map` | ✅ |
 | Unsigned integer arithmetic | ✅ |
+| `switch` statement | ✅ |
 | Pointers | ⬜ |
 | Interfaces | ⬜ |
-| `switch` statement | ⬜ |
+| Methods | ⬜ |
 | Goroutines `go` | ⬜ |
 | Channels `chan` | ⬜ |
 | `select` statement | ⬜ |
 | Anonymous `func` | ⬜ |
+| Function literal | ⬜ |
 
 
 

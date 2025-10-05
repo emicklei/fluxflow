@@ -119,7 +119,7 @@ func (c CaseClause) Eval(vm *VM) {
 		right := vm.ReturnsEval(expr)
 		var cond bool
 		if left.IsValid() {
-			// because value as on the operand stack we compare
+			// because value is on the operand stack we compare
 			cond = left.Equal(right)
 		} else {
 			// no operand on stack, treat as boolean expression

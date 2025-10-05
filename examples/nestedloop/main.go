@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/emicklei/fluxflow/programs/pkg"
 )
 
 func squared(n int) int {
@@ -20,5 +18,4 @@ func main() {
 		}
 	}
 	fmt.Println(n)
-	fmt.Println(pkg.Name, pkg.IsWeekend("Sunday"))
 }
