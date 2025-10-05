@@ -137,3 +137,22 @@ func (c CaseClause) Eval(vm *VM) {
 }
 
 func (c CaseClause) stmtStep() Evaluable { return c }
+
+type DeferStmt struct {
+	*ast.DeferStmt
+	Call Expr
+}
+
+func (d DeferStmt) String() string {
+	return fmt.Sprintf("DeferStmt(%v)", d.Call)
+}
+
+func (d DeferStmt) stmtStep() Evaluable { return d }
+
+func (d DeferStmt) Eval(vm *VM) {
+	if d.Call == nil {
+		return
+	}
+	// TODO: keep defer stack in the current frame?
+	defer d.Call.Eval(vm)
+}

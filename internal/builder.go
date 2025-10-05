@@ -49,14 +49,6 @@ func (b *builder) pop() Evaluable {
 	return top.Evaluable
 }
 
-func (b *builder) top() any {
-	if len(b.stack) == 0 {
-		panic("builder.stack is empty")
-	}
-	top := b.stack[len(b.stack)-1]
-	return top
-}
-
 func (b *builder) envSet(name string, value reflect.Value) {
 	b.env.set(name, value)
 }
@@ -64,6 +56,14 @@ func (b *builder) envSet(name string, value reflect.Value) {
 // Visit implements the ast.Visitor interface
 func (b *builder) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
+	case *ast.DeferStmt:
+		s := DeferStmt{DeferStmt: n}
+		if n.Call != nil {
+			b.Visit(n.Call)
+			e := b.pop()
+			s.Call = e.(Expr)
+		}
+		b.push(s)
 	case *ast.FuncLit:
 		s := FuncLit{FuncLit: n}
 		if n.Type != nil {

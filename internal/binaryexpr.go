@@ -168,6 +168,20 @@ func (b BinaryExprValue) IntOpInt(left int64, right int64) reflect.Value {
 		return reflect.ValueOf(left / right)
 	case token.REM:
 		return reflect.ValueOf(left % right)
+	case token.AND:
+		return reflect.ValueOf(left & right)
+	case token.OR:
+		return reflect.ValueOf(left | right)
+	case token.XOR:
+		return reflect.ValueOf(left ^ right)
+	case token.SHL:
+		// right must be unsigned
+		return reflect.ValueOf(left << uint64(right))
+	case token.SHR:
+		// right must be unsigned
+		return reflect.ValueOf(left >> uint64(right))
+	case token.AND_NOT:
+		return reflect.ValueOf(left &^ right)
 	case token.EQL:
 		return reflect.ValueOf(left == right)
 	case token.NEQ:
@@ -196,6 +210,18 @@ func (b BinaryExprValue) UIntOpUInt(left uint64, right uint64) reflect.Value {
 		return reflect.ValueOf(left / right)
 	case token.REM:
 		return reflect.ValueOf(left % right)
+	case token.AND:
+		return reflect.ValueOf(left & right)
+	case token.OR:
+		return reflect.ValueOf(left | right)
+	case token.XOR:
+		return reflect.ValueOf(left ^ right)
+	case token.SHL:
+		return reflect.ValueOf(left << right)
+	case token.SHR:
+		return reflect.ValueOf(left >> right)
+	case token.AND_NOT:
+		return reflect.ValueOf(left &^ right)
 	case token.EQL:
 		return reflect.ValueOf(left == right)
 	case token.NEQ:

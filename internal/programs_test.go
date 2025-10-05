@@ -6,6 +6,94 @@ import (
 	"testing"
 )
 
+func TestProgramTypeConvert(t *testing.T) {
+	t.Skip()
+	tests := []struct {
+		typeName string
+	}{
+		{"int8"},
+		{"int16"},
+		{"int32"},
+		{"int64"},
+		{"int"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.typeName, func(t *testing.T) {
+			out := parseAndRun(t, fmt.Sprintf(`
+package main
+
+func main() {
+	a := %s(1) + 2
+	print(a)
+}`, tt.typeName))
+			if got, want := out, "3"; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+		})
+	}
+}
+
+func TestProgramTypeUnsignedConvert(t *testing.T) {
+	// t.Skip()
+	tests := []struct {
+		typeName string
+	}{
+		{"uint8"},
+		{"uint16"},
+		{"uint32"},
+		{"uint64"},
+		{"uint"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.typeName, func(t *testing.T) {
+			out := parseAndRun(t, fmt.Sprintf(`
+package main
+
+func main() {
+	a := %s(1) + %s(2)
+	print(a)
+}`, tt.typeName, tt.typeName))
+			if got, want := out, "3"; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+		})
+	}
+}
+
+func TestAssignmentOperators(t *testing.T) {
+	tests := []struct {
+		op   string
+		want string
+	}{
+		{"+=", "3"},
+		{"-=", "-1"},
+		{"*=", "2"},
+		{"/=", "0"},
+		{"%=", "1"},
+		{"&=", "0"},
+		{"|=", "3"},
+		{"^=", "3"},
+		{"<<=", "4"},
+		{">>=", "0"},
+		{"&^=", "1"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.op, func(t *testing.T) {
+			out := parseAndRun(t, fmt.Sprintf(`
+package main
+
+func main() {
+	a := 1
+	a %s 2
+	print(a)
+}`, tt.op))
+			if got, want := out, tt.want; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+		})
+	}
+}
+
 func TestAllPrograms(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -435,8 +523,8 @@ func main() {
 		},
 		{
 			name:  "function-literal",
-			skip:  true,
-			debug: true,
+			skip:  !true,
+			debug: !true,
 			source: `
 package main
 
@@ -445,6 +533,47 @@ func main() {
 	print(f(1))
 }`,
 			want: "1",
+		},
+		{
+			name:  "type-alias",
+			skip:  !true,
+			debug: !true,
+			source: `
+package main
+
+type MyInt = int
+
+func main() {
+	var a MyInt = 1
+	print(a)
+}`,
+			want: "1",
+		},
+		{
+			name:  "defer",
+			skip:  !true,
+			debug: !true,
+			source: `
+package main
+
+func main() {
+	defer print(1)
+	defer print(2)
+}`,
+			want: "12",
+		},
+		{
+			name:  "rune",
+			skip:  !true,
+			debug: !true,
+			source: `
+package main
+
+func main() {
+	r := 'a'
+	print(r)
+}`,
+			want: "'a'",
 		},
 	}
 
@@ -467,59 +596,6 @@ func main() {
 			}
 			if got, want := out, tt.want; got != want {
 				t.Errorf("got [%v] want [%v]", got, want)
-			}
-		})
-	}
-}
-
-func TestProgramTypeConvert(t *testing.T) {
-	t.Skip()
-	tests := []struct {
-		typeName string
-	}{
-		{"int8"},
-		{"int16"},
-		{"int32"},
-		{"int64"},
-		{"int"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.typeName, func(t *testing.T) {
-			out := parseAndRun(t, fmt.Sprintf(`
-package main
-
-func main() {
-	a := %s(1) + 2
-	print(a)
-}`, tt.typeName))
-			if got, want := out, "3"; got != want {
-				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-			}
-		})
-	}
-}
-func TestProgramTypeUnsignedConvert(t *testing.T) {
-	// t.Skip()
-	tests := []struct {
-		typeName string
-	}{
-		{"uint8"},
-		{"uint16"},
-		{"uint32"},
-		{"uint64"},
-		{"uint"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.typeName, func(t *testing.T) {
-			out := parseAndRun(t, fmt.Sprintf(`
-package main
-
-func main() {
-	a := %s(1) + %s(2)
-	print(a)
-}`, tt.typeName, tt.typeName))
-			if got, want := out, "3"; got != want {
-				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 			}
 		})
 	}

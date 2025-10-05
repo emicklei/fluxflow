@@ -11,6 +11,10 @@ func init() {
 		builtinTypesMap["bool"] = reflect.TypeOf(v)
 	}
 	{
+		var v any
+		builtinTypesMap["any"] = reflect.TypeOf(&v).Elem()
+	}
+	{
 		var v byte
 		builtinTypesMap["byte"] = reflect.TypeOf(v)
 	}

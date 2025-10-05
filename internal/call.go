@@ -50,32 +50,66 @@ func (c CallExpr) Eval(vm *VM) {
 		}
 
 	case reflect.Struct:
+		fl, ok := f.Interface().(FuncLit)
+		if ok {
+			c.handleFuncLit(vm, fl)
+			return
+		}
 		lf, ok := f.Interface().(FuncDecl)
-		if !ok {
-			vm.doPanic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
+		if ok {
+			c.handleFuncDecl(vm, lf)
+			return
 		}
-		// prepare arguments
-		args := make([]reflect.Value, len(c.Args))
-		for i, arg := range c.Args {
-			val := vm.ReturnsEval(arg)
-			args[i] = val
-		}
-		frame := vm.pushNewFrame()
-		// take all parameters and put them in the env of the new frame
-		p := 0
-		for _, field := range lf.Type.Params.List {
-			for _, name := range field.Names {
-				frame.env.set(name.Name, args[p])
-				p++
-			}
-		}
-		lf.Body.Eval(vm)
-		top := vm.popFrame()
-		for _, each := range top.returnValues {
-			vm.Returns(each)
-		}
+		vm.doPanic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
 	default:
 		vm.doPanic("call to unknown function type")
+	}
+}
+
+func (c CallExpr) handleFuncLit(vm *VM, fl FuncLit) {
+	// TODO deduplicate with handleFuncDecl
+	// prepare arguments
+	args := make([]reflect.Value, len(c.Args))
+	for i, arg := range c.Args {
+		val := vm.ReturnsEval(arg)
+		args[i] = val
+	}
+	frame := vm.pushNewFrame()
+	// take all parameters and put them in the env of the new frame
+	p := 0
+	for _, field := range fl.Type.Params.List {
+		for _, name := range field.Names {
+			frame.env.set(name.Name, args[p])
+			p++
+		}
+	}
+	fl.Body.Eval(vm)
+	top := vm.popFrame()
+	for _, each := range top.returnValues {
+		vm.Returns(each)
+	}
+}
+func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
+	// TODO deduplicate with handleFuncLit
+	// prepare arguments
+	args := make([]reflect.Value, len(c.Args))
+	for i, arg := range c.Args {
+		val := vm.ReturnsEval(arg)
+		args[i] = val
+	}
+	frame := vm.pushNewFrame()
+	// take all parameters and put them in the env of the new frame
+	p := 0
+	for _, field := range fd.Type.Params.List {
+		for _, name := range field.Names {
+			frame.env.set(name.Name, args[p])
+			p++
+		}
+	}
+	fd.Body.Eval(vm)
+	top := vm.popFrame()
+	for _, each := range top.returnValues {
+		vm.Returns(each)
 	}
 }
 

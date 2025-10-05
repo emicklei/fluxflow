@@ -42,7 +42,7 @@ a Go interpreter that will serve a live code and debug experience
 | `if/else` statements | ✅ |
 | `for` loops | ✅ |
 | `for..range` loops | ✅ |
-| Basic literal types (int,string,...) | ✅ |
+| Basic literal types (int,string,rune,...) | ✅ |
 | Composite type `array` | ✅ |
 | Composite type `slice` | ✅ |
 | Package `init` | ✅ |
@@ -58,7 +58,9 @@ a Go interpreter that will serve a live code and debug experience
 | Channels `chan` | ⬜ |
 | `select` statement | ⬜ |
 | Anonymous `func` | ⬜ |
-| Function literal | ⬜ |
+| Function literal | ✅ |
+| Type alias | ✅ |
+| defer | ✅ |
 
 
 

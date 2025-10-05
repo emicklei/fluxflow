@@ -66,14 +66,11 @@ func (s CompositeLit) String() string {
 type FuncLit struct {
 	*ast.FuncLit
 	Type *FuncType
-	Body *BlockStmt
+	Body *BlockStmt // TODO not sure what to do when Body and/or Type is nil
 }
 
 func (s FuncLit) Eval(vm *VM) {
-	if s.Body == nil {
-		return
-	}
-	vm.ReturnsEval(s.Body)
+	vm.Returns(reflect.ValueOf(s))
 }
 
 func (s FuncLit) String() string {
