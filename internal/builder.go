@@ -56,6 +56,14 @@ func (b *builder) envSet(name string, value reflect.Value) {
 // Visit implements the ast.Visitor interface
 func (b *builder) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
+	case *ast.Ellipsis:
+		s := Ellipsis{Ellipsis: n}
+		if n.Elt != nil {
+			b.Visit(n.Elt)
+			e := b.pop()
+			s.Elt = e.(Expr)
+		}
+		b.push(s)
 	case *ast.DeferStmt:
 		s := DeferStmt{DeferStmt: n}
 		if n.Call != nil {

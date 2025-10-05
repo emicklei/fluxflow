@@ -318,6 +318,16 @@ func main() {
 			want: "[1 2]",
 		},
 		{
+			name: "array",
+			source: `
+package main
+
+func main() {
+	print([2]string{"A", "B"})
+}`,
+			want: "[A B]",
+		},
+		{
 			name: "slice-append-and-index",
 			source: `
 package main
@@ -574,6 +584,26 @@ func main() {
 	print(r)
 }`,
 			want: "'a'",
+		},
+		{
+			name:  "variadic-function",
+			skip:  true,
+			debug: !true,
+			source: `
+package main
+
+func sum(nums ...int) int {
+	total := 0
+	for _, n := range nums {
+		total += n
+	}
+	return total
+}
+
+func main() {
+	print(sum(1, 2, 3))
+}`,
+			want: "6",
 		},
 	}
 

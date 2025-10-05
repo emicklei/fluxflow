@@ -32,3 +32,13 @@ func (t FuncType) String() string {
 }
 
 func (t FuncType) Eval(vm *VM) {}
+
+type Ellipsis struct {
+	*ast.Ellipsis
+	Elt Expr // ellipsis element type (parameter lists only); or nil
+}
+
+func (e Ellipsis) String() string {
+	return fmt.Sprintf("Ellipsis(%v)", e.Elt)
+}
+func (e Ellipsis) Eval(vm *VM) {}
