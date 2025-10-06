@@ -14,7 +14,9 @@ type FuncDecl struct {
 }
 
 func (f FuncDecl) Eval(vm *VM) {
-	panic("todo")
+	if f.Body != nil {
+		vm.eval(f.Body)
+	}
 }
 func (f FuncDecl) String() string {
 	return fmt.Sprintf("FuncDecl(%s)", f.Name.Name)

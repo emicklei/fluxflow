@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"reflect"
 )
 
@@ -25,4 +26,5 @@ var builtinsMap = map[string]reflect.Value{
 	"complex128": reflect.ValueOf(func(c complex64) complex128 { return complex128(c) }),
 	"true":       reflect.ValueOf(true),  // not presented as Literal
 	"false":      reflect.ValueOf(false), // not presented as Literal
+	"print":      reflect.ValueOf(func(args ...any) { fmt.Println(args...) }),
 }

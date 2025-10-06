@@ -637,3 +637,22 @@ func main() {
 		})
 	}
 }
+
+func TestIsolatedProgram(t *testing.T) {
+	prog := buildProgram(t, `
+package main
+
+func main() {
+	print("one")
+	print("two")
+}`)
+	// vm := newVM(prog.builder.env)
+	// if err := RunProgram(prog, vm); err != nil {
+	// 	t.Fatal(err)
+	// }
+	here := prog.builder.stack[0]
+	for here != nil {
+		t.Log(here)
+		here = here.next
+	}
+}

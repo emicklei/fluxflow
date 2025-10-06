@@ -12,7 +12,7 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func parseAndRun(t *testing.T, source string) string {
+func buildProgram(t *testing.T, source string) *Program {
 	cwd, _ := os.Getwd()
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles,
@@ -26,6 +26,11 @@ func parseAndRun(t *testing.T, source string) string {
 	if err != nil {
 		t.Fatalf("failed to load package: %v", err)
 	}
+	return prog
+}
+
+func parseAndRun(t *testing.T, source string) string {
+	prog := buildProgram(t, source)
 	vm := newVM(prog.builder.env)
 	vm.localEnv().set("print", reflect.ValueOf(func(args ...any) {
 		for _, a := range args {

@@ -62,12 +62,12 @@ func RunProgram(p *Program, optionalVM *VM) error {
 			}
 		}
 	}
+	// then run all inits
 	for _, each := range pkgEnv.inits {
 		vm.pushNewFrame()
-		vm.eval(each.Body)
+		each.Eval(vm)
 		vm.popFrame()
 	}
-
 	main := vm.localEnv().valueLookUp("main")
 	if !main.IsValid() {
 		return errors.New("main not found")
@@ -75,7 +75,7 @@ func RunProgram(p *Program, optionalVM *VM) error {
 	// TODO
 	vm.pushNewFrame()
 	fundecl := main.Interface().(FuncDecl)
-	vm.eval(fundecl.Body)
+	fundecl.Eval(vm)
 	vm.popFrame()
 	return nil
 }

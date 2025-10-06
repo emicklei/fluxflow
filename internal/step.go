@@ -4,12 +4,6 @@ import (
 	"fmt"
 )
 
-type stap[E Evaluable] struct {
-	prev      *stap[E]
-	next      *stap[E]
-	Evaluable E
-}
-
 type step struct {
 	prev *step
 	next *step
