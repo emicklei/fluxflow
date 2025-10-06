@@ -1,0 +1,34 @@
+## Status
+
+| Feature | Implemented |
+|---|---|
+| Imports | ✅ |
+| Variable declaration `var` | ✅ |
+| Constant declaration `const` | ✅ |
+| Assignment `=`, `:=` | ✅ |
+| Functions `func` | ✅ |
+| Function calls | ✅ |
+| `return` statement | ✅ |
+| `if/else` statements | ✅ |
+| `for` loops | ✅ |
+| `for..range` loops | ✅ |
+| Basic literal types (int,string,rune,...) | ✅ |
+| Composite type `array` | ✅ |
+| Composite type `slice` | ✅ |
+| Package `init` | ✅ |
+| Binary and Unary Operators | ✅ |
+| Composite type `struct` | ✅ |
+| Composite type `map` | ✅ |
+| Unsigned integer arithmetic | ✅ |
+| `switch` statement | ✅ |
+| Pointers | ⬜ |
+| Interfaces | ⬜ |
+| Methods | ⬜ |
+| Goroutines `go` | ⬜ |
+| Channels `chan` | ⬜ |
+| `select` statement | ⬜ |
+| Anonymous `func` | ⬜ |
+| Function literal | ✅ |
+| Type alias | ✅ |
+| defer | ✅ |
+| variadic function | ⬜ |

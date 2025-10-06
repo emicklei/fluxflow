@@ -2,7 +2,13 @@
 
 [![Go](https://github.com/emicklei/fluxflow/actions/workflows/go.yml/badge.svg)](https://github.com/emicklei/fluxflow/actions/workflows/go.yml)
 
-a Go interpreter that will serve a live code and debug experience
+a Go interpreter that eventually should serve a live coding and debug experience.
+
+## status
+
+This is work in progress.
+See [examples](./examples) for runnable examples using the `fluxflow` cli.
+See [status](STATUS.md) for the supported Go language features.
 
 ## install
 
@@ -22,47 +28,8 @@ a Go interpreter that will serve a live code and debug experience
     )
 
     func main() {
-        pkg, _ := fluxflow.LoadPackage(".")
-        time, _ := fluxflow.Call(pkg,"addDays",1)
-        fmt.Println(time)
-    }    
+        fluxflow.Run("path/containing/main.go")        
+    }
     ```
-
-## Features
-
-| Feature | Implemented |
-|---|---|
-| Imports | ✅ |
-| Variable declaration `var` | ✅ |
-| Constant declaration `const` | ✅ |
-| Assignment `=`, `:=` | ✅ |
-| Functions `func` | ✅ |
-| Function calls | ✅ |
-| `return` statement | ✅ |
-| `if/else` statements | ✅ |
-| `for` loops | ✅ |
-| `for..range` loops | ✅ |
-| Basic literal types (int,string,rune,...) | ✅ |
-| Composite type `array` | ✅ |
-| Composite type `slice` | ✅ |
-| Package `init` | ✅ |
-| Binary and Unary Operators | ✅ |
-| Composite type `struct` | ✅ |
-| Composite type `map` | ✅ |
-| Unsigned integer arithmetic | ✅ |
-| `switch` statement | ✅ |
-| Pointers | ⬜ |
-| Interfaces | ⬜ |
-| Methods | ⬜ |
-| Goroutines `go` | ⬜ |
-| Channels `chan` | ⬜ |
-| `select` statement | ⬜ |
-| Anonymous `func` | ⬜ |
-| Function literal | ✅ |
-| Type alias | ✅ |
-| defer | ✅ |
-| variadic function | ⬜ |
-
-
 
 &copy; 2025. https://ernestmicklei.com . MIT License
