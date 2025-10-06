@@ -64,7 +64,7 @@ func RunProgram(p *Program, optionalVM *VM) error {
 	}
 	for _, each := range pkgEnv.inits {
 		vm.pushNewFrame()
-		each.Body.Eval(vm)
+		vm.eval(each.Body)
 		vm.popFrame()
 	}
 
@@ -75,7 +75,7 @@ func RunProgram(p *Program, optionalVM *VM) error {
 	// TODO
 	vm.pushNewFrame()
 	fundecl := main.Interface().(FuncDecl)
-	fundecl.Body.Eval(vm)
+	vm.eval(fundecl.Body)
 	vm.popFrame()
 	return nil
 }

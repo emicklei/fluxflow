@@ -18,6 +18,6 @@ func (b BlockStmt) String() string {
 
 func (b BlockStmt) Eval(vm *VM) {
 	for _, stmt := range b.List {
-		stmt.stmtStep().Eval(vm)
+		vm.eval(stmt.stmtStep())
 	}
 }

@@ -33,7 +33,7 @@ func (c CallExpr) Eval(vm *VM) {
 	f := vm.ReturnsEval(c.Fun)
 
 	if !f.IsValid() {
-		vm.doPanic("call to invalid function")
+		vm.fatal("call to invalid function")
 	}
 
 	switch f.Kind() {
@@ -60,9 +60,9 @@ func (c CallExpr) Eval(vm *VM) {
 			c.handleFuncDecl(vm, lf)
 			return
 		}
-		vm.doPanic("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
+		vm.fatal("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
 	default:
-		vm.doPanic("call to unknown function type")
+		vm.fatal("call to unknown function type")
 	}
 }
 
@@ -83,7 +83,7 @@ func (c CallExpr) handleFuncLit(vm *VM, fl FuncLit) {
 			p++
 		}
 	}
-	fl.Body.Eval(vm)
+	vm.eval(fl.Body)
 	top := vm.popFrame()
 	for _, each := range top.returnValues {
 		vm.Returns(each)
@@ -106,7 +106,7 @@ func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
 			p++
 		}
 	}
-	fd.Body.Eval(vm)
+	vm.eval(fd.Body)
 	top := vm.popFrame()
 	for _, each := range top.returnValues {
 		vm.Returns(each)

@@ -474,14 +474,21 @@ func main() {
 package main
 
 func main() {
-	i := 0
-here:
-	print("a")
-	if i < 2 {
-		i++
-		goto here
+	s := 1
+one:
+	print(s)
+	s++
+	if s == 4 {
+		return
+	} else {
+		goto two
 	}
-}`,
+two:
+	print(s)
+	s++
+	goto one
+}
+`,
 			want: "aaa",
 		},
 		{

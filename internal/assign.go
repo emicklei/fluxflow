@@ -17,7 +17,7 @@ func (a AssignStmt) stmtStep() Evaluable { return a }
 func (a AssignStmt) Eval(vm *VM) {
 	for _, each := range a.Rhs {
 		// values are stacked operands
-		each.Eval(vm)
+		vm.eval(each)
 	}
 	// operands are stacked in reverse order
 	for i := len(a.Lhs) - 1; i != -1; i-- {

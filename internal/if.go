@@ -21,15 +21,15 @@ func (i IfStmt) String() string {
 
 func (i IfStmt) Eval(vm *VM) {
 	if i.Init != nil {
-		i.Init.Eval(vm)
+		vm.eval(i.Init)
 	}
 	rv := vm.ReturnsEval(i.Cond)
 	if rv.Bool() {
-		i.Body.Eval(vm)
+		vm.eval(i.Body)
 		return
 	}
 	if i.Else != nil {
-		i.Else.stmtStep().Eval(vm)
+		vm.eval(i.Else.stmtStep())
 		return
 	}
 }

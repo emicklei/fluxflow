@@ -54,7 +54,7 @@ func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
 	if trace {
 		fmt.Println("VM.ReturnsEval", e)
 	}
-	e.Eval(vm)
+	vm.eval(e)
 	return vm.callStack.top().pop()
 }
 
@@ -71,11 +71,18 @@ func (vm *VM) pushNewFrame() *stackFrame {
 func (vm *VM) popFrame() *stackFrame {
 	return vm.callStack.pop()
 }
-func (vm *VM) doPanic(err any) {
+func (vm *VM) fatal(err any) {
 	s := structexplorer.NewService("vm", vm)
 	for i, each := range vm.callStack {
 		s.Explore(fmt.Sprintf("vm.callStack.%d", i), each, structexplorer.Column(0))
 	}
 	s.Dump("vm-panic.html")
 	panic(err)
+}
+
+func (vm *VM) eval(e Evaluable) {
+	if trace {
+		fmt.Println("VM.eval", e)
+	}
+	e.Eval(vm)
 }

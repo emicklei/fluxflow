@@ -14,7 +14,7 @@ type ExprStmt struct {
 func (s ExprStmt) stmtStep() Evaluable { return s }
 
 func (s ExprStmt) Eval(vm *VM) {
-	s.X.Eval(vm)
+	vm.eval(s.X)
 }
 
 func (s ExprStmt) String() string {
@@ -52,7 +52,7 @@ func (s LabeledStmt) String() string {
 func (s LabeledStmt) stmtStep() Evaluable { return s }
 
 func (s LabeledStmt) Eval(vm *VM) {
-	s.Stmt.stmtStep().Eval(vm)
+	vm.eval(s.Stmt.stmtStep())
 }
 
 // BranchStmt represents a break, continue, goto, or fallthrough statement.
@@ -83,12 +83,12 @@ func (s SwitchStmt) Eval(vm *VM) {
 	vm.pushNewFrame()
 	defer vm.popFrame() // to handle break statements
 	if s.Init != nil {
-		s.Init.stmtStep().Eval(vm)
+		vm.eval(s.Init.stmtStep())
 	}
 	if s.Tag != nil {
-		s.Tag.Eval(vm)
+		vm.eval(s.Tag)
 	}
-	s.Body.Eval(vm)
+	vm.eval(s.Body)
 }
 func (s SwitchStmt) String() string {
 	return fmt.Sprintf("SwitchStmt(%v,%v,%v)", s.Init, s.Tag, s.Body)
@@ -108,7 +108,7 @@ func (c CaseClause) Eval(vm *VM) {
 	if c.List == nil {
 		// default case
 		for _, stmt := range c.Body {
-			stmt.stmtStep().Eval(vm)
+			vm.eval(stmt.stmtStep())
 		}
 		return
 	}
@@ -131,7 +131,7 @@ func (c CaseClause) Eval(vm *VM) {
 			vm.pushNewFrame()
 			defer vm.popFrame()
 			for _, stmt := range c.Body {
-				stmt.stmtStep().Eval(vm)
+				vm.eval(stmt.stmtStep())
 			}
 			return
 		}
@@ -156,5 +156,5 @@ func (d DeferStmt) Eval(vm *VM) {
 		return
 	}
 	// TODO: keep defer stack in the current frame?
-	defer d.Call.Eval(vm)
+	defer vm.eval(d.Call)
 }

@@ -41,7 +41,7 @@ func (r RangeStmt) Eval(vm *VM) {
 				}
 			}
 		}
-		r.Body.Eval(vm)
+		vm.eval(r.Body)
 	}
 	vm.popFrame()
 }
