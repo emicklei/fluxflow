@@ -20,16 +20,16 @@ See [status](STATUS.md) for the supported Go language features.
 
 ## Use as package
 
-    ```go
-    package main
+```go
+package main
 
-    import (
-        "github.com/emicklei/fluxflow"
-    )
+import (
+    "github.com/emicklei/fluxflow"
+)
 
-    func main() {
-        fluxflow.Run("path/containing/main.go")        
-    }
-    ```
+func main() {
+    fluxflow.Run("path/to/program")        
+}
+```
 
 &copy; 2025. https://ernestmicklei.com . MIT License
