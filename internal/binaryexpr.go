@@ -8,7 +8,6 @@ import (
 )
 
 type BinaryExpr struct {
-	operatorUnimplemented
 	X Expr
 	Y Expr
 	*ast.BinaryExpr
@@ -236,12 +235,4 @@ func (b BinaryExprValue) UIntOpUInt(left uint64, right uint64) reflect.Value {
 		return reflect.ValueOf(left >= right)
 	}
 	panic("not implemented: BinaryExprValue.UIntOpUInt:" + b.op.String())
-}
-
-var _ Expr = &operatorUnimplemented{}
-
-type operatorUnimplemented struct{ step }
-
-func (*operatorUnimplemented) Assign(env *Environment, value reflect.Value) {
-	panic("not implemented: operatorUnimplemented.Assign")
 }

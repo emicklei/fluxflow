@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"go/ast"
+	"go/token"
 	"testing"
 )
 
@@ -44,4 +46,28 @@ func TestStep(t *testing.T) {
 			t.Error("s1.next should be s2")
 		}
 	})
+}
+
+func TestStepByStep(t *testing.T) {
+	left := BasicLit{BasicLit: &ast.BasicLit{Kind: token.STRING, Value: "Hello, "}}
+	right := BasicLit{BasicLit: &ast.BasicLit{Kind: token.STRING, Value: "World!"}}
+	expr := BinaryExpr{
+		X:          left,
+		Y:          right,
+		BinaryExpr: &ast.BinaryExpr{Op: token.ADD},
+	}
+	leftStep := &step{Evaluable: left}
+	rightStep := &step{Evaluable: right}
+	rightStep.Prev(leftStep)
+	binExprStep := &step{Evaluable: expr}
+	binExprStep.Prev(rightStep)
+
+	vm := newVM(newEnvironment(nil))
+	here := leftStep
+	for here != nil {
+		t.Log(here)
+		here.Eval(vm)
+		here = here.next
+	}
+	t.Log("result:", vm.callStack.top().pop().Interface())
 }

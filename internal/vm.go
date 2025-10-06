@@ -41,6 +41,7 @@ type evaluator interface {
 	popFrame() *stackFrame
 	fatal(err any)
 	eval(e Evaluable)
+	evalAll(list []Evaluable)
 }
 
 type VM struct {
@@ -95,4 +96,10 @@ func (vm *VM) eval(e Evaluable) {
 		fmt.Println("VM.eval", e)
 	}
 	e.Eval(vm)
+}
+
+func (vm *VM) evalAll(list []Evaluable) {
+	for _, each := range list {
+		vm.eval(each)
+	}
 }
