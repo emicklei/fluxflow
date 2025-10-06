@@ -26,7 +26,7 @@ func (v ConstOrVar) Define(vm *VM, value reflect.Value) {
 }
 func (v ConstOrVar) Declare(vm *VM) bool {
 	if v.Value != nil {
-		actual := vm.ReturnsEval(v.Value)
+		actual := vm.returnsEval(v.Value)
 		if !actual.IsValid() {
 			return false
 		}
@@ -43,7 +43,7 @@ func (v ConstOrVar) Declare(vm *VM) bool {
 
 func (v ConstOrVar) Eval(vm *VM) {
 	vv := vm.localEnv().valueLookUp(v.Name.Name)
-	vm.Returns(vv)
+	vm.pushOperand(vv)
 }
 func (v ConstOrVar) String() string {
 	return fmt.Sprintf("ConstOrVar(%v)", v.Name.Name)

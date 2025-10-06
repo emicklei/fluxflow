@@ -12,14 +12,14 @@ type SelectorExpr struct {
 }
 
 func (s SelectorExpr) Eval(vm *VM) {
-	recv := vm.ReturnsEval(s.X)
+	recv := vm.returnsEval(s.X)
 	if !recv.IsValid() {
 		panic("not a valid receiver")
 	}
 	rec, ok := recv.Interface().(FieldSelectable)
 	if ok {
 		sel := rec.Select(s.Sel.Name)
-		vm.Returns(sel)
+		vm.pushOperand(sel)
 		return
 	}
 	panic("expected FieldSelectable: " + recv.String())

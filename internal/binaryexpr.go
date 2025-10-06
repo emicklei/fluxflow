@@ -16,16 +16,16 @@ type BinaryExpr struct {
 
 func (s BinaryExpr) Eval(vm *VM) {
 	v := BinaryExprValue{
-		left:  vm.ReturnsEval(s.X),
+		left:  vm.returnsEval(s.X),
 		op:    s.Op,
-		right: vm.ReturnsEval(s.Y),
+		right: vm.returnsEval(s.Y),
 	}
 	// TODO
 	if !v.IsValid() {
-		vm.Returns(reflect.Value{})
+		vm.pushOperand(reflect.Value{})
 		return
 	}
-	vm.Returns(v.Eval())
+	vm.pushOperand(v.Eval())
 }
 
 func (s BinaryExpr) String() string {

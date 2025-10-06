@@ -23,7 +23,7 @@ func (i IfStmt) Eval(vm *VM) {
 	if i.Init != nil {
 		vm.eval(i.Init)
 	}
-	rv := vm.ReturnsEval(i.Cond)
+	rv := vm.returnsEval(i.Cond)
 	if rv.Bool() {
 		vm.eval(i.Body)
 		return

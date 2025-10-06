@@ -14,7 +14,7 @@ type ArrayType struct {
 
 // used?
 func (a ArrayType) Eval(vm *VM) {
-	vm.Returns(reflect.ValueOf(a))
+	vm.pushOperand(reflect.ValueOf(a))
 }
 
 func (a ArrayType) Instantiate(vm *VM) reflect.Value {
@@ -24,7 +24,7 @@ func (a ArrayType) Instantiate(vm *VM) reflect.Value {
 		st := reflect.SliceOf(rt)
 		return reflect.MakeSlice(st, 0, 4)
 	} else {
-		size := vm.ReturnsEval(a.Len)
+		size := vm.returnsEval(a.Len)
 		st := reflect.ArrayOf(int(size.Int()), rt)
 		pArray := reflect.New(st)
 		return pArray.Elem()

@@ -33,6 +33,16 @@ func (f *stackFrame) pop() reflect.Value {
 	return f.operandStack.pop()
 }
 
+type evaluator interface {
+	localEnv() Env
+	returnsEval(e Evaluable) reflect.Value
+	pushOperand(v reflect.Value)
+	pushNewFrame() *stackFrame
+	popFrame() *stackFrame
+	fatal(err any)
+	eval(e Evaluable)
+}
+
 type VM struct {
 	callStack stack[*stackFrame] // TODO use value io pointer?
 	output    *bytes.Buffer
@@ -49,8 +59,8 @@ func (vm *VM) localEnv() Env {
 	return vm.callStack.top().env
 }
 
-// ReturnsEval evaluates the argument and returns its return value.
-func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
+// returnsEval evaluates the argument and returns the value pushed onto the operand stack.
+func (vm *VM) returnsEval(e Evaluable) reflect.Value {
 	if trace {
 		fmt.Println("VM.ReturnsEval", e)
 	}
@@ -58,8 +68,8 @@ func (vm *VM) ReturnsEval(e Evaluable) reflect.Value {
 	return vm.callStack.top().pop()
 }
 
-// Returns pushes a value onto the operand stack as the result of an evaluation.
-func (vm *VM) Returns(v reflect.Value) {
+// pushOperand pushes a value onto the operand stack as the result of an evaluation.
+func (vm *VM) pushOperand(v reflect.Value) {
 	// TODO consider add pushOperand to callStack so stackFrame can be value that is replaced on top.
 	vm.callStack.top().push(v)
 }

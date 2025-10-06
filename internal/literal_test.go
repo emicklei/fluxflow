@@ -33,7 +33,7 @@ func TestBasicLit_Eval(t *testing.T) {
 		t.Run(tt.lit.Kind.String(), func(t *testing.T) {
 			vm := newVM(newEnvironment(nil))
 			bl := BasicLit{BasicLit: tt.lit}
-			result := vm.ReturnsEval(bl)
+			result := vm.returnsEval(bl)
 			if result.Interface() != tt.expected {
 				t.Errorf("expected %v, got %v", tt.expected, result.Interface())
 			}
@@ -61,7 +61,7 @@ func TestCompositeArrayLit_Eval(t *testing.T) {
 				BasicLit{BasicLit: &ast.BasicLit{Kind: token.INT, Value: "2"}},
 			},
 		}
-		result := vm.ReturnsEval(cl)
+		result := vm.returnsEval(cl)
 		if result.Kind() != reflect.Array {
 			t.Fatalf("expected array, got %v", result.Kind())
 		}
@@ -96,7 +96,7 @@ func TestCompositeSliceLit_Eval(t *testing.T) {
 				BasicLit{BasicLit: &ast.BasicLit{Kind: token.INT, Value: "2"}},
 			},
 		}
-		result := vm.ReturnsEval(cl)
+		result := vm.returnsEval(cl)
 		if result.Kind() != reflect.Slice {
 			t.Fatalf("expected slice, got %v", result.Kind())
 		}

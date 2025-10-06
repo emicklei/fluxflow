@@ -18,7 +18,7 @@ func (i IncDecStmt) String() string {
 	return fmt.Sprintf("IncDecStmt(%v)", i.X)
 }
 func (i IncDecStmt) Eval(vm *VM) {
-	current := vm.ReturnsEval(i.X)
+	current := vm.returnsEval(i.X)
 	if i.Tok == token.INC {
 		switch current.Kind() {
 		case reflect.Int:

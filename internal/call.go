@@ -15,10 +15,10 @@ type CallExpr struct {
 func (c CallExpr) evalAppend(vm *VM) {
 	args := make([]reflect.Value, len(c.Args))
 	for i, arg := range c.Args {
-		args[i] = vm.ReturnsEval(arg)
+		args[i] = vm.returnsEval(arg)
 	}
 	result := reflect.Append(args[0], args[1:]...)
-	vm.Returns(result)
+	vm.pushOperand(result)
 }
 
 func (c CallExpr) Eval(vm *VM) {
@@ -30,7 +30,7 @@ func (c CallExpr) Eval(vm *VM) {
 		}
 	}
 	// function f is either an external or an interpreted one
-	f := vm.ReturnsEval(c.Fun)
+	f := vm.returnsEval(c.Fun)
 
 	if !f.IsValid() {
 		vm.fatal("call to invalid function")
@@ -40,13 +40,13 @@ func (c CallExpr) Eval(vm *VM) {
 	case reflect.Func:
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
-			val := vm.ReturnsEval(arg)
+			val := vm.returnsEval(arg)
 			args[i] = val
 		}
 		vals := f.Call(args)
 		// set return values on top of stack
 		for _, each := range vals {
-			vm.Returns(each)
+			vm.pushOperand(each)
 		}
 
 	case reflect.Struct:
@@ -71,7 +71,7 @@ func (c CallExpr) handleFuncLit(vm *VM, fl FuncLit) {
 	// prepare arguments
 	args := make([]reflect.Value, len(c.Args))
 	for i, arg := range c.Args {
-		val := vm.ReturnsEval(arg)
+		val := vm.returnsEval(arg)
 		args[i] = val
 	}
 	frame := vm.pushNewFrame()
@@ -86,7 +86,7 @@ func (c CallExpr) handleFuncLit(vm *VM, fl FuncLit) {
 	vm.eval(fl.Body)
 	top := vm.popFrame()
 	for _, each := range top.returnValues {
-		vm.Returns(each)
+		vm.pushOperand(each)
 	}
 }
 func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
@@ -94,7 +94,7 @@ func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
 	// prepare arguments
 	args := make([]reflect.Value, len(c.Args))
 	for i, arg := range c.Args {
-		val := vm.ReturnsEval(arg)
+		val := vm.returnsEval(arg)
 		args[i] = val
 	}
 	frame := vm.pushNewFrame()
@@ -109,7 +109,7 @@ func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
 	vm.eval(fd.Body)
 	top := vm.popFrame()
 	for _, each := range top.returnValues {
-		vm.Returns(each)
+		vm.pushOperand(each)
 	}
 }
 

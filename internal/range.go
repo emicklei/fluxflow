@@ -20,7 +20,7 @@ func (r RangeStmt) String() string {
 func (r RangeStmt) stmtStep() Evaluable { return r }
 
 func (r RangeStmt) Eval(vm *VM) {
-	rangeable := vm.ReturnsEval(r.X)
+	rangeable := vm.returnsEval(r.X)
 	vm.pushNewFrame()
 	for i := 0; i < rangeable.Len(); i++ {
 		if r.Key != nil {

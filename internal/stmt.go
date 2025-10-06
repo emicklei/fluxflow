@@ -118,7 +118,7 @@ func (c CaseClause) Eval(vm *VM) {
 		left = vm.callStack.top().pop()
 	}
 	for _, expr := range c.List {
-		right := vm.ReturnsEval(expr)
+		right := vm.returnsEval(expr)
 		var cond bool
 		if left.IsValid() {
 			// because value is on the operand stack we compare

@@ -18,22 +18,22 @@ func (i IndexExpr) String() string {
 	return fmt.Sprintf("IndexExpr(%v, %v)", i.X, i.Index)
 }
 func (i IndexExpr) Eval(vm *VM) {
-	target := vm.ReturnsEval(i.X)
-	index := vm.ReturnsEval(i.Index)
+	target := vm.returnsEval(i.X)
+	index := vm.returnsEval(i.Index)
 	if target.Kind() == reflect.Map {
-		vm.Returns(target.MapIndex(index))
+		vm.pushOperand(target.MapIndex(index))
 		return
 	}
 	if target.Kind() == reflect.Slice || target.Kind() == reflect.Array {
-		vm.Returns(target.Index(int(index.Int())))
+		vm.pushOperand(target.Index(int(index.Int())))
 		return
 	}
 	expected(target, "map or slice or array")
 }
 
 func (i IndexExpr) Assign(vm *VM, value reflect.Value) {
-	target := vm.ReturnsEval(i.X)
-	index := vm.ReturnsEval(i.Index)
+	target := vm.returnsEval(i.X)
+	index := vm.returnsEval(i.Index)
 	if target.Kind() == reflect.Map {
 		target.SetMapIndex(index, value)
 		return

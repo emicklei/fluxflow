@@ -22,8 +22,8 @@ func (e KeyValueExpr) Eval(vm *VM) {
 		panic("unhandled key type")
 	}
 	key := reflect.ValueOf(id.Name)
-	value := vm.ReturnsEval(e.Value)
-	vm.Returns(reflect.ValueOf(KeyValue{Key: key, Value: value}))
+	value := vm.returnsEval(e.Value)
+	vm.pushOperand(reflect.ValueOf(KeyValue{Key: key, Value: value}))
 }
 
 type KeyValue struct {

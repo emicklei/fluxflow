@@ -13,7 +13,7 @@ type Ident struct {
 }
 
 func (i Ident) Eval(vm *VM) {
-	vm.Returns(vm.localEnv().valueLookUp(i.Name))
+	vm.pushOperand(vm.localEnv().valueLookUp(i.Name))
 }
 func (i Ident) Assign(vm *VM, value reflect.Value) {
 	vm.localEnv().valueOwnerOf(i.Name).set(i.Name, value)

@@ -12,8 +12,8 @@ type StarExpr struct {
 }
 
 func (s StarExpr) Eval(vm *VM) {
-	v := vm.ReturnsEval(s.X)
-	vm.Returns(v.Elem())
+	v := vm.returnsEval(s.X)
+	vm.pushOperand(v.Elem())
 }
 func (s StarExpr) Assign(vm *VM, value reflect.Value) {
 	// TODO

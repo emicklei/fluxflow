@@ -21,12 +21,12 @@ func (s TypeSpec) Eval(vm *VM) {
 	if s.Name == nil {
 		return // TODO ?
 	}
-	actualType := vm.ReturnsEval(s.Type)
+	actualType := vm.returnsEval(s.Type)
 	vm.localEnv().set(s.Name.Name, actualType) // use the spec itself as value
 }
 
 func (s TypeSpec) Instantiate(vm *VM) reflect.Value {
-	actualType := vm.ReturnsEval(s.Type).Interface()
+	actualType := vm.returnsEval(s.Type).Interface()
 	// fmt.Println(actualType)
 	if i, ok := actualType.(CanInstantiate); ok {
 		instance := i.Instantiate(vm)
@@ -60,7 +60,7 @@ func (s StructType) String() string {
 }
 
 func (s StructType) Eval(vm *VM) {
-	vm.Returns(reflect.ValueOf(s))
+	vm.pushOperand(reflect.ValueOf(s))
 }
 
 func (s StructType) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
@@ -86,7 +86,7 @@ func (m MapType) String() string {
 }
 
 func (m MapType) Eval(vm *VM) {
-	vm.Returns(reflect.ValueOf(m))
+	vm.pushOperand(reflect.ValueOf(m))
 }
 
 func (m MapType) Instantiate(vm *VM) reflect.Value {

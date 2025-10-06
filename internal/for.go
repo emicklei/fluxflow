@@ -23,7 +23,7 @@ func (f ForStmt) Eval(vm *VM) {
 	if f.Init != nil {
 		vm.eval(f.Init.stmtStep())
 	}
-	for vm.ReturnsEval(f.Cond).Bool() {
+	for vm.returnsEval(f.Cond).Bool() {
 		vm.eval(f.Body.stmtStep())
 		vm.eval(f.Post.stmtStep())
 	}

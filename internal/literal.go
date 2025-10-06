@@ -17,16 +17,16 @@ func (s BasicLit) Eval(vm *VM) {
 	switch s.Kind {
 	case token.INT:
 		i, _ := strconv.Atoi(s.Value)
-		vm.Returns(reflect.ValueOf(i))
+		vm.pushOperand(reflect.ValueOf(i))
 	case token.STRING:
 		unq := strings.Trim(s.Value, "`\"")
-		vm.Returns(reflect.ValueOf(unq))
+		vm.pushOperand(reflect.ValueOf(unq))
 	case token.FLOAT:
 		f, _ := strconv.ParseFloat(s.Value, 64)
-		vm.Returns(reflect.ValueOf(f))
+		vm.pushOperand(reflect.ValueOf(f))
 	case token.CHAR:
 		// a character literal is a rune, which is an alias for int32
-		vm.Returns(reflect.ValueOf(s.Value))
+		vm.pushOperand(reflect.ValueOf(s.Value))
 	default:
 		panic("not implemented: BasicList.Eval:" + s.Kind.String())
 	}
@@ -45,7 +45,7 @@ type CompositeLit struct {
 }
 
 func (s CompositeLit) Eval(vm *VM) {
-	internalType := vm.ReturnsEval(s.Type).Interface()
+	internalType := vm.returnsEval(s.Type).Interface()
 	i, ok := internalType.(CanInstantiate)
 	if !ok {
 		panic(fmt.Sprintf("expected CanInstantiate:%v (%T)", internalType, internalType))
@@ -53,10 +53,10 @@ func (s CompositeLit) Eval(vm *VM) {
 	instance := i.Instantiate(vm)
 	values := make([]reflect.Value, len(s.Elts))
 	for i, elt := range s.Elts {
-		values[i] = vm.ReturnsEval(elt)
+		values[i] = vm.returnsEval(elt)
 	}
 	result := i.LiteralCompose(instance, values)
-	vm.Returns(result)
+	vm.pushOperand(result)
 }
 
 func (s CompositeLit) String() string {
@@ -70,7 +70,7 @@ type FuncLit struct {
 }
 
 func (s FuncLit) Eval(vm *VM) {
-	vm.Returns(reflect.ValueOf(s))
+	vm.pushOperand(reflect.ValueOf(s))
 }
 
 func (s FuncLit) String() string {
