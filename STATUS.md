@@ -32,3 +32,5 @@
 | Type alias | ✅ |
 | defer | ✅ |
 | variadic function | ⬜ |
+| blank identifier | ⬜ |
+| goto, continue, break. fallthrough | ⬜ |

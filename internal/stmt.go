@@ -37,6 +37,8 @@ func (s DeclStmt) String() string {
 }
 
 // LabeledStmt represents a labeled statement.
+// https://go.dev/ref/spec#Labeled_statements
+// https://go.dev/ref/spec#Label_scopes
 type LabeledStmt struct {
 	*ast.LabeledStmt
 	Label *Ident
