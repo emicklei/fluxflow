@@ -650,9 +650,9 @@ func main() {
 	// if err := RunProgram(prog, vm); err != nil {
 	// 	t.Fatal(err)
 	// }
-	here := prog.builder.stack[0]
+	var here Step = prog.builder.stack[0]
 	for here != nil {
 		t.Log(here)
-		here = here.next
+		here = here.Next()
 	}
 }

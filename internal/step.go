@@ -4,12 +4,14 @@ import (
 	"fmt"
 )
 
+var _ Step = (*step)(nil)
+
 var idgen int = 0
 
 type step struct {
 	id   int
-	prev *step
-	next *step
+	prev Step
+	next Step
 	Evaluable
 }
 
@@ -23,6 +25,10 @@ type conditionalStep struct {
 	falseStep *step
 }
 
+func (s *step) ID() int {
+	return s.id
+}
+
 func (s *step) String() string {
 	if s == nil {
 		return "nil"
@@ -30,24 +36,30 @@ func (s *step) String() string {
 	return fmt.Sprintf("step(%v)", s.Evaluable)
 }
 
-func (s *step) Next(n *step) {
+func (s *step) Next() Step {
+	return s.next
+}
+func (s *step) Prev() Step {
+	return s.prev
+}
+
+func (s *step) SetNext(n Step) {
+	if n == s {
+		panic("step cannot point to itself")
+	}
 	if s.next == n {
 		return
 	}
 	s.next = n
-	n.Prev(s)
+	n.SetPrev(s)
 }
-func (s *step) Prev(p *step) {
+func (s *step) SetPrev(p Step) {
+	if p == s {
+		panic("step cannot point to itself")
+	}
 	if s.prev == p {
 		return
 	}
 	s.prev = p
-	p.Next(s)
-}
-func (s *step) head() *step {
-	here := s
-	for here.prev != nil {
-		here = here.prev
-	}
-	return here
+	p.SetNext(s)
 }

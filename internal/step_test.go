@@ -10,19 +10,19 @@ func TestStep(t *testing.T) {
 	t.Run("Next", func(t *testing.T) {
 		s1 := &step{}
 		s2 := &step{}
-		s1.Next(s2)
-		if s1.next != s2 {
+		s1.SetNext(s2)
+		if s1.Next() != s2 {
 			t.Error("s1.next should be s2")
 		}
-		if s2.prev != s1 {
+		if s2.Prev() != s1 {
 			t.Error("s2.prev should be s1")
 		}
 		// test idempotency
-		s1.Next(s2)
-		if s1.next != s2 {
+		s1.SetNext(s2)
+		if s1.Next() != s2 {
 			t.Error("s1.next should be s2")
 		}
-		if s2.prev != s1 {
+		if s2.Prev() != s1 {
 			t.Error("s2.prev should be s1")
 		}
 	})
@@ -30,15 +30,15 @@ func TestStep(t *testing.T) {
 	t.Run("Prev", func(t *testing.T) {
 		s1 := &step{}
 		s2 := &step{}
-		s2.Prev(s1)
-		if s2.prev != s1 {
+		s2.SetPrev(s1)
+		if s2.Prev() != s1 {
 			t.Error("s2.prev should be s1")
 		}
-		if s1.next != s2 {
+		if s1.Next() != s2 {
 			t.Error("s1.next should be s2")
 		}
 		// test idempotency
-		s2.Prev(s1)
+		s2.SetPrev(s1)
 		if s2.prev != s1 {
 			t.Error("s2.prev should be s1")
 		}
@@ -58,16 +58,16 @@ func TestStepByStep(t *testing.T) {
 	}
 	leftStep := &step{Evaluable: left}
 	rightStep := &step{Evaluable: right}
-	rightStep.Prev(leftStep)
+	rightStep.SetPrev(leftStep)
 	binExprStep := &step{Evaluable: expr}
-	binExprStep.Prev(rightStep)
+	binExprStep.SetPrev(rightStep)
 
 	vm := newVM(newEnvironment(nil))
-	here := leftStep
+	var here Step = leftStep
 	for here != nil {
 		t.Log(here)
 		here.Eval(vm)
-		here = here.next
+		here = here.Next()
 	}
 	t.Log("result:", vm.callStack.top().pop().Interface())
 }

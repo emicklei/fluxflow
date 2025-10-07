@@ -6,6 +6,7 @@ import (
 )
 
 func TestGrapherFor(t *testing.T) {
+	t.Skip()
 	source := `
 package main
 

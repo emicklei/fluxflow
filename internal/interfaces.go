@@ -47,7 +47,12 @@ type Decl interface {
 	declStep() CanDeclare
 }
 
-type Stepper interface {
-	Next(s Stepper)
-	Prev(s Stepper)
+type Step interface {
+	Evaluable
+	SetNext(s Step)
+	SetPrev(s Step)
+	Next() Step
+	Prev() Step
+	ID() int
+	String() string
 }
