@@ -21,3 +21,9 @@ func (b BlockStmt) Eval(vm *VM) {
 		vm.eval(stmt.stmtStep())
 	}
 }
+
+// func (b BlockStmt) Flow(g *grapher) {
+// 	for _, stmt := range b.List {
+// 		stmt.stmtStep().Flow(g)
+// 	}
+// }

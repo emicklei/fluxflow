@@ -10,6 +10,11 @@ type step struct {
 	Evaluable
 }
 
+type conditionalStep struct {
+	*step
+	falseStep *step
+}
+
 func (s *step) String() string {
 	if s == nil {
 		return "nil"

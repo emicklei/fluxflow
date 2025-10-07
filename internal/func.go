@@ -18,6 +18,13 @@ func (f FuncDecl) Eval(vm *VM) {
 		vm.eval(f.Body)
 	}
 }
+
+func (f FuncDecl) Flow(g *grapher) {
+	// if f.Body != nil {
+	// 	f.Body.Flow(g)
+	// }
+}
+
 func (f FuncDecl) String() string {
 	return fmt.Sprintf("FuncDecl(%s)", f.Name.Name)
 }

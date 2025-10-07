@@ -131,7 +131,7 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s.X = e.(Expr)
 		b.push(s)
 	case *ast.ForStmt:
-		s := &ForStmt{ForStmt: n}
+		s := ForStmt{ForStmt: n}
 		if n.Init != nil {
 			b.Visit(n.Init)
 			e := b.pop()

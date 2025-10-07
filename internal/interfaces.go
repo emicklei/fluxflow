@@ -18,8 +18,7 @@ type CanDeclare interface {
 type Statement interface{}
 
 type Expr interface {
-	// Eval performs the expression and may push the value(s) on the operand stack.
-	Eval(vm *VM)
+	Evaluable
 }
 
 type HasZeroValue interface {
@@ -46,4 +45,9 @@ type CanInstantiate interface {
 
 type Decl interface {
 	declStep() CanDeclare
+}
+
+type Stepper interface {
+	Next(s Stepper)
+	Prev(s Stepper)
 }
