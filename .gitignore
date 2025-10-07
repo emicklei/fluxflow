@@ -32,3 +32,5 @@ go.work.sum
 .specstory
 .vscode
 internal/vm-panic.html
+graph.dot
+internal/graph.png

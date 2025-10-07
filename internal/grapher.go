@@ -1,12 +1,19 @@
 package internal
 
+import (
+	"os"
+	"strconv"
+
+	"github.com/emicklei/dot"
+)
+
 type grapher struct {
 	current        *step
 	conditionStack stack[*conditionalStep]
 }
 
 func (g *grapher) next(stmt Evaluable) {
-	next := &step{Evaluable: stmt}
+	next := newStep(stmt)
 	if g.current != nil {
 		g.current.Next(next)
 	}
@@ -14,7 +21,7 @@ func (g *grapher) next(stmt Evaluable) {
 }
 func (g *grapher) beginIf(cond Evaluable) *step {
 	c := &conditionalStep{
-		step: &step{Evaluable: cond},
+		step: newStep(cond),
 	}
 	g.next(c)
 	g.conditionStack.push(c)
@@ -28,4 +35,21 @@ func (g *grapher) endIf() {
 }
 func (g *grapher) jump(s *step) {
 	g.current.Next(s)
+}
+func (g *grapher) dotify() {
+	if g.current == nil {
+		return
+	}
+	d := dot.NewGraph(dot.Directed)
+	here := g.current.head()
+	hereNode := d.Node(strconv.Itoa(here.id)).Label(here.String())
+	for ; here != nil; here = here.next {
+		nextNode := d.Node(strconv.Itoa(here.id))
+		if nextNode.HasDefaultLabel() {
+			nextNode.Label(here.String())
+		}
+		hereNode.Edge(nextNode, "")
+		hereNode = nextNode
+	}
+	os.WriteFile("graph.dot", []byte(d.String()), 0644)
 }

@@ -1,6 +1,9 @@
 package internal
 
-import "testing"
+import (
+	"os/exec"
+	"testing"
+)
 
 func TestGrapherFor(t *testing.T) {
 	source := `
@@ -21,4 +24,7 @@ func main() {
 
 	g := new(grapher)
 	forstmt.Flow(g)
+	g.dotify()
+	// will fail in pipeline without graphviz installed
+	exec.Command("dot", "-Tpng", "-o", "graph.png", "graph.dot").Run()
 }
