@@ -2,6 +2,9 @@ package internal
 
 import (
 	"fmt"
+	"strconv"
+
+	"github.com/emicklei/dot"
 )
 
 var _ Step = (*step)(nil)
@@ -25,6 +28,32 @@ type conditionalStep struct {
 	falseStep *step
 }
 
+func (c *conditionalStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
+	me := c.step.Traverse(g, visited)
+	if c.falseStep != nil {
+		falseN := c.falseStep.Traverse(g, visited)
+		me.Edge(falseN, "false")
+	}
+	return me
+}
+
+func (s *step) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
+	if n, ok := visited[s.id]; ok {
+		return n
+	}
+	n := g.Node(strconv.Itoa(s.ID())).Label(s.String())
+	visited[s.id] = n
+	if s.prev != nil {
+		prevN := s.prev.Traverse(g, visited)
+		prevN.Edge(n, "next")
+	}
+	if s.next != nil {
+		nextN := s.next.Traverse(g, visited)
+		n.Edge(nextN, "next")
+	}
+	return n
+}
+
 func (s *step) ID() int {
 	return s.id
 }
@@ -44,9 +73,6 @@ func (s *step) Prev() Step {
 }
 
 func (s *step) SetNext(n Step) {
-	if n == s {
-		panic("step cannot point to itself")
-	}
 	if s.next == n {
 		return
 	}
@@ -54,9 +80,6 @@ func (s *step) SetNext(n Step) {
 	n.SetPrev(s)
 }
 func (s *step) SetPrev(p Step) {
-	if p == s {
-		panic("step cannot point to itself")
-	}
 	if s.prev == p {
 		return
 	}

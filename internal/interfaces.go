@@ -1,6 +1,10 @@
 package internal
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/emicklei/dot"
+)
 
 type Evaluable interface {
 	Eval(vm *VM)
@@ -55,4 +59,5 @@ type Step interface {
 	Prev() Step
 	ID() int
 	String() string
+	Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node
 }
