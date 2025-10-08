@@ -35,7 +35,7 @@ func (b *builder) push(s Evaluable) {
 	step.Evaluable = s
 	if len(b.stack) > 0 {
 		top := b.stack[len(b.stack)-1]
-		step.SetPrev(top)
+		top.SetNext(step)
 	}
 	b.stack = append(b.stack, step)
 }

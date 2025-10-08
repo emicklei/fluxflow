@@ -13,7 +13,6 @@ var idgen int = 0
 
 type step struct {
 	id   int
-	prev Step
 	next Step
 	Evaluable
 }
@@ -41,12 +40,8 @@ func (s *step) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
 	if n, ok := visited[s.id]; ok {
 		return n
 	}
-	n := g.Node(strconv.Itoa(s.ID())).Label(s.String())
+	n := g.Node(strconv.Itoa(s.ID())).Label(fmt.Sprintf("%d: %s", s.ID(), s.String()))
 	visited[s.id] = n
-	if s.prev != nil {
-		prevN := s.prev.Traverse(g, visited)
-		prevN.Edge(n, "next")
-	}
 	if s.next != nil {
 		nextN := s.next.Traverse(g, visited)
 		n.Edge(nextN, "next")
@@ -68,21 +63,10 @@ func (s *step) String() string {
 func (s *step) Next() Step {
 	return s.next
 }
-func (s *step) Prev() Step {
-	return s.prev
-}
 
 func (s *step) SetNext(n Step) {
 	if s.next == n {
 		return
 	}
 	s.next = n
-	n.SetPrev(s)
-}
-func (s *step) SetPrev(p Step) {
-	if s.prev == p {
-		return
-	}
-	s.prev = p
-	p.SetNext(s)
 }

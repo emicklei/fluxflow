@@ -32,9 +32,9 @@ func (f ForStmt) Eval(vm *VM) {
 
 func (f ForStmt) Flow(g *grapher) {
 	g.next(f.Init.stmtStep())
-	start := g.beginIf(f.Cond)
+	begin := g.beginIf(f.Cond)
 	f.Body.Flow(g)
 	//f.Post.Flow(g)
-	g.jump(start)
-	g.endIf()
+	g.jump(begin)
+	g.endIf(begin)
 }

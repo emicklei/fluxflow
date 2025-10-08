@@ -54,9 +54,7 @@ type Decl interface {
 type Step interface {
 	Evaluable
 	SetNext(s Step)
-	SetPrev(s Step)
 	Next() Step
-	Prev() Step
 	ID() int
 	String() string
 	Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node
