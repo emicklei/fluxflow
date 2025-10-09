@@ -6,6 +6,8 @@ import (
 	"go/token"
 )
 
+var _ Stmt = AssignStmt{}
+
 type AssignStmt struct {
 	*ast.AssignStmt
 	Lhs []Expr
@@ -83,4 +85,11 @@ func (a AssignStmt) Eval(vm *VM) {
 }
 func (a AssignStmt) String() string {
 	return fmt.Sprintf("Assign(%v,%s, %v)", a.Lhs, a.AssignStmt.Tok, a.Rhs)
+}
+
+func (a AssignStmt) Flow(g *grapher) {
+	for _, each := range a.Rhs {
+		g.next(each)
+	}
+	g.next(a)
 }

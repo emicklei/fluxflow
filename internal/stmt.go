@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+var _ Stmt = ExprStmt{}
+
 type ExprStmt struct {
 	*ast.ExprStmt
 	X Expr
@@ -19,6 +21,10 @@ func (s ExprStmt) Eval(vm *VM) {
 
 func (s ExprStmt) String() string {
 	return fmt.Sprintf("ExprStmt(%v)", s.X)
+}
+
+func (s ExprStmt) Flow(g *grapher) {
+	g.next(s.X)
 }
 
 type DeclStmt struct {

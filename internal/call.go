@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+var _ Expr = CallExpr{}
+
 type CallExpr struct {
 	Fun  Expr
 	Args []Expr

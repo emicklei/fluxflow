@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+var _ Stmt = ReturnStmt{}
+
 type ReturnStmt struct {
 	*ast.ReturnStmt
 	Results []Expr
@@ -26,4 +28,11 @@ func (r ReturnStmt) Eval(vm *VM) {
 	frame := vm.callStack.pop()
 	frame.returnValues = results
 	vm.callStack.push(frame)
+}
+
+func (r ReturnStmt) Flow(g *grapher) {
+	// for _, each := range r.Results {
+	// 	each.Flow(g)
+	// }
+	g.next(r)
 }

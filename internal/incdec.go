@@ -7,6 +7,8 @@ import (
 	"reflect"
 )
 
+var _ Stmt = IncDecStmt{}
+
 type IncDecStmt struct {
 	*ast.IncDecStmt
 	X Expr
@@ -70,4 +72,8 @@ func (i IncDecStmt) Eval(vm *VM) {
 			panic("unsupported type for -- :" + current.Kind().String())
 		}
 	}
+}
+
+func (i IncDecStmt) Flow(g *grapher) {
+	g.next(i.X)
 }

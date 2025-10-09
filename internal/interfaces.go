@@ -22,7 +22,12 @@ type CanDeclare interface {
 type Statement interface{}
 
 type Expr interface {
+	//Flowable
 	Evaluable
+}
+
+type Flowable interface {
+	Flow(g *grapher)
 }
 
 type HasZeroValue interface {
@@ -31,6 +36,7 @@ type HasZeroValue interface {
 
 // All statement nodes implement the Stmt interface.
 type Stmt interface {
+	Flowable
 	stmtStep() Evaluable
 }
 

@@ -30,6 +30,10 @@ type conditionalStep struct {
 func (c *conditionalStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
 	me := c.step.Traverse(g, visited)
 	if c.falseStep != nil {
+		// no edge if visited before
+		if _, ok := visited[c.falseStep.id]; ok {
+			return me
+		}
 		falseN := c.falseStep.Traverse(g, visited)
 		me.Edge(falseN, "false")
 	}

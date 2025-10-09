@@ -34,7 +34,7 @@ func (f ForStmt) Flow(g *grapher) {
 	g.next(f.Init.stmtStep())
 	begin := g.beginIf(f.Cond)
 	f.Body.Flow(g)
-	//f.Post.Flow(g)
+	f.Post.Flow(g)
 	g.jump(begin)
 	g.endIf(begin)
 }

@@ -16,6 +16,9 @@ func (g *grapher) next(stmt Evaluable) {
 }
 func (g *grapher) nextStep(next Step) {
 	if g.current != nil {
+		if g.current.Next() != nil {
+			panic("current step already has a next step")
+		}
 		g.current.SetNext(next)
 	} else {
 		g.head = next
@@ -32,7 +35,7 @@ func (g *grapher) beginIf(cond Evaluable) *conditionalStep {
 func (g *grapher) endIf(beginIf *conditionalStep) {
 	nop := newStep(nil) // no-op step
 	beginIf.falseStep = nop
-	g.nextStep(nop)
+	g.current = nop
 }
 func (g *grapher) jump(s Step) {
 	g.nextStep(s)

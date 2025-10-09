@@ -5,6 +5,8 @@ import (
 	"go/ast"
 )
 
+var _ Stmt = IfStmt{}
+
 type IfStmt struct {
 	*ast.IfStmt
 	Init Expr
@@ -32,4 +34,15 @@ func (i IfStmt) Eval(vm *VM) {
 		vm.eval(i.Else.stmtStep())
 		return
 	}
+}
+
+func (i IfStmt) Flow(g *grapher) {
+	if i.Init != nil {
+		g.next(i.Init)
+	}
+	begin := g.beginIf(i.Cond)
+	i.Body.Flow(g)
+	g.jump(begin)
+	g.endIf(begin)
+	// TODO else
 }
