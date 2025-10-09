@@ -27,6 +27,8 @@ func (s ExprStmt) Flow(g *grapher) {
 	g.next(s.X)
 }
 
+var _ Stmt = DeclStmt{}
+
 type DeclStmt struct {
 	*ast.DeclStmt
 	Decl Decl
@@ -41,6 +43,8 @@ func (s DeclStmt) Eval(vm *VM) {
 func (s DeclStmt) String() string {
 	return fmt.Sprintf("DeclStmt(%v)", s.Decl)
 }
+
+func (s DeclStmt) Flow(g *grapher) {}
 
 // LabeledStmt represents a labeled statement.
 // https://go.dev/ref/spec#Labeled_statements
@@ -61,6 +65,8 @@ func (s LabeledStmt) Eval(vm *VM) {
 	vm.eval(s.Stmt.stmtStep())
 }
 
+var _ Stmt = BranchStmt{}
+
 // BranchStmt represents a break, continue, goto, or fallthrough statement.
 type BranchStmt struct {
 	*ast.BranchStmt
@@ -74,6 +80,10 @@ func (s BranchStmt) String() string {
 }
 
 func (s BranchStmt) stmtStep() Evaluable { return s }
+
+func (s BranchStmt) Flow(g *grapher) {}
+
+var _ Stmt = SwitchStmt{}
 
 // A SwitchStmt represents an expression switch statement.
 type SwitchStmt struct {
@@ -100,12 +110,20 @@ func (s SwitchStmt) String() string {
 	return fmt.Sprintf("SwitchStmt(%v,%v,%v)", s.Init, s.Tag, s.Body)
 }
 
+func (s SwitchStmt) Flow(g *grapher) {
+	// TODO
+}
+
+var _ Flowable = CaseClause{}
+
 // A CaseClause represents a case of an expression or type switch statement.
 type CaseClause struct {
 	*ast.CaseClause
 	List []Expr // list of expressions; nil means default case
 	Body []Stmt
 }
+
+func (c CaseClause) stmtStep() Evaluable { return c }
 
 func (c CaseClause) String() string {
 	return fmt.Sprintf("CaseClause(%v,%v)", c.List, c.Body)
@@ -144,7 +162,11 @@ func (c CaseClause) Eval(vm *VM) {
 	}
 }
 
-func (c CaseClause) stmtStep() Evaluable { return c }
+func (c CaseClause) Flow(g *grapher) {
+	// TODO
+}
+
+var _ Stmt = DeferStmt{}
 
 type DeferStmt struct {
 	*ast.DeferStmt
@@ -163,4 +185,8 @@ func (d DeferStmt) Eval(vm *VM) {
 	}
 	// TODO: keep defer stack in the current frame?
 	defer vm.eval(d.Call)
+}
+
+func (d DeferStmt) Flow(g *grapher) {
+	// TODO
 }

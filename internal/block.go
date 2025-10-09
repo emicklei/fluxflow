@@ -5,6 +5,8 @@ import (
 	"go/ast"
 )
 
+var _ Stmt = BlockStmt{}
+
 type BlockStmt struct {
 	*ast.BlockStmt
 	List []Stmt
@@ -23,8 +25,7 @@ func (b BlockStmt) Eval(vm *VM) {
 }
 
 func (b BlockStmt) Flow(g *grapher) {
-	// for _, stmt := range b.List {
-	// 	stmt.stmtStep().Flow(g)
-	// }
-	g.next(b)
+	for _, stmt := range b.List {
+		stmt.Flow(g)
+	}
 }

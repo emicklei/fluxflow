@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+var _ Stmt = RangeStmt{}
+
 type RangeStmt struct {
 	*ast.RangeStmt
 	Key, Value Expr // Key, Value may be nil
@@ -44,4 +46,8 @@ func (r RangeStmt) Eval(vm *VM) {
 		vm.eval(r.Body)
 	}
 	vm.popFrame()
+}
+
+func (r RangeStmt) Flow(g *grapher) {
+	// TODO
 }

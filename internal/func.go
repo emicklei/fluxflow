@@ -20,9 +20,9 @@ func (f FuncDecl) Eval(vm *VM) {
 }
 
 func (f FuncDecl) Flow(g *grapher) {
-	// if f.Body != nil {
-	// 	f.Body.Flow(g)
-	// }
+	if f.Body != nil {
+		f.Body.Flow(g)
+	}
 }
 
 func (f FuncDecl) String() string {

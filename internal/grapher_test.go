@@ -21,10 +21,9 @@ func main() {
 	prog := buildProgram(t, source)
 	main := prog.builder.env.valueLookUp("main")
 	decl := main.Interface().(FuncDecl)
-	forstmt := decl.Body.List[1].(ForStmt)
 
 	g := new(grapher)
-	forstmt.Flow(g)
+	decl.Flow(g)
 	g.dotify()
 	// will fail in pipeline without graphviz installed
 	exec.Command("dot", "-Tpng", "-o", "graph.png", "graph.dot").Run()

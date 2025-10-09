@@ -121,3 +121,7 @@ func (c CallExpr) Assign(env *Environment, value reflect.Value) {}
 func (c CallExpr) String() string {
 	return fmt.Sprintf("CallExpr(%v, len=%d)", c.Fun, len(c.Args))
 }
+
+func (c CallExpr) Flow(g *grapher) {
+	g.next(c) // TODO
+}
