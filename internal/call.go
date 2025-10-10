@@ -122,6 +122,7 @@ func (c CallExpr) String() string {
 	return fmt.Sprintf("CallExpr(%v, len=%d)", c.Fun, len(c.Args))
 }
 
-func (c CallExpr) Flow(g *grapher) {
-	g.next(c) // TODO
+func (c CallExpr) Flow(g *grapher) (head Step) {
+	g.next(c)
+	return g.current
 }

@@ -5,6 +5,8 @@ import (
 	"go/ast"
 )
 
+var _ Stmt = ForStmt{}
+
 type ForStmt struct {
 	*ast.ForStmt
 	Init Stmt
@@ -30,11 +32,13 @@ func (f ForStmt) Eval(vm *VM) {
 	vm.popFrame()
 }
 
-func (f ForStmt) Flow(g *grapher) {
+func (f ForStmt) Flow(g *grapher) (head Step) {
 	g.next(f.Init.stmtStep())
+	head = g.current
 	begin := g.beginIf(f.Cond)
 	f.Body.Flow(g)
 	f.Post.Flow(g)
 	g.jump(begin)
 	g.endIf(begin)
+	return head
 }

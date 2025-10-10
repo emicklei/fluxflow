@@ -24,8 +24,14 @@ func (b BlockStmt) Eval(vm *VM) {
 	}
 }
 
-func (b BlockStmt) Flow(g *grapher) {
-	for _, stmt := range b.List {
+func (b BlockStmt) Flow(g *grapher) (head Step) {
+	head = g.current
+	for i, stmt := range b.List {
+		if i == 0 {
+			head = stmt.Flow(g)
+			continue
+		}
 		stmt.Flow(g)
 	}
+	return head
 }

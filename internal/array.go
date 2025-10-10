@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+var _ Expr = ArrayType{}
+
 type ArrayType struct {
 	*ast.ArrayType
 	Len Expr
@@ -29,6 +31,10 @@ func (a ArrayType) Instantiate(vm *VM) reflect.Value {
 		pArray := reflect.New(st)
 		return pArray.Elem()
 	}
+}
+
+func (a ArrayType) Flow(g *grapher) (head Step) {
+	return g.current
 }
 
 func mustIdentName(e Expr) string {

@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var _ Expr = BasicLit{}
+
 type BasicLit struct {
 	*ast.BasicLit
 }
@@ -38,6 +40,13 @@ func (s BasicLit) String() string {
 	return fmt.Sprintf("BasicLit(%v)", s.Value)
 }
 
+func (s BasicLit) Flow(g *grapher) (head Step) {
+	g.next(s)
+	return g.current
+}
+
+var _ Expr = CompositeLit{}
+
 type CompositeLit struct {
 	*ast.CompositeLit
 	Type Expr
@@ -63,6 +72,20 @@ func (s CompositeLit) String() string {
 	return fmt.Sprintf("CompositeLit(%v,%v)", s.Type, s.Elts)
 }
 
+func (s CompositeLit) Flow(g *grapher) (head Step) {
+	head = g.current
+	for i, each := range s.Elts {
+		if i == 0 {
+			head = each.Flow(g)
+			continue
+		}
+		each.Flow(g)
+	}
+	return head
+}
+
+var _ Expr = FuncLit{}
+
 type FuncLit struct {
 	*ast.FuncLit
 	Type *FuncType
@@ -75,4 +98,8 @@ func (s FuncLit) Eval(vm *VM) {
 
 func (s FuncLit) String() string {
 	return fmt.Sprintf("FuncLit(%v,%v)", s.Type, s.Body)
+}
+
+func (s FuncLit) Flow(g *grapher) (head Step) {
+	return s.Body.Flow(g)
 }

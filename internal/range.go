@@ -48,6 +48,6 @@ func (r RangeStmt) Eval(vm *VM) {
 	vm.popFrame()
 }
 
-func (r RangeStmt) Flow(g *grapher) {
-	// TODO
+func (r RangeStmt) Flow(g *grapher) (head Step) {
+	return head // TODO
 }

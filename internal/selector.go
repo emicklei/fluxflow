@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+var _ Expr = SelectorExpr{}
+
 type SelectorExpr struct {
 	*ast.SelectorExpr
 	X Expr
@@ -32,4 +34,10 @@ func (s SelectorExpr) Assign(env *Environment, value reflect.Value) {
 
 func (s SelectorExpr) String() string {
 	return fmt.Sprintf("SelectorExpr(%v, %v)", s.X, s.SelectorExpr.Sel.Name)
+}
+
+func (s SelectorExpr) Flow(g *grapher) (head Step) {
+	head = s.X.Flow(g)
+	g.next(s)
+	return head
 }

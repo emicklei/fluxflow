@@ -7,6 +7,8 @@ import (
 	"reflect"
 )
 
+var _ Expr = UnaryExpr{}
+
 type UnaryExpr struct {
 	*ast.UnaryExpr
 	X Expr
@@ -61,4 +63,10 @@ func (u UnaryExpr) Eval(vm *VM) {
 	default:
 		panic("not implemented: UnaryExpr.Eval:" + v.Kind().String())
 	}
+}
+
+func (u UnaryExpr) Flow(g *grapher) (head Step) {
+	head = u.X.Flow(g)
+	g.next(u)
+	return head
 }

@@ -36,13 +36,21 @@ func (i IfStmt) Eval(vm *VM) {
 	}
 }
 
-func (i IfStmt) Flow(g *grapher) {
+func (i IfStmt) Flow(g *grapher) (head Step) {
 	if i.Init != nil {
 		g.next(i.Init)
+		head = g.current
 	}
+	end := newStep(nil)
 	begin := g.beginIf(i.Cond)
+	if head == nil {
+		head = begin
+	}
 	i.Body.Flow(g)
-	g.jump(begin)
-	g.endIf(begin)
-	// TODO else
+	g.nextStep(end)
+	if i.Else != nil {
+		begin.elseStep = i.Else.Flow(g)
+		g.nextStep(end)
+	}
+	return head
 }

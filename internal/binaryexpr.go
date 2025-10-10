@@ -7,6 +7,8 @@ import (
 	"reflect"
 )
 
+var _ Expr = BinaryExpr{}
+
 type BinaryExpr struct {
 	X Expr
 	Y Expr
@@ -29,6 +31,13 @@ func (s BinaryExpr) Eval(vm *VM) {
 
 func (s BinaryExpr) String() string {
 	return fmt.Sprintf("BinaryExpr(%v %v %v)", s.X, s.Op, s.Y)
+}
+
+func (s BinaryExpr) Flow(g *grapher) (head Step) {
+	head = s.X.Flow(g)
+	s.Y.Flow(g)
+	g.next(s)
+	return head
 }
 
 type BinaryExprValue struct {

@@ -30,9 +30,14 @@ func (r ReturnStmt) Eval(vm *VM) {
 	vm.callStack.push(frame)
 }
 
-func (r ReturnStmt) Flow(g *grapher) {
-	// for _, each := range r.Results {
-	// 	each.Flow(g)
-	// }
-	g.next(r)
+func (r ReturnStmt) Flow(g *grapher) (head Step) {
+	head = g.current
+	for i, each := range r.Results {
+		if i == 0 {
+			head = each.Flow(g)
+			continue
+		}
+		each.Flow(g)
+	}
+	return
 }

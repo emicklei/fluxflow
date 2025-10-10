@@ -74,6 +74,7 @@ func (i IncDecStmt) Eval(vm *VM) {
 	}
 }
 
-func (i IncDecStmt) Flow(g *grapher) {
-	g.next(i.X)
+func (i IncDecStmt) Flow(g *grapher) (head Step) {
+	// TODO
+	return i.X.Flow(g)
 }

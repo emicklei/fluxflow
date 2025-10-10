@@ -22,12 +22,14 @@ type CanDeclare interface {
 type Statement interface{}
 
 type Expr interface {
-	//Flowable
+	Flowable
 	Evaluable
 }
 
 type Flowable interface {
-	Flow(g *grapher)
+	// Flow builds the control flow graph using the provided grapher.
+	// Head is the entry point to the flow graph.
+	Flow(g *grapher) (head Step)
 }
 
 type HasZeroValue interface {

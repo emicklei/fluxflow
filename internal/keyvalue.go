@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+var _ Expr = KeyValueExpr{}
+
 type KeyValueExpr struct {
 	*ast.KeyValueExpr
 	Key   Expr
@@ -24,6 +26,12 @@ func (e KeyValueExpr) Eval(vm *VM) {
 	key := reflect.ValueOf(id.Name)
 	value := vm.returnsEval(e.Value)
 	vm.pushOperand(reflect.ValueOf(KeyValue{Key: key, Value: value}))
+}
+
+func (e KeyValueExpr) Flow(g *grapher) (head Step) {
+	head = e.Value.Flow(g)
+	e.Key.Flow(g)
+	return head
 }
 
 type KeyValue struct {

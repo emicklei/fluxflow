@@ -43,6 +43,8 @@ func (s TypeSpec) LiteralCompose(composite reflect.Value, values []reflect.Value
 	return expected(s.Type, "a CanCompose value")
 }
 
+var _ Expr = StructType{}
+
 type StructType struct {
 	*ast.StructType
 	Fields  *FieldList
@@ -63,6 +65,10 @@ func (s StructType) Eval(vm *VM) {
 	vm.pushOperand(reflect.ValueOf(s))
 }
 
+func (s StructType) Flow(g *grapher) (head Step) {
+	return g.current
+}
+
 func (s StructType) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
 	i, ok := composite.Interface().(CanCompose)
 	if !ok {
@@ -74,6 +80,8 @@ func (s StructType) LiteralCompose(composite reflect.Value, values []reflect.Val
 func (s StructType) Instantiate(vm *VM) reflect.Value {
 	return reflect.ValueOf(NewInstance(vm, s))
 }
+
+var _ Expr = MapType{}
 
 type MapType struct {
 	*ast.MapType
@@ -87,6 +95,10 @@ func (m MapType) String() string {
 
 func (m MapType) Eval(vm *VM) {
 	vm.pushOperand(reflect.ValueOf(m))
+}
+
+func (m MapType) Flow(g *grapher) (head Step) {
+	return g.current
 }
 
 func (m MapType) Instantiate(vm *VM) reflect.Value {

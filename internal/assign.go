@@ -87,9 +87,14 @@ func (a AssignStmt) String() string {
 	return fmt.Sprintf("Assign(%v,%s, %v)", a.Lhs, a.AssignStmt.Tok, a.Rhs)
 }
 
-func (a AssignStmt) Flow(g *grapher) {
-	for _, each := range a.Rhs {
-		g.next(each)
+func (a AssignStmt) Flow(g *grapher) (head Step) {
+	head = g.current
+	for i, each := range a.Rhs {
+		if i == 0 {
+			head = each.Flow(g)
+			continue
+		}
+		each.Flow(g)
 	}
-	g.next(a)
+	return head
 }

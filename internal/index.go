@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+var _ Expr = IndexExpr{}
 var _ CanAssign = IndexExpr{}
 
 type IndexExpr struct {
@@ -18,8 +19,8 @@ func (i IndexExpr) String() string {
 	return fmt.Sprintf("IndexExpr(%v, %v)", i.X, i.Index)
 }
 func (i IndexExpr) Eval(vm *VM) {
-	target := vm.returnsEval(i.X)
 	index := vm.returnsEval(i.Index)
+	target := vm.returnsEval(i.X)
 	if target.Kind() == reflect.Map {
 		vm.pushOperand(target.MapIndex(index))
 		return
@@ -47,4 +48,10 @@ func (i IndexExpr) Assign(vm *VM, value reflect.Value) {
 
 func (i IndexExpr) Define(vm *VM, value reflect.Value) {
 	fmt.Println("IndexExpr.Define", i, value)
+}
+
+func (i IndexExpr) Flow(g *grapher) (head Step) {
+	head = i.X.Flow(g)
+	g.next(i)
+	return head
 }

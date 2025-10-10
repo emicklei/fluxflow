@@ -23,8 +23,8 @@ func (s ExprStmt) String() string {
 	return fmt.Sprintf("ExprStmt(%v)", s.X)
 }
 
-func (s ExprStmt) Flow(g *grapher) {
-	g.next(s.X)
+func (s ExprStmt) Flow(g *grapher) (head Step) {
+	return s.X.Flow(g)
 }
 
 var _ Stmt = DeclStmt{}
@@ -44,7 +44,9 @@ func (s DeclStmt) String() string {
 	return fmt.Sprintf("DeclStmt(%v)", s.Decl)
 }
 
-func (s DeclStmt) Flow(g *grapher) {}
+func (s DeclStmt) Flow(g *grapher) (head Step) {
+	return head // TODO
+}
 
 // LabeledStmt represents a labeled statement.
 // https://go.dev/ref/spec#Labeled_statements
@@ -81,7 +83,9 @@ func (s BranchStmt) String() string {
 
 func (s BranchStmt) stmtStep() Evaluable { return s }
 
-func (s BranchStmt) Flow(g *grapher) {}
+func (s BranchStmt) Flow(g *grapher) (head Step) {
+	return head // TODO
+}
 
 var _ Stmt = SwitchStmt{}
 
@@ -110,8 +114,8 @@ func (s SwitchStmt) String() string {
 	return fmt.Sprintf("SwitchStmt(%v,%v,%v)", s.Init, s.Tag, s.Body)
 }
 
-func (s SwitchStmt) Flow(g *grapher) {
-	// TODO
+func (s SwitchStmt) Flow(g *grapher) (head Step) {
+	return g.current // TODO
 }
 
 var _ Flowable = CaseClause{}
@@ -162,8 +166,8 @@ func (c CaseClause) Eval(vm *VM) {
 	}
 }
 
-func (c CaseClause) Flow(g *grapher) {
-	// TODO
+func (c CaseClause) Flow(g *grapher) (head Step) {
+	return g.current // TODO
 }
 
 var _ Stmt = DeferStmt{}
@@ -187,6 +191,6 @@ func (d DeferStmt) Eval(vm *VM) {
 	defer vm.eval(d.Call)
 }
 
-func (d DeferStmt) Flow(g *grapher) {
-	// TODO
+func (d DeferStmt) Flow(g *grapher) (head Step) {
+	return g.current // TODO
 }

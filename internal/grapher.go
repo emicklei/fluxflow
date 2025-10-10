@@ -34,7 +34,7 @@ func (g *grapher) beginIf(cond Evaluable) *conditionalStep {
 }
 func (g *grapher) endIf(beginIf *conditionalStep) {
 	nop := newStep(nil) // no-op step
-	beginIf.falseStep = nop
+	beginIf.elseStep = nop
 	g.current = nop
 }
 func (g *grapher) jump(s Step) {

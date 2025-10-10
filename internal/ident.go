@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+var _ Expr = Ident{}
 var _ CanAssign = Ident{}
 
 type Ident struct {
@@ -37,4 +38,9 @@ func (i Ident) String() string {
 		return fmt.Sprintf("Ident(%v)", i.Name)
 	}
 	return fmt.Sprintf("Ident(%v)", i.Obj.Name)
+}
+
+func (i Ident) Flow(g *grapher) (head Step) {
+	g.next(i)
+	return g.current
 }
