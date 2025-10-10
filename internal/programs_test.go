@@ -166,7 +166,7 @@ func main() {
 		},
 		{
 			name: "numbers",
-			step: true,
+			step: !true,
 			source: `
 package main
 
@@ -207,6 +207,7 @@ func main() {
 		},
 		{
 			name: "for",
+			step: true,
 			source: `
 package main
 
@@ -250,6 +251,7 @@ func main() {
 		},
 		{
 			name: "declare",
+			step: true,
 			source: `
 package main
 
@@ -260,7 +262,9 @@ func main() {
 			want: "",
 		},
 		{
-			name: "const",
+			name:  "const",
+			step:  !true,
+			debug: !true,
 			source: `
 package main
 

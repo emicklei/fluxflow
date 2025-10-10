@@ -42,9 +42,14 @@ func (c CallExpr) Eval(vm *VM) {
 	case reflect.Func:
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
-			val := vm.returnsEval(arg)
+			var val reflect.Value
+			if vm.isStepping {
+				val = vm.callStack.top().pop() // first to last, see Flow
+			} else {
+				val = vm.returnsEval(arg)
+			}
 			if !val.IsValid() {
-				vm.fatal("call to function with invalid argument:" + fmt.Sprintf(" arg %d (%v)", i, arg))
+				vm.fatal("call to function with invalid argument:" + fmt.Sprintf("%d=%v", i, arg))
 			}
 			args[i] = val
 		}
@@ -126,6 +131,18 @@ func (c CallExpr) String() string {
 }
 
 func (c CallExpr) Flow(g *grapher) (head Step) {
+	// make sure first value is on top of the operand stack
+	// so we can pop in the right order during Eval
+	for i := len(c.Args) - 1; i >= 0; i-- {
+		if i == len(c.Args)-1 {
+			head = c.Args[i].Flow(g)
+			continue
+		}
+		c.Args[i].Flow(g)
+	}
 	g.next(c)
-	return g.current
+	if head == nil {
+		head = g.current
+	}
+	return head
 }

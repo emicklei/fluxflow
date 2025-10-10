@@ -45,7 +45,8 @@ func (s DeclStmt) String() string {
 }
 
 func (s DeclStmt) Flow(g *grapher) (head Step) {
-	return head // TODO
+	g.next(s)
+	return g.current
 }
 
 // LabeledStmt represents a labeled statement.
