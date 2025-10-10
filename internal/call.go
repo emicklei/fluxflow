@@ -43,6 +43,9 @@ func (c CallExpr) Eval(vm *VM) {
 		args := make([]reflect.Value, len(c.Args))
 		for i, arg := range c.Args {
 			val := vm.returnsEval(arg)
+			if !val.IsValid() {
+				vm.fatal("call to function with invalid argument:" + fmt.Sprintf(" arg %d (%v)", i, arg))
+			}
 			args[i] = val
 		}
 		vals := f.Call(args)

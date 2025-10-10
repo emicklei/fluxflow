@@ -20,7 +20,12 @@ func (i IncDecStmt) String() string {
 	return fmt.Sprintf("IncDecStmt(%v)", i.X)
 }
 func (i IncDecStmt) Eval(vm *VM) {
-	current := vm.returnsEval(i.X)
+	var current reflect.Value
+	if vm.isStepping {
+		current = vm.callStack.top().operandStack.pop() // TODO
+	} else {
+		current = vm.returnsEval(i.X)
+	}
 	if i.Tok == token.INC {
 		switch current.Kind() {
 		case reflect.Int:
@@ -75,6 +80,7 @@ func (i IncDecStmt) Eval(vm *VM) {
 }
 
 func (i IncDecStmt) Flow(g *grapher) (head Step) {
-	// TODO
-	return i.X.Flow(g)
+	head = i.X.Flow(g)
+	g.next(i)
+	return head
 }

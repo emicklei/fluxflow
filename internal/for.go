@@ -33,12 +33,20 @@ func (f ForStmt) Eval(vm *VM) {
 }
 
 func (f ForStmt) Flow(g *grapher) (head Step) {
-	g.next(f.Init.stmtStep())
+	push := &pushStackFrameStep{step: newStep(nil)}
+	g.nextStep(push) // TODO
+
 	head = g.current
+	f.Init.Flow(g)
 	begin := g.beginIf(f.Cond)
 	f.Body.Flow(g)
 	f.Post.Flow(g)
-	g.jump(begin)
+	g.jump(begin) // TODO inline
 	g.endIf(begin)
+
+	pop := &popStackFrameStep{step: newStep(nil)}
+	begin.elseStep = pop
+	g.current = pop
+
 	return head
 }

@@ -37,7 +37,7 @@ func (g *grapher) endIf(beginIf *conditionalStep) {
 	beginIf.elseStep = nop
 	g.current = nop
 }
-func (g *grapher) jump(s Step) {
+func (g *grapher) jump(s Step) { // TODO inline
 	g.nextStep(s)
 }
 func (g *grapher) dotify() {

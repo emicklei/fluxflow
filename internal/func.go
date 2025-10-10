@@ -19,10 +19,12 @@ func (f FuncDecl) Eval(vm *VM) {
 	}
 }
 
-func (f FuncDecl) Flow(g *grapher) {
+func (f FuncDecl) Flow(g *grapher) (head Step) {
+	head = g.current
 	if f.Body != nil {
-		f.Body.Flow(g)
+		head = f.Body.Flow(g)
 	}
+	return
 }
 
 func (f FuncDecl) String() string {

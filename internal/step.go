@@ -28,7 +28,7 @@ type conditionalStep struct {
 }
 
 func (c *conditionalStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
-	me := c.step.Traverse(g, visited)
+	me := c.step.traverse(g, c.step.String(), "true", visited)
 	if c.elseStep != nil {
 		// no edge if visited before
 		if _, ok := visited[c.elseStep.ID()]; ok {
@@ -40,15 +40,27 @@ func (c *conditionalStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.N
 	return me
 }
 
+func (c *conditionalStep) Take(vm *VM) Step {
+	cond := vm.returnsEval(c.Evaluable)
+	if cond.Bool() {
+		return c.next
+	}
+	return c.elseStep
+}
+
 func (s *step) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
+	return s.traverse(g, s.String(), "next", visited)
+}
+
+func (s *step) traverse(g *dot.Graph, label, edge string, visited map[int]dot.Node) dot.Node {
 	if n, ok := visited[s.id]; ok {
 		return n
 	}
-	n := g.Node(strconv.Itoa(s.ID())).Label(fmt.Sprintf("%d: %s", s.ID(), s.String()))
+	n := g.Node(strconv.Itoa(s.ID())).Label(label)
 	visited[s.id] = n
 	if s.next != nil {
 		nextN := s.next.Traverse(g, visited)
-		n.Edge(nextN, "next")
+		n.Edge(nextN, edge)
 	}
 	return n
 }
@@ -61,7 +73,7 @@ func (s *step) String() string {
 	if s == nil {
 		return "nil"
 	}
-	return fmt.Sprintf("step(%v)", s.Evaluable)
+	return fmt.Sprintf("%d:step(%v)", s.id, s.Evaluable)
 }
 
 func (s *step) Next() Step {
@@ -73,4 +85,41 @@ func (s *step) SetNext(n Step) {
 		return
 	}
 	s.next = n
+}
+
+func (s *step) Take(vm *VM) Step {
+	if s.Evaluable != nil {
+		s.Evaluable.Eval(vm)
+	}
+	return s.next
+}
+
+type pushStackFrameStep struct {
+	*step
+}
+
+func (p *pushStackFrameStep) String() string { return "pushStackFrame" }
+
+func (p *pushStackFrameStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
+	return p.step.traverse(g, fmt.Sprintf("%d: step(push stackframe)", p.ID()), "next", visited)
+}
+
+func (p *pushStackFrameStep) Take(vm *VM) Step {
+	vm.pushNewFrame()
+	return p.next
+}
+
+type popStackFrameStep struct {
+	*step
+}
+
+func (p *popStackFrameStep) Take(vm *VM) Step {
+	vm.popFrame()
+	return p.next
+}
+
+func (p *popStackFrameStep) String() string { return "popStackFrame" }
+
+func (p *popStackFrameStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
+	return p.step.traverse(g, fmt.Sprintf("%d: step(pop stackframe)", p.ID()), "next", visited)
 }

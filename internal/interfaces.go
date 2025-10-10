@@ -61,9 +61,18 @@ type Decl interface {
 
 type Step interface {
 	Evaluable
+	StepTaker
+	Traverseable
 	SetNext(s Step)
 	Next() Step
 	ID() int
 	String() string
+}
+
+type StepTaker interface {
+	Take(vm *VM) Step
+}
+
+type Traverseable interface {
 	Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node
 }

@@ -17,13 +17,21 @@ type AssignStmt struct {
 func (a AssignStmt) stmtStep() Evaluable { return a }
 
 func (a AssignStmt) Eval(vm *VM) {
-	for _, each := range a.Rhs {
-		// values are stacked operands
-		vm.eval(each)
+	if !vm.isStepping {
+		// when stepping, the rhs are already evaluated
+		for _, each := range a.Rhs {
+			// values are on operand stack
+			vm.eval(each)
+		}
 	}
 	// operands are stacked in reverse order
 	for i := len(a.Lhs) - 1; i != -1; i-- {
 		each := a.Lhs[i]
+		if trace {
+			if len(vm.callStack.top().operandStack) == 0 {
+				vm.fatal("operand stack empty before assignment")
+			}
+		}
 		v := vm.callStack.top().pop()
 		target, ok_ := each.(CanAssign)
 		if !ok_ {
@@ -96,5 +104,6 @@ func (a AssignStmt) Flow(g *grapher) (head Step) {
 		}
 		each.Flow(g)
 	}
+	g.next(a)
 	return head
 }

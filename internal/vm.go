@@ -45,8 +45,9 @@ type evaluator interface {
 }
 
 type VM struct {
-	callStack stack[*stackFrame] // TODO use value io pointer?
-	output    *bytes.Buffer
+	callStack  stack[*stackFrame] // TODO use value io pointer?
+	isStepping bool
+	output     *bytes.Buffer
 }
 
 func newVM(env Env) *VM {
@@ -60,10 +61,10 @@ func (vm *VM) localEnv() Env {
 	return vm.callStack.top().env
 }
 
-// returnsEval evaluates the argument and returns the value pushed onto the operand stack.
+// returnsEval evaluates the argument and returns the popped value that was pushed onto the operand stack.
 func (vm *VM) returnsEval(e Evaluable) reflect.Value {
 	if trace {
-		fmt.Println("VM.ReturnsEval", e)
+		fmt.Println("VM.returnsEval", e)
 	}
 	vm.eval(e)
 	return vm.callStack.top().pop()
@@ -86,6 +87,7 @@ func (vm *VM) fatal(err any) {
 	s := structexplorer.NewService("vm", vm)
 	for i, each := range vm.callStack {
 		s.Explore(fmt.Sprintf("vm.callStack.%d", i), each, structexplorer.Column(0))
+		s.Explore(fmt.Sprintf("vm.callStack.%d.operandStack", i), each, structexplorer.Column(0))
 	}
 	s.Dump("vm-panic.html")
 	panic(err)
@@ -96,10 +98,4 @@ func (vm *VM) eval(e Evaluable) {
 		fmt.Println("VM.eval", e)
 	}
 	e.Eval(vm)
-}
-
-func (vm *VM) evalAll(list []Evaluable) {
-	for _, each := range list {
-		vm.eval(each)
-	}
 }

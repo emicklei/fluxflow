@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"os/exec"
 	"testing"
 )
@@ -27,4 +28,13 @@ func main() {
 	g.dotify()
 	// will fail in pipeline without graphviz installed
 	exec.Command("dot", "-Tpng", "-o", "graph.png", "graph.dot").Run()
+
+	// run it step by step
+	vm := newVM(prog.builder.env)
+	vm.isStepping = true
+	here := g.head
+	for here != nil {
+		fmt.Println(here)
+		here = here.Take(vm)
+	}
 }

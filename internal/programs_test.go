@@ -646,13 +646,8 @@ func main() {
 	print("one")
 	print("two")
 }`)
-	// vm := newVM(prog.builder.env)
-	// if err := RunProgram(prog, vm); err != nil {
-	// 	t.Fatal(err)
-	// }
-	var here Step = prog.builder.stack[0]
-	for here != nil {
-		t.Log(here)
-		here = here.Next()
+	vm := newVM(prog.builder.env)
+	if err := RunProgram(prog, vm); err != nil {
+		t.Fatal(err)
 	}
 }
