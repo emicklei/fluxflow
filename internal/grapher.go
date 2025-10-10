@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/emicklei/dot"
@@ -17,7 +18,7 @@ func (g *grapher) next(stmt Evaluable) {
 func (g *grapher) nextStep(next Step) {
 	if g.current != nil {
 		if g.current.Next() != nil {
-			panic("current step already has a next step")
+			panic(fmt.Sprintf("current %s already has a next %s, failing %s", g.current, g.current.Next(), next))
 		}
 		g.current.SetNext(next)
 	} else {

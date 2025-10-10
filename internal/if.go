@@ -38,19 +38,32 @@ func (i IfStmt) Eval(vm *VM) {
 
 func (i IfStmt) Flow(g *grapher) (head Step) {
 	if i.Init != nil {
-		g.next(i.Init)
-		head = g.current
+		head = i.Init.Flow(g)
 	}
-	end := newStep(nil)
 	begin := g.beginIf(i.Cond)
+	// if no init then head is begin
 	if head == nil {
 		head = begin
 	}
+	// both true and false branch need a new stack frame
+	push := &pushStackFrameStep{step: newStep(nil)}
+	// both branches will pop and can use the same step
+	pop := &popStackFrameStep{step: newStep(nil)}
+
+	g.nextStep(push)
 	i.Body.Flow(g)
-	g.nextStep(end)
+	// after true branch
+	g.nextStep(pop)
+
+	// now handle false branch
 	if i.Else != nil {
-		begin.elseStep = i.Else.Flow(g)
-		g.nextStep(end)
+		elsePush := &pushStackFrameStep{step: newStep(nil)}
+		// branching to else
+		g.current = elsePush
+		begin.elseStep = elsePush
+		i.Else.Flow(g)
+		// after false branch
+		g.nextStep(pop)
 	}
 	return head
 }

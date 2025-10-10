@@ -100,11 +100,13 @@ func TestAllPrograms(t *testing.T) {
 		source  string
 		want    string
 		skip    bool
+		step    bool // also step through the program
 		debug   bool
 		special func(string) bool // special check for output
 	}{
 		{
 			name: "print",
+			step: true,
 			source: `
 package main
 
@@ -116,6 +118,7 @@ func main() {
 		},
 		{
 			name: "multi-assign",
+			step: true,
 			source: `
 package main
 
@@ -127,6 +130,7 @@ func main() {
 		},
 		{
 			name: "if-else",
+			step: true,
 			source: `
 package main
 
@@ -141,6 +145,7 @@ func main() {
 		},
 		{
 			name: "true-false",
+			step: true,
 			source: `
 package main
 
@@ -161,6 +166,7 @@ func main() {
 		},
 		{
 			name: "numbers",
+			step: true,
 			source: `
 package main
 
@@ -171,6 +177,7 @@ func main() {
 		},
 		{
 			name: "func",
+			step: true,
 			source: `
 package main
 
@@ -185,6 +192,7 @@ func main() {
 		},
 		{
 			name: "func-multi-return",
+			step: true,
 			source: `
 package main
 
@@ -633,6 +641,13 @@ func main() {
 			}
 			if got, want := out, tt.want; got != want {
 				t.Errorf("got [%v] want [%v]", got, want)
+			}
+			if tt.step {
+				t.Log("stepping through:", tt.name)
+				out := parseAndStepThrough(t, tt.source)
+				if got, want := out, tt.want; got != want {
+					t.Errorf("got [%v] want [%v]", got, want)
+				}
 			}
 		})
 	}

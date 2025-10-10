@@ -5,6 +5,7 @@ import (
 	"go/token"
 	"io"
 	"os"
+	"os/exec"
 	"path"
 	"reflect"
 	"testing"
@@ -29,9 +30,7 @@ func buildProgram(t *testing.T, source string) *Program {
 	return prog
 }
 
-func parseAndRun(t *testing.T, source string) string {
-	prog := buildProgram(t, source)
-	vm := newVM(prog.builder.env)
+func collectPrintOutput(vm *VM) {
 	vm.localEnv().set("print", reflect.ValueOf(func(args ...any) {
 		for _, a := range args {
 			if rv, ok := a.(reflect.Value); ok && rv.IsValid() && rv.CanInterface() {
@@ -46,6 +45,38 @@ func parseAndRun(t *testing.T, source string) string {
 			}
 		}
 	}))
+}
+
+func parseAndStepThrough(t *testing.T, source string) string {
+	prog := buildProgram(t, source)
+	vm := newVM(prog.builder.env)
+	collectPrintOutput(vm)
+
+	main := prog.builder.env.valueLookUp("main")
+	decl := main.Interface().(FuncDecl)
+
+	g := new(grapher)
+	decl.Flow(g)
+	g.dotify()
+	// will fail in pipeline without graphviz installed
+	exec.Command("dot", "-Tpng", "-o", "graph.png", "graph.dot").Run()
+
+	// run it step by step
+	vm.isStepping = true
+	here := g.head
+	for here != nil {
+		if trace {
+			fmt.Println("taking", here)
+		}
+		here = here.Take(vm)
+	}
+	return vm.output.String()
+}
+
+func parseAndRun(t *testing.T, source string) string {
+	prog := buildProgram(t, source)
+	vm := newVM(prog.builder.env)
+	collectPrintOutput(vm)
 	if err := RunProgram(prog, vm); err != nil {
 		panic(err)
 	}
