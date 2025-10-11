@@ -168,8 +168,9 @@ func main() {
 			want: "'e'",
 		},
 		{
-			name: "numbers",
-			step: !true,
+			name:  "numbers",
+			step:  true,
+			debug: !true,
 			source: `
 package main
 
@@ -226,6 +227,7 @@ func main() {
 		},
 		{
 			name: "for-scope",
+			step: true,
 			source: `
 package main
 

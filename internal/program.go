@@ -115,6 +115,7 @@ func WalkProgram(p *Program, optionalVM *VM) error {
 	}
 	decl := main.Interface().(FuncDecl)
 
+	idgen = 0 // state of grapher?
 	g := new(grapher)
 	decl.Flow(g)
 	if fileName := os.Getenv("DOT"); fileName != "" {

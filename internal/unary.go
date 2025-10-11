@@ -19,8 +19,13 @@ func (u UnaryExpr) String() string {
 }
 
 func (u UnaryExpr) Eval(vm *VM) {
-	v := vm.returnsEval(u.X)
-	// propagate invalid value
+	var v reflect.Value
+	if vm.isStepping {
+		v = vm.callStack.top().pop()
+	} else {
+		v = vm.returnsEval(u.X)
+	}
+	// propagate invalid value ?? TODO when?
 	if !v.IsValid() {
 		vm.pushOperand(v)
 		return
