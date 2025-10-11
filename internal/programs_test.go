@@ -263,7 +263,7 @@ func main() {
 		},
 		{
 			name:  "const",
-			step:  !true,
+			step:  true,
 			debug: !true,
 			source: `
 package main
@@ -648,7 +648,7 @@ func main() {
 			}
 			if tt.step {
 				t.Log("stepping through:", tt.name)
-				out := parseAndStepThrough(t, tt.source)
+				out := parseAndWalk(t, tt.source)
 				if got, want := out, tt.want; got != want {
 					t.Errorf("got [%v] want [%v]", got, want)
 				}

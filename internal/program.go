@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"go/token"
+	"os/exec"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -77,5 +78,56 @@ func RunProgram(p *Program, optionalVM *VM) error {
 	fundecl := main.Interface().(FuncDecl)
 	fundecl.Eval(vm)
 	vm.popFrame()
+	return nil
+}
+
+func WalkProgram(p *Program, optionalVM *VM) error {
+	var vm *VM
+	if optionalVM != nil {
+		vm = optionalVM
+	} else {
+		vm = newVM(p.builder.env)
+	}
+	// first run const and vars
+	// try declare all of them until none left
+	// a declare may refer to other unseen declares.
+	pkgEnv := vm.localEnv().(*PkgEnvironment)
+	for len(pkgEnv.declTable) > 0 {
+		for key, each := range pkgEnv.declTable {
+			if each.Declare(vm) {
+				delete(pkgEnv.declTable, key)
+			}
+		}
+	}
+
+	// then walk all inits
+	// TODO should walk through them step by step!!
+	for _, each := range pkgEnv.inits {
+		vm.pushNewFrame()
+		each.Eval(vm)
+		vm.popFrame()
+	}
+
+	main := p.builder.env.valueLookUp("main")
+	if !main.IsValid() {
+		return errors.New("main not found")
+	}
+	decl := main.Interface().(FuncDecl)
+
+	g := new(grapher)
+	decl.Flow(g)
+	g.dotify()
+	// will fail in pipeline without graphviz installed
+	exec.Command("dot", "-Tpng", "-o", "graph.png", g.dotFilename()).Run()
+
+	// run it step by step
+	vm.isStepping = true
+	here := g.head
+	for here != nil {
+		if trace {
+			fmt.Println("taking", here)
+		}
+		here = here.Take(vm)
+	}
 	return nil
 }
