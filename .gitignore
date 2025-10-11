@@ -34,3 +34,6 @@ go.work.sum
 internal/vm-panic.html
 graph.dot
 internal/graph.png
+
+internal/testgraphs/*.dot
+internal/testgraphs/*.png

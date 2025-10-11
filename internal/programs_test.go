@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 )
@@ -648,6 +649,7 @@ func main() {
 			}
 			if tt.step {
 				t.Log("stepping through:", tt.name)
+				os.Setenv("DOT", fmt.Sprintf("testgraphs/%s.dot", tt.name))
 				out := parseAndWalk(t, tt.source)
 				if got, want := out, tt.want; got != want {
 					t.Errorf("got [%v] want [%v]", got, want)

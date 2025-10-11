@@ -49,3 +49,12 @@ The interpretation process for various language constructs is handled by dedicat
 
 - **Standard Library & External Packages:** Code from packages outside the main program (standard library, `go.mod` dependencies) is not interpreted directly. Instead, Fluxflow uses Go's `reflect` package to interact with these compiled packages, allowing the interpreted program to call their functions and use their types. The `internal/stdlib_generated.go` file likely contains pre-generated wrappers for standard library functions.
 - **Built-in Functions (`builtins.go`):** Go's built-in functions (e.g., `len`, `cap`, `append`) are implemented natively within the interpreter to ensure correct and efficient behavior.
+
+
+### Dev Notes
+
+- Call Graph on Demand? per FuncDecl?
+- stackframe on Go stack not heap?
+- think about a driver api to do stepping,breakpoints
+- more unit tests for walk and eval once design has settled
+- how to handle concurrency. (eval -> native, walk -> simulated?)

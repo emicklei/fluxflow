@@ -56,7 +56,7 @@ func (g *grapher) dotFilename() string {
 	return "graph.dot"
 }
 
-// dotify writes the current graph to graph.dot
+// dotify writes the current graph to a file.
 func (g *grapher) dotify() {
 	if g.current == nil {
 		return
