@@ -130,7 +130,7 @@ func main() {
 			want: "fluxflow",
 		},
 		{
-			name: "if-else",
+			name: "if-else-if-else",
 			step: true,
 			source: `
 package main
@@ -138,8 +138,10 @@ package main
 func main() {
 	if 1 == 2 {
 		print("unreachable")
-	} else {
+	} else if 2 == 2 {
 		print("fluxflow")
+	} else {
+		print("unreachable")
 	}
 }`,
 			want: "fluxflow",
@@ -281,6 +283,7 @@ func main() {
 		},
 		{
 			name: "var",
+			step: true,
 			source: `
 package main
 
