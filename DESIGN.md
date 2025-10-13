@@ -58,3 +58,4 @@ The interpretation process for various language constructs is handled by dedicat
 - think about a driver api to do stepping,breakpoints
 - more unit tests for walk and eval once design has settled
 - how to handle concurrency. (eval -> native, walk -> simulated?)
+- a literal eval is pushing the value as operand; other literals should do the same.

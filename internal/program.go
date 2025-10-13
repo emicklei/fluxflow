@@ -119,12 +119,10 @@ func WalkProgram(p *Program, optionalVM *VM) error {
 	g := new(grapher)
 	decl.Flow(g)
 	if fileName := os.Getenv("DOT"); fileName != "" {
-		go func() {
-			g.dotFile = fileName
-			g.dotify()
-			// will fail in pipeline without graphviz installed
-			exec.Command("dot", "-Tpng", "-o", g.dotFilename()+".png", g.dotFilename()).Run()
-		}()
+		g.dotFile = fileName
+		g.dotify()
+		// will fail in pipeline without graphviz installed
+		exec.Command("dot", "-Tpng", "-o", g.dotFilename()+".png", g.dotFilename()).Run()
 	}
 
 	// run it step by step

@@ -98,7 +98,7 @@ type pushStackFrameStep struct {
 	*step
 }
 
-func (p *pushStackFrameStep) String() string { return fmt.Sprintf("%d: step(push stackframe)", p.ID()) }
+func (p *pushStackFrameStep) String() string { return fmt.Sprintf("%d:step(push stackframe)", p.ID()) }
 
 func (p *pushStackFrameStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
 	return p.step.traverse(g, p.String(), "next", visited)
@@ -118,7 +118,7 @@ func (p *popStackFrameStep) Take(vm *VM) Step {
 	return p.next
 }
 
-func (p *popStackFrameStep) String() string { return fmt.Sprintf("%d: step(pop stackframe)", p.ID()) }
+func (p *popStackFrameStep) String() string { return fmt.Sprintf("%d:step(pop stackframe)", p.ID()) }
 
 func (p *popStackFrameStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
 	return p.step.traverse(g, p.String(), "next", visited)

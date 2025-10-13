@@ -20,13 +20,22 @@ func TestProgramTypeConvert(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.typeName, func(t *testing.T) {
-			out := parseAndRun(t, fmt.Sprintf(`
-package main
-
-func main() {
-	a := %s(1) + 2
-	print(a)
-}`, tt.typeName))
+			src := fmt.Sprintf(`
+			package main
+			
+			fun
+			out = parseAndWalk(t, src)	c main() {
+			package main
+			
+			fun
+				a := %s(1) + 2
+				print(a)
+			}`, tt.typeName)
+			out := parseAndRun(t, src)
+			if got, want := out, "3"; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+			out = parseAndWalk(t, src)
 			if got, want := out, "3"; got != want {
 				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 			}
@@ -47,13 +56,20 @@ func TestProgramTypeUnsignedConvert(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.typeName, func(t *testing.T) {
-			out := parseAndRun(t, fmt.Sprintf(`
-package main
-
-func main() {
-	a := %s(1) + %s(2)
-	print(a)
-}`, tt.typeName, tt.typeName))
+			src := fmt.Sprintf(`
+			package main
+			
+			func main() {
+				a := %s(1) + %s(2)
+				print(a)
+			}`, tt.typeName, tt.typeName)
+			// out := parseAndRun(t, src)
+			// if got, want := out, "3"; got != want {
+			// 	t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			// }
+			//trace = true
+			os.Setenv("DOT", fmt.Sprintf("testgraphs/unsigned_convert-%s.dot", tt.typeName))
+			out := parseAndWalk(t, src)
 			if got, want := out, "3"; got != want {
 				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 			}
@@ -80,14 +96,19 @@ func TestAssignmentOperators(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.op, func(t *testing.T) {
-			out := parseAndRun(t, fmt.Sprintf(`
-package main
-
-func main() {
-	a := 1
-	a %s 2
-	print(a)
-}`, tt.op))
+			src := fmt.Sprintf(`
+			package main
+			
+			func main() {
+				a := 1
+				a %s 2
+				print(a)
+			}`, tt.op)
+			out := parseAndRun(t, src)
+			if got, want := out, tt.want; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+			out = parseAndWalk(t, src)
 			if got, want := out, tt.want; got != want {
 				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 			}
@@ -326,7 +347,9 @@ func main() {
 			want: "fluxflow",
 		},
 		{
-			name: "slice",
+			name:  "slice",
+			step:  true,
+			debug: true,
 			source: `
 package main
 
@@ -654,6 +677,7 @@ func main() {
 			}
 			if tt.step {
 				t.Log("stepping through:", tt.name)
+				os.WriteFile(fmt.Sprintf("testgraphs/%s.src", tt.name), []byte(tt.source), 0644)
 				os.Setenv("DOT", fmt.Sprintf("testgraphs/%s.dot", tt.name))
 				out := parseAndWalk(t, tt.source)
 				if got, want := out, tt.want; got != want {
@@ -673,6 +697,7 @@ func main() {
 	print("two")
 }`)
 	vm := newVM(prog.builder.env)
+	collectPrintOutput(vm)
 	if err := RunProgram(prog, vm); err != nil {
 		t.Fatal(err)
 	}

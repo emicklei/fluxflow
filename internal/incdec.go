@@ -7,6 +7,7 @@ import (
 	"reflect"
 )
 
+var _ Flowable = IncDecStmt{}
 var _ Stmt = IncDecStmt{}
 
 type IncDecStmt struct {
@@ -14,11 +15,12 @@ type IncDecStmt struct {
 	X Expr
 }
 
-func (i IncDecStmt) stmtStep() Evaluable { return i }
-
-func (i IncDecStmt) String() string {
-	return fmt.Sprintf("IncDecStmt(%v)", i.X)
+func (i IncDecStmt) Flow(g *grapher) (head Step) {
+	head = i.X.Flow(g)
+	g.next(i)
+	return head
 }
+
 func (i IncDecStmt) Eval(vm *VM) {
 	var current reflect.Value
 	if vm.isStepping {
@@ -79,8 +81,8 @@ func (i IncDecStmt) Eval(vm *VM) {
 	}
 }
 
-func (i IncDecStmt) Flow(g *grapher) (head Step) {
-	head = i.X.Flow(g)
-	g.next(i)
-	return head
+func (i IncDecStmt) stmtStep() Evaluable { return i }
+
+func (i IncDecStmt) String() string {
+	return fmt.Sprintf("IncDecStmt(%v)", i.X)
 }

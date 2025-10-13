@@ -32,12 +32,15 @@ func (f ForStmt) Eval(vm *VM) {
 	vm.popFrame()
 }
 
+// TODO make use of Eval? using g.next(f) ?
 func (f ForStmt) Flow(g *grapher) (head Step) {
 	push := &pushStackFrameStep{step: newStep(nil)}
 	g.nextStep(push) // TODO
-
 	head = g.current
-	f.Init.Flow(g)
+
+	if f.Init != nil {
+		head = f.Init.Flow(g)
+	}
 	begin := g.beginIf(f.Cond)
 	f.Body.Flow(g)
 	f.Post.Flow(g)

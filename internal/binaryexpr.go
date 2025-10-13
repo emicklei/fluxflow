@@ -7,24 +7,29 @@ import (
 	"reflect"
 )
 
+var _ Flowable = BinaryExpr{}
 var _ Expr = BinaryExpr{}
 
 type BinaryExpr struct {
-	X Expr
-	Y Expr
 	*ast.BinaryExpr
+	X Expr // left
+	Y Expr // right
 }
 
 func (s BinaryExpr) Eval(vm *VM) {
-	v := BinaryExprValue{
-		left:  vm.returnsEval(s.X),
-		op:    s.Op,
-		right: vm.returnsEval(s.Y),
+	var left, right reflect.Value
+	if vm.isStepping {
+		// see Flow for the order
+		right = vm.callStack.top().pop()
+		left = vm.callStack.top().pop()
+	} else {
+		left = vm.returnsEval(s.X)
+		right = vm.returnsEval(s.Y)
 	}
-	// TODO
-	if !v.IsValid() {
-		vm.pushOperand(reflect.Value{})
-		return
+	v := BinaryExprValue{
+		left:  left,
+		op:    s.Op,
+		right: right,
 	}
 	vm.pushOperand(v.Eval())
 }

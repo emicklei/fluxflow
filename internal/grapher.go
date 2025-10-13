@@ -34,9 +34,10 @@ func (g *grapher) nextStep(next Step) {
 
 // beginIf creates a conditional step with the given condition
 // and makes it the current step. It returns the created conditional step to set the else branch later.
-func (g *grapher) beginIf(cond Evaluable) *conditionalStep {
+func (g *grapher) beginIf(cond Expr) *conditionalStep {
+	head := cond.Flow(g)
 	c := &conditionalStep{
-		step: newStep(cond),
+		step: head.(*step),
 	}
 	g.nextStep(c)
 	return c

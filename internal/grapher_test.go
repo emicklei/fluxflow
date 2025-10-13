@@ -1,11 +1,12 @@
 package internal
 
 import (
+	"os"
 	"testing"
 )
 
 func TestGrapherFor(t *testing.T) {
-	//t.Skip()
+	t.Skip()
 	source := `
 package main
 
@@ -18,6 +19,8 @@ func main() {
 	print(j)
 }`
 
+	trace = true
+	os.Setenv("DOT", "testgraphs/TestGrapherFor.dot")
 	out := parseAndWalk(t, source)
 	expected := `0122`
 	if out != expected {

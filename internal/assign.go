@@ -96,7 +96,6 @@ func (a AssignStmt) String() string {
 }
 
 func (a AssignStmt) Flow(g *grapher) (head Step) {
-	head = g.current
 	for i, each := range a.Rhs {
 		if i == 0 {
 			head = each.Flow(g)
@@ -105,5 +104,8 @@ func (a AssignStmt) Flow(g *grapher) (head Step) {
 		each.Flow(g)
 	}
 	g.next(a)
+	if head == nil {
+		head = g.current
+	}
 	return head
 }

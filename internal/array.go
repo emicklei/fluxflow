@@ -34,17 +34,8 @@ func (a ArrayType) Instantiate(vm *VM) reflect.Value {
 }
 
 func (a ArrayType) Flow(g *grapher) (head Step) {
+	g.next(a)
 	return g.current
-}
-
-func mustIdentName(e Expr) string {
-	if id, ok := e.(Ident); ok {
-		return id.Name
-	}
-	if id, ok := e.(*Ident); ok {
-		return id.Name
-	}
-	panic(fmt.Sprintf("expected Ident but got %T", e))
 }
 
 func (a ArrayType) String() string {

@@ -43,7 +43,7 @@ func (i IfStmt) Flow(g *grapher) (head Step) {
 	begin := g.beginIf(i.Cond)
 	// if no init then head is begin
 	if head == nil {
-		head = begin
+		head = begin.step
 	}
 	// both true and false branch need a new stack frame
 	push := &pushStackFrameStep{step: newStep(nil)}

@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -45,6 +46,7 @@ func (s BasicLit) Flow(g *grapher) (head Step) {
 	return g.current
 }
 
+var _ Flowable = CompositeLit{}
 var _ Expr = CompositeLit{}
 
 type CompositeLit struct {
@@ -57,12 +59,21 @@ func (s CompositeLit) Eval(vm *VM) {
 	internalType := vm.returnsEval(s.Type).Interface()
 	i, ok := internalType.(CanInstantiate)
 	if !ok {
-		panic(fmt.Sprintf("expected CanInstantiate:%v (%T)", internalType, internalType))
+		vm.fatal(fmt.Sprintf("expected CanInstantiate:%v (%T)", internalType, internalType))
 	}
 	instance := i.Instantiate(vm)
 	values := make([]reflect.Value, len(s.Elts))
 	for i, elt := range s.Elts {
-		values[i] = vm.returnsEval(elt)
+		var val reflect.Value
+		if vm.isStepping {
+			val = vm.callStack.top().pop()
+		} else {
+			val = vm.returnsEval(elt)
+		}
+		values[i] = val
+	}
+	if vm.isStepping {
+		slices.Reverse(values) // because we pop() in reverse order
 	}
 	result := i.LiteralCompose(instance, values)
 	vm.pushOperand(result)
@@ -81,6 +92,7 @@ func (s CompositeLit) Flow(g *grapher) (head Step) {
 		}
 		each.Flow(g)
 	}
+	g.next(s)
 	return head
 }
 
