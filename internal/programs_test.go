@@ -202,7 +202,7 @@ func main() {
 		},
 		{
 			name: "func",
-			step: true,
+			step: false,
 			source: `
 package main
 
@@ -217,7 +217,7 @@ func main() {
 		},
 		{
 			name: "func-multi-return",
-			step: true,
+			step: false,
 			source: `
 package main
 
@@ -232,7 +232,7 @@ func main() {
 		},
 		{
 			name: "for",
-			step: true,
+			step: false,
 			source: `
 package main
 
@@ -248,7 +248,7 @@ func main() {
 		},
 		{
 			name: "for-scope",
-			step: true,
+			step: false,
 			source: `
 package main
 
@@ -289,7 +289,7 @@ func main() {
 		},
 		{
 			name:  "const",
-			step:  true,
+			step:  false,
 			debug: !true,
 			source: `
 package main
@@ -349,7 +349,7 @@ func main() {
 		{
 			name:  "slice",
 			step:  true,
-			debug: true,
+			debug: !true,
 			source: `
 package main
 

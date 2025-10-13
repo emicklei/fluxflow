@@ -24,6 +24,10 @@ func (s BinaryExpr) Eval(vm *VM) {
 		left = vm.callStack.top().pop()
 	} else {
 		left = vm.returnsEval(s.X)
+		if !left.IsValid() {
+			vm.pushOperand(left)
+			return
+		}
 		right = vm.returnsEval(s.Y)
 	}
 	v := BinaryExprValue{

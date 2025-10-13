@@ -23,8 +23,15 @@ func (r ReturnStmt) Eval(vm *VM) {
 	// TODO optimize for empty results
 	results := make([]reflect.Value, len(r.Results))
 	for i, each := range r.Results {
-		results[i] = vm.returnsEval(each)
+		var val reflect.Value
+		if vm.isStepping {
+			val = vm.callStack.top().pop()
+		} else {
+			val = vm.returnsEval(each)
+		}
+		results[i] = val
 	}
+	// set return values in the current frame
 	frame := vm.callStack.pop()
 	frame.returnValues = results
 	vm.callStack.push(frame)
@@ -32,7 +39,9 @@ func (r ReturnStmt) Eval(vm *VM) {
 
 func (r ReturnStmt) Flow(g *grapher) (head Step) {
 	head = g.current
-	for i, each := range r.Results {
+	// reverse order to keep Eval correct
+	for i := len(r.Results) - 1; i >= 0; i-- {
+		each := r.Results[i]
 		if i == 0 {
 			head = each.Flow(g)
 			continue

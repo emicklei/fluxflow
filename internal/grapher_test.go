@@ -19,7 +19,7 @@ func main() {
 	print(j)
 }`
 
-	trace = true
+	//trace = true
 	os.Setenv("DOT", "testgraphs/TestGrapherFor.dot")
 	out := parseAndWalk(t, source)
 	expected := `0122`
