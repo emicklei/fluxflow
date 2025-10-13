@@ -104,7 +104,12 @@ func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
 	// prepare arguments
 	args := make([]reflect.Value, len(c.Args))
 	for i, arg := range c.Args {
-		val := vm.returnsEval(arg)
+		var val reflect.Value
+		if vm.isStepping {
+			val = vm.callStack.top().pop() // first to last, see Flow
+		} else {
+			val = vm.returnsEval(arg)
+		}
 		args[i] = val
 	}
 	frame := vm.pushNewFrame()
@@ -116,7 +121,12 @@ func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
 			p++
 		}
 	}
-	vm.eval(fd.Body)
+	if vm.isStepping {
+		// when stepping we already have the call graph in FuncDecl
+		fd.Take(vm)
+	} else {
+		vm.eval(fd.Body)
+	}
 	top := vm.popFrame()
 	for _, each := range top.returnValues {
 		vm.pushOperand(each)

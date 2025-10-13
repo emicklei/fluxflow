@@ -311,6 +311,10 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.envSet(n.Name.Name, reflect.ValueOf(s))
 
+		g := new(grapher)
+		s.callGraph = s.Flow(g)
+		b.envSet(n.Name.Name, reflect.ValueOf(s))
+
 	case *ast.FuncType:
 		s := FuncType{FuncType: n}
 		if n.TypeParams != nil {

@@ -7,10 +7,11 @@ import (
 
 type FuncDecl struct {
 	*ast.FuncDecl
-	Name *Ident
-	Recv *FieldList
-	Body *BlockStmt
-	Type *FuncType
+	Name      *Ident
+	Recv      *FieldList
+	Body      *BlockStmt
+	Type      *FuncType
+	callGraph Step
 }
 
 func (f FuncDecl) Eval(vm *VM) {
@@ -25,6 +26,18 @@ func (f FuncDecl) Flow(g *grapher) (head Step) {
 		head = f.Body.Flow(g)
 	}
 	return
+}
+
+// Take the function call graph and execute it step by step
+func (f FuncDecl) Take(vm *VM) Step {
+	here := f.callGraph
+	for here != nil {
+		if trace {
+			fmt.Println("funcdecl taking", here)
+		}
+		here = here.Take(vm)
+	}
+	return nil
 }
 
 func (f FuncDecl) String() string {

@@ -127,12 +127,6 @@ func WalkProgram(p *Program, optionalVM *VM) error {
 
 	// run it step by step
 	vm.isStepping = true
-	here := g.head
-	for here != nil {
-		if trace {
-			fmt.Println("taking", here)
-		}
-		here = here.Take(vm)
-	}
+	decl.Take(vm)
 	return nil
 }

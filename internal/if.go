@@ -52,18 +52,17 @@ func (i IfStmt) Flow(g *grapher) (head Step) {
 	g.nextStep(begin)
 
 	// both true and false branch need a new stack frame
-	push := &pushStackFrameStep{step: newStep(nil)}
+	truePush := &pushStackFrameStep{step: newStep(nil)}
 	// both branches will pop and can use the same step
 	pop := &popStackFrameStep{step: newStep(nil)}
 
-	g.nextStep(push)
+	g.nextStep(truePush)
 	i.Body.Flow(g)
 	// after true branch
 	g.nextStep(pop)
 
 	// now handle false branch
 	if i.Else != nil {
-		// branching to else
 		elsePush := &pushStackFrameStep{step: newStep(nil)}
 		begin.elseStep = elsePush
 		g.current = elsePush

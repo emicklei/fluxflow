@@ -42,7 +42,7 @@ func (r ReturnStmt) Flow(g *grapher) (head Step) {
 	// reverse order to keep Eval correct
 	for i := len(r.Results) - 1; i >= 0; i-- {
 		each := r.Results[i]
-		if i == 0 {
+		if i == len(r.Results)-1 {
 			head = each.Flow(g)
 			continue
 		}

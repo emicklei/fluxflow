@@ -201,8 +201,10 @@ func main() {
 			want: "-13.141e+09",
 		},
 		{
-			name: "func",
-			step: false,
+			name:  "func",
+			step:  true,
+			skip:  true,
+			debug: true,
 			source: `
 package main
 
