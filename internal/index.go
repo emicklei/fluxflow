@@ -19,8 +19,14 @@ func (i IndexExpr) String() string {
 	return fmt.Sprintf("IndexExpr(%v, %v)", i.X, i.Index)
 }
 func (i IndexExpr) Eval(vm *VM) {
-	index := vm.returnsEval(i.Index)
-	target := vm.returnsEval(i.X)
+	var index, target reflect.Value
+	if vm.isStepping {
+		index = vm.callStack.top().pop()
+		target = vm.callStack.top().pop()
+	} else {
+		index = vm.returnsEval(i.Index)
+		target = vm.returnsEval(i.X)
+	}
 	if target.Kind() == reflect.Map {
 		vm.pushOperand(target.MapIndex(index))
 		return
@@ -52,6 +58,7 @@ func (i IndexExpr) Define(vm *VM, value reflect.Value) {
 
 func (i IndexExpr) Flow(g *grapher) (head Step) {
 	head = i.X.Flow(g)
+	i.Index.Flow(g)
 	g.next(i)
 	return head
 }

@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"go/token"
 	"reflect"
-	"slices"
 	"strconv"
 	"strings"
 )
@@ -66,14 +65,12 @@ func (s CompositeLit) Eval(vm *VM) {
 	for i, elt := range s.Elts {
 		var val reflect.Value
 		if vm.isStepping {
+			// see Flow for the order of pushing
 			val = vm.callStack.top().pop()
 		} else {
 			val = vm.returnsEval(elt)
 		}
 		values[i] = val
-	}
-	if vm.isStepping {
-		slices.Reverse(values) // because we pop() in reverse order
 	}
 	result := i.LiteralCompose(instance, values)
 	vm.pushOperand(result)
@@ -84,8 +81,9 @@ func (s CompositeLit) String() string {
 }
 
 func (s CompositeLit) Flow(g *grapher) (head Step) {
-	head = g.current
-	for i, each := range s.Elts {
+	// reverse order to have the first element on top of the stack
+	for i := len(s.Elts) - 1; i >= 0; i-- {
+		each := s.Elts[i]
 		if i == 0 {
 			head = each.Flow(g)
 			continue
@@ -93,6 +91,9 @@ func (s CompositeLit) Flow(g *grapher) (head Step) {
 		each.Flow(g)
 	}
 	g.next(s)
+	if head == nil {
+		head = g.current
+	}
 	return head
 }
 

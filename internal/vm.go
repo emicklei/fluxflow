@@ -98,7 +98,7 @@ func (vm *VM) takeAll(head Step) {
 	here := head
 	for here != nil {
 		if trace {
-			fmt.Println("vm taking", here)
+			fmt.Println(here)
 		}
 		here = here.Take(vm)
 	}

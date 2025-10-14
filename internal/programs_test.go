@@ -434,7 +434,10 @@ two:
 }
 
 func TestMap(t *testing.T) {
-	testProgram(t, true, false, `package main
+	trace = true
+	defer func() { trace = false }()
+
+	testProgram(t, true, true, `package main
 
 func main() {
 	m := map[string]int{}
@@ -445,9 +448,7 @@ func main() {
 }
 
 func TestIfElseIfElse(t *testing.T) {
-	// trace = true
-	// defer func() { trace = false }()
-	testProgram(t, false, true, `package main
+	testProgram(t, true, true, `package main
 
 func main() {
 	if 1 == 2 {
