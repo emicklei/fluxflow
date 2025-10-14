@@ -182,7 +182,7 @@ func main() {
 }
 
 func TestFor(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 func main() {
 	for i := 0; i < 10; i++ {
 		print(i)
@@ -194,7 +194,7 @@ func main() {
 }
 
 func TestForScope(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 func main() {
 	j := 1
 	for i := 0; i < 3; i++ {
@@ -218,7 +218,7 @@ func main() {
 }`, "hello")
 }
 func TestDeclare(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 func main() {
 	var s string
@@ -227,7 +227,7 @@ func main() {
 }
 
 func TestConst(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 const (
 	C = A+1
@@ -240,7 +240,7 @@ func main() {
 }
 
 func TestVar(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 var (
 	a = 1
@@ -253,7 +253,7 @@ func main() {
 }
 
 func TestConstScope(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 var b = a
 func main() {
@@ -265,7 +265,7 @@ const a = 1`, "21")
 }
 
 func TestDeclareAndInit(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 func main() {
 	var s string = "fluxflow"
@@ -274,7 +274,7 @@ func main() {
 }
 
 func TestSlice(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 func main() {

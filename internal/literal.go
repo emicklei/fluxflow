@@ -84,13 +84,14 @@ func (s CompositeLit) Flow(g *grapher) (head Step) {
 	// reverse order to have the first element on top of the stack
 	for i := len(s.Elts) - 1; i >= 0; i-- {
 		each := s.Elts[i]
-		if i == 0 {
+		if i == len(s.Elts)-1 {
 			head = each.Flow(g)
 			continue
 		}
 		each.Flow(g)
 	}
 	g.next(s)
+	// without elements, head is the current step
 	if head == nil {
 		head = g.current
 	}
@@ -109,10 +110,10 @@ func (s FuncLit) Eval(vm *VM) {
 	vm.pushOperand(reflect.ValueOf(s))
 }
 
-func (s FuncLit) String() string {
-	return fmt.Sprintf("FuncLit(%v,%v)", s.Type, s.Body)
-}
-
 func (s FuncLit) Flow(g *grapher) (head Step) {
 	return s.Body.Flow(g)
+}
+
+func (s FuncLit) String() string {
+	return fmt.Sprintf("FuncLit(%v,%v)", s.Type, s.Body)
 }

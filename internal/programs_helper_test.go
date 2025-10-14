@@ -49,6 +49,7 @@ func collectPrintOutput(vm *VM) {
 
 func parseAndWalk(t *testing.T, source string) string {
 	t.Helper()
+	idgen = 0
 	prog := buildProgram(t, source)
 	vm := newVM(prog.builder.env)
 	collectPrintOutput(vm)
@@ -85,10 +86,10 @@ func testProgram(t *testing.T, running bool, stepping bool, source string, wantF
 		}
 	}
 	if stepping {
-		t.Log("stepping through:", t.Name())
 		os.WriteFile(fmt.Sprintf("testgraphs/%s.src", t.Name()), []byte(source), 0644)
 		os.Setenv("DOT", fmt.Sprintf("testgraphs/%s.dot", t.Name()))
 		out := parseAndWalk(t, source)
+		os.Unsetenv("DOT")
 		if fn, ok := wantFuncOrString.(func(string) bool); ok {
 			if !fn(out) {
 				t.Errorf("got [%v] which does not match predicate", out)
@@ -99,5 +100,7 @@ func testProgram(t *testing.T, running bool, stepping bool, source string, wantF
 		if got, want := out, want; got != want {
 			t.Errorf("[step] got [%v] want [%v]", got, want)
 		}
+	} else {
+		t.Log("TODO skipping stepping through:", t.Name())
 	}
 }
