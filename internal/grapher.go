@@ -23,7 +23,7 @@ func (g *grapher) next(e Evaluable) {
 func (g *grapher) nextStep(next Step) {
 	if g.current != nil {
 		if g.current.Next() != nil {
-			panic(fmt.Sprintf("current %s already has a next %s, failing %s", g.current, g.current.Next(), next))
+			fmt.Println(fmt.Sprintf("BUG: current %s already has a next %s, failing %s", g.current, g.current.Next(), next))
 		}
 		g.current.SetNext(next)
 	} else {
@@ -35,12 +35,22 @@ func (g *grapher) nextStep(next Step) {
 // beginIf creates a conditional step with the given condition
 // and makes it the current step. It returns the created conditional step to set the else branch later.
 func (g *grapher) beginIf(cond Expr) *conditionalStep {
-	head := cond.Flow(g)
+	cond.Flow(g)
 	c := &conditionalStep{
-		step: head.(*step),
+		step: newStep(nil),
 	}
 	g.nextStep(c)
 	return c
+}
+
+// newPushStackFrameStep creates a step that pushes a new stack frame.
+func (g *grapher) newPushStackFrame() *pushStackFrameStep {
+	return &pushStackFrameStep{step: newStep(nil)}
+}
+
+// newPopStackFrameStep creates a step that pops the current stack frame.
+func (g *grapher) newPopStackFrame() *popStackFrameStep {
+	return &popStackFrameStep{step: newStep(nil)}
 }
 
 // TODO not sure if needed, replace with pop?
