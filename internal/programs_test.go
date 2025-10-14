@@ -63,13 +63,13 @@ func TestProgramTypeUnsignedConvert(t *testing.T) {
 				a := %s(1) + %s(2)
 				print(a)
 			}`, tt.typeName, tt.typeName)
-			// out := parseAndRun(t, src)
-			// if got, want := out, "3"; got != want {
-			// 	t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
-			// }
-			//trace = true
+			out := parseAndRun(t, src)
+			if got, want := out, "3"; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+			trace = true
 			os.Setenv("DOT", fmt.Sprintf("testgraphs/unsigned_convert-%s.dot", tt.typeName))
-			out := parseAndWalk(t, src)
+			out = parseAndWalk(t, src)
 			if got, want := out, "3"; got != want {
 				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 			}
