@@ -41,6 +41,9 @@ func (i IfStmt) Flow(g *grapher) (head Step) {
 		head = i.Init.Flow(g)
 	}
 	begin := g.beginIf(i.Cond)
+	if head == nil {
+		head = begin.conditionFlow
+	}
 
 	// both true and false branch need a new and different stack frame
 	truePush := g.newPushStackFrame()

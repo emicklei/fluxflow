@@ -14,6 +14,7 @@ type Env interface {
 	valueOwnerOf(name string) Env
 	set(name string, value reflect.Value)
 	newChild() Env
+	depth() int
 	getParent() Env
 	addConstOrVar(cv ConstOrVar)
 }
@@ -68,7 +69,7 @@ func (e *Environment) depth() int {
 	if e.parent == nil {
 		return 0
 	}
-	return e.parent.(*Environment).depth() + 1
+	return e.parent.depth() + 1
 }
 
 func (e *Environment) String() string {

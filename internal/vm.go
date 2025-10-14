@@ -94,6 +94,7 @@ func (vm *VM) eval(e Evaluable) {
 }
 
 func (vm *VM) takeAll(head Step) {
+	vm.isStepping = true
 	here := head
 	for here != nil {
 		if trace {

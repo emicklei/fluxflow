@@ -64,7 +64,7 @@ func parseAndRun(t *testing.T, source string) string {
 	vm := newVM(prog.builder.env)
 	collectPrintOutput(vm)
 	if err := RunProgram(prog, vm); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	return vm.output.String()
 }
@@ -88,11 +88,6 @@ func testProgram(t *testing.T, running bool, stepping bool, source string, wantF
 		t.Log("stepping through:", t.Name())
 		os.WriteFile(fmt.Sprintf("testgraphs/%s.src", t.Name()), []byte(source), 0644)
 		os.Setenv("DOT", fmt.Sprintf("testgraphs/%s.dot", t.Name()))
-		defer func() {
-			if r := recover(); r != nil {
-				t.Errorf("paniced: %v", r)
-			}
-		}()
 		out := parseAndWalk(t, source)
 		if fn, ok := wantFuncOrString.(func(string) bool); ok {
 			if !fn(out) {

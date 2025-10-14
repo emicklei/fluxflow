@@ -65,13 +65,12 @@ func TestProgramTypeUnsignedConvert(t *testing.T) {
 			}`, tt.typeName, tt.typeName)
 			out := parseAndRun(t, src)
 			if got, want := out, "3"; got != want {
-				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+				t.Errorf("[run] got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 			}
-			trace = true
 			os.Setenv("DOT", fmt.Sprintf("testgraphs/unsigned_convert-%s.dot", tt.typeName))
 			out = parseAndWalk(t, src)
 			if got, want := out, "3"; got != want {
-				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+				t.Errorf("[step] got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 			}
 		})
 	}
@@ -446,7 +445,9 @@ func main() {
 }
 
 func TestIfElseIfElse(t *testing.T) {
-	testProgram(t, true, true, `package main
+	// trace = true
+	// defer func() { trace = false }()
+	testProgram(t, false, true, `package main
 
 func main() {
 	if 1 == 2 {

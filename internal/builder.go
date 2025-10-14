@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"os"
+	"os/exec"
 	"path"
 	"reflect"
 	"strconv"
@@ -283,8 +284,8 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.FuncDecl:
+		// any declarations inside the function scope
 		b.pushEnv()
-		defer b.popEnv()
 		s := FuncDecl{FuncDecl: n}
 		if n.Recv != nil {
 			b.Visit(n.Recv)
@@ -308,14 +309,29 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s.Body = &blk
 		b.push(s) // ??
 
+		// store call graph in the FuncDecl
+		g := new(grapher)
+		s.callGraph = s.Flow(g)
+
+		// for debugging
+		if fileName := os.Getenv("DOT"); fileName != "" {
+			g.dotFile = fileName
+			g.dotify()
+			// will fail in pipeline without graphviz installed
+			exec.Command("dot", "-Tpng", "-o", g.dotFilename()+".png", g.dotFilename()).Run()
+		}
+
+		// leave the function scope
+		b.popEnv()
+
 		if pe, ok := b.env.(*PkgEnvironment); ok {
 			if n.Name.Name == "init" {
 				pe.addInit(s)
 				break
 			}
 		}
-		g := new(grapher)
-		s.callGraph = s.Flow(g)
+
+		// register in current env
 		b.envSet(n.Name.Name, reflect.ValueOf(s))
 
 	case *ast.FuncType:

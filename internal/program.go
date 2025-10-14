@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"go/token"
-	"os"
-	"os/exec"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -115,18 +113,7 @@ func WalkProgram(p *Program, optionalVM *VM) error {
 	}
 	decl := main.Interface().(FuncDecl)
 
-	idgen = 0 // state of grapher?
-	g := new(grapher)
-	decl.Flow(g)
-	if fileName := os.Getenv("DOT"); fileName != "" {
-		g.dotFile = fileName
-		g.dotify()
-		// will fail in pipeline without graphviz installed
-		exec.Command("dot", "-Tpng", "-o", g.dotFilename()+".png", g.dotFilename()).Run()
-	}
-
 	// run it step by step
-	vm.isStepping = true
 	vm.takeAll(decl.callGraph)
 	return nil
 }
