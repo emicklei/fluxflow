@@ -28,18 +28,6 @@ func (f FuncDecl) Flow(g *grapher) (head Step) {
 	return
 }
 
-// Take the function call graph and execute it step by step
-func (f FuncDecl) Take(vm *VM) Step {
-	here := f.callGraph
-	for here != nil {
-		if trace {
-			fmt.Println("funcdecl taking", here)
-		}
-		here = here.Take(vm)
-	}
-	return nil
-}
-
 func (f FuncDecl) String() string {
 	return fmt.Sprintf("FuncDecl(%s)", f.Name.Name)
 }

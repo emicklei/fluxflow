@@ -40,16 +40,7 @@ func (i IfStmt) Flow(g *grapher) (head Step) {
 	if i.Init != nil {
 		head = i.Init.Flow(g)
 	}
-	// this is the flow of cond returing the head
-	// this head already has next steps
-	cond := i.Cond.Flow(g)
-	if i.Init == nil {
-		head = cond
-	}
-	begin := &conditionalStep{
-		step: newStep(nil),
-	}
-	g.nextStep(begin)
+	begin := g.beginIf(i.Cond)
 
 	// both true and false branch need a new and different stack frame
 	truePush := g.newPushStackFrame()
@@ -64,7 +55,7 @@ func (i IfStmt) Flow(g *grapher) (head Step) {
 	// now handle false branch
 	if i.Else != nil {
 		elsePush := g.newPushStackFrame()
-		begin.elseStep = elsePush
+		begin.elseFlow = elsePush
 		g.current = elsePush
 		i.Else.Flow(g)
 		// after false branch

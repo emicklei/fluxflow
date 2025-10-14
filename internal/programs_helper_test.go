@@ -13,6 +13,7 @@ import (
 )
 
 func buildProgram(t *testing.T, source string) *Program {
+	t.Helper()
 	cwd, _ := os.Getwd()
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles,
@@ -47,6 +48,7 @@ func collectPrintOutput(vm *VM) {
 }
 
 func parseAndWalk(t *testing.T, source string) string {
+	t.Helper()
 	prog := buildProgram(t, source)
 	vm := newVM(prog.builder.env)
 	collectPrintOutput(vm)
@@ -57,6 +59,7 @@ func parseAndWalk(t *testing.T, source string) string {
 }
 
 func parseAndRun(t *testing.T, source string) string {
+	t.Helper()
 	prog := buildProgram(t, source)
 	vm := newVM(prog.builder.env)
 	collectPrintOutput(vm)
@@ -64,4 +67,42 @@ func parseAndRun(t *testing.T, source string) string {
 		panic(err)
 	}
 	return vm.output.String()
+}
+
+func testProgram(t *testing.T, running bool, stepping bool, source string, wantFuncOrString any) {
+	t.Helper()
+	if running {
+		out := parseAndRun(t, source)
+		if fn, ok := wantFuncOrString.(func(string) bool); ok {
+			if !fn(out) {
+				t.Errorf("got [%v] which does not match predicate", out)
+			}
+			return
+		}
+		want := wantFuncOrString.(string)
+		if got, want := out, want; got != want {
+			t.Errorf("[run] got [%v] want [%v]", got, want)
+		}
+	}
+	if stepping {
+		t.Log("stepping through:", t.Name())
+		os.WriteFile(fmt.Sprintf("testgraphs/%s.src", t.Name()), []byte(source), 0644)
+		os.Setenv("DOT", fmt.Sprintf("testgraphs/%s.dot", t.Name()))
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("paniced: %v", r)
+			}
+		}()
+		out := parseAndWalk(t, source)
+		if fn, ok := wantFuncOrString.(func(string) bool); ok {
+			if !fn(out) {
+				t.Errorf("got [%v] which does not match predicate", out)
+			}
+			return
+		}
+		want := wantFuncOrString.(string)
+		if got, want := out, want; got != want {
+			t.Errorf("[step] got [%v] want [%v]", got, want)
+		}
+	}
 }

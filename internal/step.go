@@ -24,17 +24,19 @@ func newStep(e Evaluable) *step {
 
 type conditionalStep struct {
 	*step
-	elseStep Step
+	conditionFlow Step
+	elseFlow      Step
 }
 
 func (c *conditionalStep) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {
+	c.conditionFlow.Traverse(g, visited)
 	me := c.step.traverse(g, c.step.String(), "true", visited)
-	if c.elseStep != nil {
+	if c.elseFlow != nil {
 		// no edge if visited before
-		if _, ok := visited[c.elseStep.ID()]; ok {
+		if _, ok := visited[c.elseFlow.ID()]; ok {
 			return me
 		}
-		falseN := c.elseStep.Traverse(g, visited)
+		falseN := c.elseFlow.Traverse(g, visited)
 		me.Edge(falseN, "false")
 	}
 	return me
@@ -45,7 +47,7 @@ func (c *conditionalStep) Take(vm *VM) Step {
 	if cond.Bool() {
 		return c.next
 	}
-	return c.elseStep
+	return c.elseFlow
 }
 
 func (s *step) Traverse(g *dot.Graph, visited map[int]dot.Node) dot.Node {

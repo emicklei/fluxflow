@@ -14,4 +14,11 @@ func TestPackageEnv(t *testing.T) {
 	if one.Interface() != 1 {
 		t.Fail()
 	}
+	sub := pkg.newChild()
+	if sub.getParent() != pkg {
+		t.Errorf("sub's parent must be pkg, got %v, want %v", sub.getParent(), pkg)
+	}
+	if pkg.getParent() != global {
+		t.Errorf("pkg's parent must be global, got %v, want %v", pkg.getParent(), global)
+	}
 }

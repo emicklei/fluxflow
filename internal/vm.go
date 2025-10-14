@@ -33,17 +33,6 @@ func (f *stackFrame) pop() reflect.Value {
 	return f.operandStack.pop()
 }
 
-type evaluator interface {
-	localEnv() Env
-	returnsEval(e Evaluable) reflect.Value
-	pushOperand(v reflect.Value)
-	pushNewFrame() *stackFrame
-	popFrame() *stackFrame
-	fatal(err any)
-	eval(e Evaluable)
-	evalAll(list []Evaluable)
-}
-
 type VM struct {
 	callStack  stack[*stackFrame] // TODO use value io pointer?
 	isStepping bool
@@ -73,6 +62,10 @@ func (vm *VM) returnsEval(e Evaluable) reflect.Value {
 // pushOperand pushes a value onto the operand stack as the result of an evaluation.
 func (vm *VM) pushOperand(v reflect.Value) {
 	// TODO consider add pushOperand to callStack so stackFrame can be value that is replaced on top.
+
+	if trace {
+		fmt.Println("VM.pushOperand", v)
+	}
 	vm.callStack.top().push(v)
 }
 func (vm *VM) pushNewFrame() *stackFrame {
@@ -98,4 +91,14 @@ func (vm *VM) eval(e Evaluable) {
 		fmt.Println("VM.eval", e)
 	}
 	e.Eval(vm)
+}
+
+func (vm *VM) takeAll(head Step) {
+	here := head
+	for here != nil {
+		if trace {
+			fmt.Println("vm taking", here)
+		}
+		here = here.Take(vm)
+	}
 }

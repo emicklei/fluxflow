@@ -23,14 +23,15 @@ func newBuilder() builder {
 	return builder{env: pkgenv}
 }
 
+func (b *builder) pushEnv() {
+	b.env = b.env.newChild()
+}
+
+func (b *builder) popEnv() {
+	b.env = b.env.getParent()
+}
+
 func (b *builder) push(s Evaluable) {
-	if trace {
-		if str, ok := s.(fmt.Stringer); ok {
-			fmt.Fprintf(os.Stderr, "%v\n", str.String())
-		} else {
-			fmt.Fprintf(os.Stderr, "%T\n", s)
-		}
-	}
 	step := new(step)
 	step.Evaluable = s
 	if len(b.stack) > 0 {
@@ -73,6 +74,8 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.FuncLit:
+		b.pushEnv()
+		defer b.popEnv()
 		s := FuncLit{FuncLit: n}
 		if n.Type != nil {
 			b.Visit(n.Type)
@@ -280,6 +283,8 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		}
 		b.push(s)
 	case *ast.FuncDecl:
+		b.pushEnv()
+		defer b.popEnv()
 		s := FuncDecl{FuncDecl: n}
 		if n.Recv != nil {
 			b.Visit(n.Recv)
@@ -309,8 +314,6 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 				break
 			}
 		}
-		b.envSet(n.Name.Name, reflect.ValueOf(s))
-
 		g := new(grapher)
 		s.callGraph = s.Flow(g)
 		b.envSet(n.Name.Name, reflect.ValueOf(s))

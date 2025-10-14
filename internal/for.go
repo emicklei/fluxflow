@@ -41,10 +41,12 @@ func (f ForStmt) Flow(g *grapher) (head Step) {
 	begin := g.beginIf(f.Cond)
 	f.Body.Flow(g)
 	f.Post.Flow(g)
-	g.nextStep(begin)
+	g.nextStep(begin.conditionFlow)
 
+	// begin.nextStep(...)
+	// g.endIf(...)
 	pop := g.newPopStackFrame()
-	begin.elseStep = pop
+	begin.elseFlow = pop
 	g.current = pop
 
 	return

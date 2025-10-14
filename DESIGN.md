@@ -51,6 +51,12 @@ The interpretation process for various language constructs is handled by dedicat
 - **Built-in Functions (`builtins.go`):** Go's built-in functions (e.g., `len`, `cap`, `append`) are implemented natively within the interpreter to ensure correct and efficient behavior.
 
 
+## Why Flow returns head
+
+Flow() builds a callgraph for a given Mirror Node (replicated Go AST Node).
+To use that callgraph, one needs to have a reference to the first step of the chain of steps.
+The first step is the head of the chain.
+
 ### Dev Notes
 
 - Call Graph on Demand? per FuncDecl?

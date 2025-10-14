@@ -29,6 +29,10 @@ func (s BinaryExpr) Eval(vm *VM) {
 			return
 		}
 		right = vm.returnsEval(s.Y)
+		if !right.IsValid() {
+			vm.pushOperand(right)
+			return
+		}
 	}
 	v := BinaryExprValue{
 		left:  left,
@@ -38,15 +42,15 @@ func (s BinaryExpr) Eval(vm *VM) {
 	vm.pushOperand(v.Eval())
 }
 
-func (s BinaryExpr) String() string {
-	return fmt.Sprintf("BinaryExpr(%v %v %v)", s.X, s.Op, s.Y)
-}
-
 func (s BinaryExpr) Flow(g *grapher) (head Step) {
 	head = s.X.Flow(g)
 	s.Y.Flow(g)
 	g.next(s)
 	return head
+}
+
+func (s BinaryExpr) String() string {
+	return fmt.Sprintf("BinaryExpr(%v %v %v)", s.X, s.Op, s.Y)
 }
 
 type BinaryExprValue struct {

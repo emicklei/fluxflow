@@ -14,6 +14,7 @@ type Env interface {
 	valueOwnerOf(name string) Env
 	set(name string, value reflect.Value)
 	newChild() Env
+	getParent() Env
 	addConstOrVar(cv ConstOrVar)
 }
 
@@ -43,6 +44,10 @@ func (p *PkgEnvironment) String() string {
 	return fmt.Sprintf("PkgEnv(pkgs=%d)", len(p.pkgTable))
 }
 
+func (p *PkgEnvironment) newChild() Env {
+	return newEnvironment(p)
+}
+
 type Environment struct {
 	parent     Env
 	valueTable map[string]reflect.Value
@@ -53,6 +58,10 @@ func newEnvironment(parentOrNil Env) Env {
 		parent:     parentOrNil,
 		valueTable: map[string]reflect.Value{},
 	}
+}
+
+func (e *Environment) getParent() Env {
+	return e.parent
 }
 
 func (e *Environment) depth() int {

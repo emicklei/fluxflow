@@ -35,9 +35,10 @@ func (g *grapher) nextStep(next Step) {
 // beginIf creates a conditional step with the given condition
 // and makes it the current step. It returns the created conditional step to set the else branch later.
 func (g *grapher) beginIf(cond Expr) *conditionalStep {
-	cond.Flow(g)
+	head := cond.Flow(g)
 	c := &conditionalStep{
-		step: newStep(nil),
+		conditionFlow: head,
+		step:          newStep(nil),
 	}
 	g.nextStep(c)
 	return c
@@ -51,13 +52,6 @@ func (g *grapher) newPushStackFrame() *pushStackFrameStep {
 // newPopStackFrameStep creates a step that pops the current stack frame.
 func (g *grapher) newPopStackFrame() *popStackFrameStep {
 	return &popStackFrameStep{step: newStep(nil)}
-}
-
-// TODO not sure if needed, replace with pop?
-func (g *grapher) endIf(beginIf *conditionalStep) {
-	nop := newStep(nil) // no-op step
-	beginIf.elseStep = nop
-	g.current = nop
 }
 
 func (g *grapher) dotFilename() string {

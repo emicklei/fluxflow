@@ -30,7 +30,7 @@ type Expr interface {
 
 type Flowable interface {
 	// Flow builds the control flow graph using the provided grapher.
-	// Head is the entry point to the flow graph.
+	// Head is the entry point to that call flow graph.
 	Flow(g *grapher) (head Step)
 }
 

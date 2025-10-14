@@ -123,7 +123,7 @@ func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
 	}
 	if vm.isStepping {
 		// when stepping we already have the call graph in FuncDecl
-		fd.Take(vm)
+		vm.takeAll(fd.callGraph)
 	} else {
 		vm.eval(fd.Body)
 	}

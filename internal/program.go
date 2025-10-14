@@ -127,6 +127,6 @@ func WalkProgram(p *Program, optionalVM *VM) error {
 
 	// run it step by step
 	vm.isStepping = true
-	decl.Take(vm)
+	vm.takeAll(decl.callGraph)
 	return nil
 }

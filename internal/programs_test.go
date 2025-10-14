@@ -116,97 +116,50 @@ func TestAssignmentOperators(t *testing.T) {
 	}
 }
 
-func TestAllPrograms(t *testing.T) {
-	tests := []struct {
-		name    string
-		source  string
-		want    string
-		skip    bool
-		step    bool // also step through the program
-		debug   bool
-		special func(string) bool // special check for output
-	}{
-		{
-			name: "print",
-			step: true,
-			source: `
-package main
+func TestPrint(t *testing.T) {
+	testProgram(t, true, true, `package main
 
 func main() {
 	print("flux")
-	print("flow")
-}`,
-			want: "fluxflow",
-		},
-		{
-			name: "multi-assign",
-			step: true,
-			source: `
-package main
+	print("flow")	
+}`, "fluxflow")
+}
 
+func TestMultiAssign(t *testing.T) {
+	testProgram(t, true, false, `
+package main
 func main() {
 	in1, in2 := "flux", "flow"
 	print(in1, in2)
-}`,
-			want: "fluxflow",
-		},
-		{
-			name: "if-else-if-else",
-			step: true,
-			source: `
-package main
+}`, "fluxflow")
+}
 
-func main() {
-	if 1 == 2 {
-		print("unreachable")
-	} else if 2 == 2 {
-		print("fluxflow")
-	} else {
-		print("unreachable")
-	}
-}`,
-			want: "fluxflow",
-		},
-		{
-			name: "true-false",
-			step: true,
-			source: `
+func TestTrueFalse(t *testing.T) {
+	testProgram(t, true, true, `
 package main
 
 func main() {
 	print(true, false)
-}`,
-			want: "truefalse",
-		},
-		{
-			name: "rune",
-			source: `
+}`, "truefalse")
+}
+
+func TestRune(t *testing.T) {
+	testProgram(t, true, true, `
 package main
 
 func main() {
 	print('e')
-}`,
-			want: "'e'",
-		},
-		{
-			name:  "numbers",
-			step:  true,
-			debug: !true,
-			source: `
-package main
+}`, "'e'")
+}
+func TestNumbers(t *testing.T) {
+	testProgram(t, true, true, `package main
 
 func main() {
 	print(-1,+3.14,0.1e10)
-}`,
-			want: "-13.141e+09",
-		},
-		{
-			name:  "func",
-			step:  true,
-			skip:  true,
-			debug: true,
-			source: `
-package main
+}`, "-13.141e+09")
+}
+func TestFunc(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 func plus(a int, b int) int {
 	return a + b
@@ -214,14 +167,11 @@ func plus(a int, b int) int {
 func main() {
 	result := plus(2, 3)
 	print(result)
-}`,
-			want: "5",
-		},
-		{
-			name: "func-multi-return",
-			step: false,
-			source: `
-package main
+}`, "5")
+}
+
+func TestFuncMultiReturn(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 func ab(a int, b int) (int,int) {
 	return a,b
@@ -229,31 +179,23 @@ func ab(a int, b int) (int,int) {
 func main() {
 	a,b := ab(2, 3)
 	print(a,b)
-}`,
-			want: "23",
-		},
-		{
-			name: "for",
-			step: false,
-			source: `
-package main
+}`, "23")
+}
 
+func TestFor(t *testing.T) {
+	testProgram(t, true, false, `package main
 func main() {
 	for i := 0; i < 10; i++ {
 		print(i)
 	}
 	for i := 9; i > 0; i-- {
 		print(i)
-	}		
-}`,
-			want: "0123456789987654321",
-		},
-		{
-			name: "for-scope",
-			step: false,
-			source: `
-package main
+	}	
+}`, "0123456789987654321")
+}
 
+func TestForScope(t *testing.T) {
+	testProgram(t, true, false, `package main
 func main() {
 	j := 1
 	for i := 0; i < 3; i++ {
@@ -261,13 +203,12 @@ func main() {
 		print(i)
 	}
 	print(j)
-}`,
-			want: "0122",
-		},
-		{
-			name: "generic",
-			skip: true,
-			source: `
+}`, "0122")
+}
+
+func TestGeneric(t *testing.T) {
+	t.Skip()
+	testProgram(t, true, false, `
 package main
 
 import "fmt"
@@ -275,26 +216,19 @@ func Generic[T any](arg T) (*T, error) { return &arg, nil }
 func main() {
 	h, _ := Generic("hello")
 	fmt.Println(*h)
-}`,
-		},
-		{
-			name: "declare",
-			step: true,
-			source: `
+}`, "hello")
+}
+func TestDeclare(t *testing.T) {
+	testProgram(t, true, false, `
 package main
-
 func main() {
 	var s string
 	print(s)
-}`,
-			want: "",
-		},
-		{
-			name:  "const",
-			step:  false,
-			debug: !true,
-			source: `
-package main
+}`, "")
+}
+
+func TestConst(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 const (
 	C = A+1
@@ -303,14 +237,11 @@ const (
 )
 func main() {	
 	print(A,B,C)
-}`,
-			want: "011",
-		},
-		{
-			name: "var",
-			step: true,
-			source: `
-package main
+}`, "011")
+}
+
+func TestVar(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 var (
 	a = 1
@@ -319,72 +250,61 @@ var (
 )
 func main() {	
 	print(a,s,b)
-}`,
-			want: "1false",
-		},
-		{
-			name: "const-scope",
-			skip: true,
-			source: `
-package main
+}`, "1false")
+}
+
+func TestConstScope(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 var b = a
-const a = 1
 func main() {
 	var b = a
 	const a = 2
 	print(a, b)
-}`,
-			want: "21",
-		},
-		{
-			name: "declare-and-init",
-			source: `
-package main
+}
+const a = 1`, "21")
+}
+
+func TestDeclareAndInit(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 func main() {
 	var s string = "fluxflow"
 	print(s)
-}`,
-			want: "fluxflow",
-		},
-		{
-			name:  "slice",
-			step:  true,
-			debug: !true,
-			source: `
+}`, "fluxflow")
+}
+
+func TestSlice(t *testing.T) {
+	testProgram(t, true, false, `
 package main
 
 func main() {
 	print([]int{1, 2})
-}`,
-			want: "[1 2]",
-		},
-		{
-			name: "array",
-			source: `
+}`, "[1 2]")
+}
+
+func TestArray(t *testing.T) {
+	testProgram(t, true, false, `
 package main
 
 func main() {
 	print([2]string{"A", "B"})
-}`,
-			want: "[A B]",
-		},
-		{
-			name: "slice-append-and-index",
-			source: `
+}`, "[A B]")
+}
+
+func TestSliceAppendAndIndex(t *testing.T) {
+	testProgram(t, true, false, `
 package main
 
 func main() {
 	list := []int{}
 	list = append(list, 1, 2)
 	print(list[0], list[1])
-}`,
-			want: "12",
-		},
-		{
-			name: "append",
-			source: `
+}`, "12")
+}
+
+func TestAppend(t *testing.T) {
+	testProgram(t, true, false, `
 package main
 
 func main() {
@@ -392,101 +312,86 @@ func main() {
 	print(list)
 	list = append(list, 4, 5)
 	print(list)
-}`,
-			want: "[][4 5]",
-		},
-		{
-			name: "time-constant",
-			source: `
+}`, "[][4 5]")
+}
+
+func TestTimeConstant(t *testing.T) {
+	testProgram(t, true, false, `
 package main
 
 import "time"
 func main() {
 	r := time.RFC1123
 	print(r)
-}`,
-			want: "Mon, 02 Jan 2006 15:04:05 MST",
-		},
-		{
-			name: "time-alias-constant",
-			source: `
+}`, "Mon, 02 Jan 2006 15:04:05 MST")
+}
+
+func TestTimeAliasConstant(t *testing.T) {
+	testProgram(t, true, false, `
 package main
 
 import t "time"
 func main() {
 	r := t.RFC1123
 	print(r)
-}`,
-			want: "Mon, 02 Jan 2006 15:04:05 MST",
-		},
-		{
-			name: "floats",
-			source: `
+}`, "Mon, 02 Jan 2006 15:04:05 MST")
+}
+
+func TestFloats(t *testing.T) {
+	testProgram(t, true, false, `
 package main
 
 func main() {
 	f32, f64 := float32(3.14), 3.14
 	print(f32," ",f64)
-}`,
-			want: "3.14 3.14",
-		},
-		{
-			name: "new-type",
-			source: `
-package main
+}`, "3.14 3.14")
+}
 
+func TestNewType(t *testing.T) {
+	testProgram(t, true, false, `package main
 type Airplane struct {
 	Kind string
 }
 func main() {
 	heli := Airplane{Kind:"helicopter"}
 	print(heli.Kind)
-}`,
-			want: "helicopter",
-		},
-		{
-			name: "pointer-to-type",
-			skip: true,
-			source: `
-package main
+}`, "helicopter")
+}
 
+func TestPointerToType(t *testing.T) {
+	t.Skip()
+	testProgram(t, true, false, `package main
 type Airplane struct {
 	Kind string
 }
 func main() {
 	heli := &Airplane{Kind:"helicopter"}
 	print(heli.Kind)
-}`,
-			want: "helicopter",
-		},
-		{
-			name: "address-of-int",
-			source: `
-package main
+}`, "helicopter")
+}
+
+func TestAddressOfInt(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 func main() {
 	i := 42
 	print(&i)
-}`,
-			special: func(out string) bool { return strings.HasPrefix(out, "0x") },
-		},
-		{
-			name: "range-of-strings",
-			source: `
-package main
+}`, func(out string) bool { return strings.HasPrefix(out, "0x") })
+}
+
+func TestRangeOrStrings(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 func main() {
 	strings := []string{"hello", "world"}
 	for i,s := range strings {
 		print(i,s)
 	}
-}`,
-			want: "0hello1world",
-		},
-		{
-			name: "init",
-			source: `
-package main
+}`, "0hello1world")
+}
+
+func TestInit(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 func init() {
 	print("0")
@@ -494,26 +399,21 @@ func init() {
 func init() {
 	print("1")
 }
-func main() {}`,
-			want: "01",
-		},
-		{
-			name: "method",
-			skip: true,
-			source: `
-package main
+func main() {}`, "01")
+}
+
+func TestMethod(t *testing.T) {
+	testProgram(t, false, false, `package main
 
 func (_ Airplane) S() string { return "airplane" }
 type Airplane struct {}
 func main() {
 	print(Airplane{}.S())
-}`,
-			want: "airplane",
-		},
-		{
-			name: "goto",
-			skip: true,
-			source: `
+}`, "airplane")
+}
+
+func TestGoto(t *testing.T) {
+	testProgram(t, false, false, `
 package main
 
 func main() {
@@ -531,26 +431,104 @@ two:
 	s++
 	goto one
 }
-`,
-			want: "aaa",
-		},
-		{
-			name: "map",
-			source: `
-package main
+`, "aaa")
+}
+
+func TestMap(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 func main() {
 	m := map[string]int{}
 	m["a"] = 1
 	m["b"] = 2
 	print(m["a"] + m["b"])
-}`,
-			want: "3",
-		},
-		{
-			name: "switch",
-			source: `
+}`, "3")
+}
+
+func TestIfElseIfElse(t *testing.T) {
+	testProgram(t, true, true, `package main
+
+func main() {
+	if 1 == 2 {
+		print("unreachable")
+	} else if 2 == 2 {
+		print("fluxflow")
+	} else {
+		print("unreachable")
+	}
+}`, "fluxflow")
+}
+
+func TestTwoPrints(t *testing.T) {
+	testProgram(t, true, true, `package main
+
+func main() {
+	print("one")
+	print("two")
+}`, "onetwo")
+}
+
+func TestVariadicFunction(t *testing.T) {
+	t.Skip()
+	testProgram(t, true, false, `package main
+
+func sum(nums ...int) int {
+	total := 0
+	for _, n := range nums {
+		total += n
+	}
+	return total
+}
+
+func main() {
+	print(sum(1, 2, 3))
+}`, "6")
+}
+
+func TestDefer(t *testing.T) {
+	testProgram(t, true, false, `package main
+
+func main() {
+	defer print(1)
+	defer print(2)
+}`, "12")
+}
+
+func TestTypeAlias(t *testing.T) {
+	testProgram(t, false, false, `
 package main
+
+type MyInt = int
+
+func main() {
+	var a MyInt = 1
+	print(a)
+}`, "1")
+}
+
+func TestFunctionLiteral(t *testing.T) {
+	testProgram(t, true, false, `package main
+
+func main() {
+	f := func(a int) int { return a } 
+	print(f(1))
+}`, "1")
+}
+
+func TestSwitchOnBool(t *testing.T) {
+	testProgram(t, true, false, `package main
+
+func main() {
+	var a int = 1
+	switch {
+	case a == 1:
+		print(a)
+	}
+}`, "1")
+}
+
+func TestSwitch(t *testing.T) {
+	testProgram(t, true, false, `package main
 
 func main() {
 	var a int
@@ -563,144 +541,5 @@ func main() {
 	default:
 		print(2)
 	}
-}`,
-			want: "12",
-		},
-		{
-			name:  "switch-on-bool",
-			debug: !true,
-			source: `
-package main
-
-func main() {
-	var a int = 1
-	switch {
-	case a == 1:
-		print(a)
-	}
-}`,
-			want: "1",
-		},
-		{
-			name:  "function-literal",
-			skip:  !true,
-			debug: !true,
-			source: `
-package main
-
-func main() {
-	f := func(a int) int { return a } 
-	print(f(1))
-}`,
-			want: "1",
-		},
-		{
-			name:  "type-alias",
-			skip:  !true,
-			debug: !true,
-			source: `
-package main
-
-type MyInt = int
-
-func main() {
-	var a MyInt = 1
-	print(a)
-}`,
-			want: "1",
-		},
-		{
-			name:  "defer",
-			skip:  !true,
-			debug: !true,
-			source: `
-package main
-
-func main() {
-	defer print(1)
-	defer print(2)
-}`,
-			want: "12",
-		},
-		{
-			name:  "rune",
-			skip:  !true,
-			debug: !true,
-			source: `
-package main
-
-func main() {
-	r := 'a'
-	print(r)
-}`,
-			want: "'a'",
-		},
-		{
-			name:  "variadic-function",
-			skip:  true,
-			debug: !true,
-			source: `
-package main
-
-func sum(nums ...int) int {
-	total := 0
-	for _, n := range nums {
-		total += n
-	}
-	return total
-}
-
-func main() {
-	print(sum(1, 2, 3))
-}`,
-			want: "6",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip {
-				t.Skip()
-			}
-			if tt.debug {
-				t.Log("debug and trace on for", tt.name)
-				// put a breakpoint here to inspect the test case
-				trace = true
-			}
-			out := parseAndRun(t, tt.source)
-			if tt.special != nil {
-				if !tt.special(out) {
-					t.Errorf("special check failed on output: %s", out)
-				}
-				return
-			}
-			if got, want := out, tt.want; got != want {
-				t.Errorf("got [%v] want [%v]", got, want)
-			}
-			if tt.step {
-				t.Log("stepping through:", tt.name)
-				os.WriteFile(fmt.Sprintf("testgraphs/%s.src", tt.name), []byte(tt.source), 0644)
-				os.Setenv("DOT", fmt.Sprintf("testgraphs/%s.dot", tt.name))
-				out := parseAndWalk(t, tt.source)
-				if got, want := out, tt.want; got != want {
-					t.Errorf("got [%v] want [%v]", got, want)
-				}
-			}
-		})
-	}
-}
-
-func TestIsolatedProgram(t *testing.T) {
-	prog := buildProgram(t, `
-package main
-
-func main() {
-	print("one")
-	print("two")
-}`)
-	vm := newVM(prog.builder.env)
-	collectPrintOutput(vm)
-	if err := RunProgram(prog, vm); err != nil {
-		t.Fatal(err)
-	}
+}`, "12")
 }
