@@ -2,9 +2,13 @@ package internal
 
 import (
 	"fmt"
+	"go/token"
 	"os"
+	"path"
 	"strings"
 	"testing"
+
+	"golang.org/x/tools/go/packages"
 )
 
 func TestProgramTypeConvert(t *testing.T) {
@@ -434,8 +438,8 @@ two:
 }
 
 func TestMap(t *testing.T) {
-	trace = true
-	defer func() { trace = false }()
+	// trace = true
+	// defer func() { trace = false }()
 
 	testProgram(t, true, true, `package main
 
@@ -544,4 +548,56 @@ func main() {
 		print(2)
 	}
 }`, "12")
+}
+
+func BenchmarkIfElseIfElse(b *testing.B) {
+	src := `package main
+
+func main() {
+	for i := 0; i < 100; i++ {
+		for j := 0; j < 100; j++ {
+			if i == j {
+				print("a")
+			} else if i < j {
+				print("b")
+			} else {
+				print("c")
+			}
+		}
+	}
+}`
+	cwd, err := os.Getwd()
+	if err != nil {
+		b.Fatal(err)
+	}
+	cfg := &packages.Config{
+		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles,
+		Fset: token.NewFileSet(),
+		Dir:  path.Join(cwd, "../examples"),
+		Overlay: map[string][]byte{
+			path.Join(cwd, "../examples/main.go"): []byte(src),
+		},
+	}
+	p, err := LoadProgram(cfg.Dir, cfg)
+	if err != nil {
+		b.Fatalf("failed to load package: %v", err)
+	}
+	b.Run("run", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			vm := newVM(p.builder.env)
+			collectPrintOutput(vm)
+			if err := RunProgram(p, vm); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+	b.Run("walk", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			vm := newVM(p.builder.env)
+			collectPrintOutput(vm)
+			if err := WalkProgram(p, vm); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
 }
