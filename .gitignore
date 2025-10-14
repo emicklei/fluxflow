@@ -38,3 +38,4 @@ internal/graph.png
 internal/testgraphs/*.dot
 internal/testgraphs/*.png
 internal/testgraphs/*.src
+PERF.md
