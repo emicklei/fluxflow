@@ -2,7 +2,7 @@
 
 [![Go](https://github.com/emicklei/fluxflow/actions/workflows/go.yml/badge.svg)](https://github.com/emicklei/fluxflow/actions/workflows/go.yml)
 [![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/fluxflow)](https://pkg.go.dev/github.com/emicklei/fluxflow)
-[![codecov](https://codecov.io/gh/emicklei/fluxflow/branch/master/graph/badge.svg)](https://codecov.io/gh/emicklei/fluxflow)
+[![codecov](https://codecov.io/gh/emicklei/fluxflow/branch/main/graph/badge.svg)](https://codecov.io/gh/emicklei/fluxflow)
 
 a Go interpreter that eventually should serve a live coding and debug experience.
 

@@ -73,7 +73,7 @@ func (e *Environment) depth() int {
 }
 
 func (e *Environment) String() string {
-	return fmt.Sprintf("Env(%d,values=%d)", e.depth(), len(e.valueTable))
+	return fmt.Sprintf("-- env[depth=%d,len=%d]", e.depth(), len(e.valueTable))
 }
 
 func (e *Environment) newChild() Env {

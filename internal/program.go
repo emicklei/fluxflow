@@ -9,10 +9,10 @@ import (
 )
 
 type Program struct {
-	builder builder
+	builder builder // we only need the builder's env TODO
 }
 
-func LoadProgram(absolutePath string, optionalConfig *packages.Config) (*Program, error) {
+func LoadPackages(absolutePath string, optionalConfig *packages.Config) ([]*packages.Package, error) {
 	var cfg *packages.Config
 	if optionalConfig != nil {
 		cfg = optionalConfig
@@ -25,15 +25,20 @@ func LoadProgram(absolutePath string, optionalConfig *packages.Config) (*Program
 	}
 	pkgs, err := packages.Load(cfg, ".")
 	if err != nil {
-		return nil, fmt.Errorf("failed to load package: %v", err)
+		return pkgs, fmt.Errorf("failed to load package: %v", err)
 	}
 	if count := packages.PrintErrors(pkgs); count > 0 {
-		return nil, fmt.Errorf("errors during package loading: %d", count)
+		return pkgs, fmt.Errorf("errors during package loading: %d", count)
 	}
 	if len(pkgs) == 0 {
-		return nil, fmt.Errorf("no packages found")
+		return pkgs, fmt.Errorf("no packages found")
 	}
+	return pkgs, nil
+}
+
+func BuildProgram(pkgs []*packages.Package, isStepping bool) (*Program, error) {
 	b := newBuilder()
+	b.opts = buildOptions{callGraph: isStepping}
 	for _, pkg := range pkgs {
 		for _, stx := range pkg.Syntax {
 			for _, decl := range stx.Decls {

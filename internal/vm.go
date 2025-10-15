@@ -53,7 +53,7 @@ func (vm *VM) localEnv() Env {
 // returnsEval evaluates the argument and returns the popped value that was pushed onto the operand stack.
 func (vm *VM) returnsEval(e Evaluable) reflect.Value {
 	if trace {
-		fmt.Println("VM.returnsEval", e)
+		fmt.Println("vm.returnsEval", e)
 	}
 	vm.eval(e)
 	return vm.callStack.top().pop()
@@ -64,7 +64,7 @@ func (vm *VM) pushOperand(v reflect.Value) {
 	// TODO consider add pushOperand to callStack so stackFrame can be value that is replaced on top.
 
 	if trace {
-		fmt.Println("VM.pushOperand", v)
+		fmt.Println("vm.pushOperand", v)
 	}
 	vm.callStack.top().push(v)
 }
@@ -88,7 +88,7 @@ func (vm *VM) fatal(err any) {
 
 func (vm *VM) eval(e Evaluable) {
 	if trace {
-		fmt.Println("VM.eval", e)
+		fmt.Println("vm.eval", e)
 	}
 	e.Eval(vm)
 }

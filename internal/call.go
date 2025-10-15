@@ -24,11 +24,24 @@ func (c CallExpr) evalAppend(vm *VM) {
 	vm.pushOperand(result)
 }
 
+func (c CallExpr) evalLen(vm *VM) {
+	var sized reflect.Value
+	if vm.isStepping {
+		sized = vm.callStack.top().pop()
+	} else {
+		sized = vm.returnsEval(c.Args[0])
+	}
+	vm.pushOperand(reflect.ValueOf(sized.Len()))
+}
+
 func (c CallExpr) Eval(vm *VM) {
-	// structexplorer.Break("vm", vm)
 	if i, ok := c.Fun.(Ident); ok {
 		if i.Name == "append" {
 			c.evalAppend(vm)
+			return
+		}
+		if i.Name == "len" {
+			c.evalLen(vm)
 			return
 		}
 	}

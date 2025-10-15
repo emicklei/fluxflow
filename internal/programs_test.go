@@ -286,6 +286,15 @@ func main() {
 }`, "[1 2]")
 }
 
+func TestSliceLen(t *testing.T) {
+	testProgram(t, true, true, `
+package main
+
+func main() {
+	print(len([]int{1}))
+}`, "1")
+}
+
 func TestArray(t *testing.T) {
 	testProgram(t, true, true, `
 package main
@@ -293,6 +302,15 @@ package main
 func main() {
 	print([2]string{"A", "B"})
 }`, "[A B]")
+}
+
+func TestArrayLen(t *testing.T) {
+	testProgram(t, true, true, `
+package main
+
+func main() {
+	print(len([2]string{"A", "B"}))
+}`, "2")
 }
 
 func TestSliceAppendAndIndex(t *testing.T) {
@@ -361,7 +379,7 @@ func main() {
 }`, "helicopter")
 }
 
-func TestPointerToType(t *testing.T) {
+func TestAddressOfType(t *testing.T) {
 	t.Skip()
 	testProgram(t, true, false, `package main
 type Airplane struct {
@@ -383,6 +401,8 @@ func main() {
 }
 
 func TestRangeOrStrings(t *testing.T) {
+	trace = true
+	defer func() { trace = false }()
 	testProgram(t, true, false, `package main
 
 func main() {
@@ -575,24 +595,28 @@ func main() {
 			path.Join(cwd, "../examples/main.go"): []byte(src),
 		},
 	}
-	p, err := LoadProgram(cfg.Dir, cfg)
+	pkgs, err := LoadPackages(cfg.Dir, cfg)
 	if err != nil {
-		b.Fatalf("failed to load package: %v", err)
+		b.Fatalf("failed to load packages: %v", err)
+	}
+	prog, err := BuildProgram(pkgs, true)
+	if err != nil {
+		b.Fatalf("failed to build program: %v", err)
 	}
 	b.Run("run", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			vm := newVM(p.builder.env)
+			vm := newVM(prog.builder.env)
 			collectPrintOutput(vm)
-			if err := RunProgram(p, vm); err != nil {
+			if err := RunProgram(prog, vm); err != nil {
 				b.Fatal(err)
 			}
 		}
 	})
 	b.Run("walk", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			vm := newVM(p.builder.env)
+			vm := newVM(prog.builder.env)
 			collectPrintOutput(vm)
-			if err := WalkProgram(p, vm); err != nil {
+			if err := WalkProgram(prog, vm); err != nil {
 				b.Fatal(err)
 			}
 		}

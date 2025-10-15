@@ -13,15 +13,20 @@ import (
 
 var _ ast.Visitor = (*builder)(nil)
 
+type buildOptions struct {
+	callGraph bool
+}
+
 type builder struct {
 	stack []*step
 	env   Env
+	opts  buildOptions
 }
 
 func newBuilder() builder {
 	builtins := &Environment{valueTable: builtinsMap}
 	pkgenv := newPkgEnvironment(builtins)
-	return builder{env: pkgenv}
+	return builder{env: pkgenv, opts: buildOptions{callGraph: true}}
 }
 
 func (b *builder) pushEnv() {
@@ -309,16 +314,18 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		s.Body = &blk
 		b.push(s) // ??
 
-		// store call graph in the FuncDecl
-		g := new(grapher)
-		s.callGraph = s.Flow(g)
+		if b.opts.callGraph {
+			// store call graph in the FuncDecl
+			g := new(grapher)
+			s.callGraph = s.Flow(g)
 
-		// for debugging
-		if fileName := os.Getenv("DOT"); fileName != "" {
-			g.dotFile = fileName
-			g.dotify()
-			// will fail in pipeline without graphviz installed
-			exec.Command("dot", "-Tpng", "-o", g.dotFilename()+".png", g.dotFilename()).Run()
+			// for debugging
+			if fileName := os.Getenv("DOT"); fileName != "" {
+				g.dotFile = fileName
+				g.dotify()
+				// will fail in pipeline without graphviz installed
+				exec.Command("dot", "-Tpng", "-o", g.dotFilename()+".png", g.dotFilename()).Run()
+			}
 		}
 
 		// leave the function scope

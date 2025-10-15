@@ -23,9 +23,13 @@ func buildProgram(t *testing.T, source string) *Program {
 			path.Join(cwd, "../examples/main.go"): []byte(source),
 		},
 	}
-	prog, err := LoadProgram(cfg.Dir, cfg)
+	pkgs, err := LoadPackages(cfg.Dir, cfg)
 	if err != nil {
-		t.Fatalf("failed to load package: %v", err)
+		t.Fatalf("failed to load packages: %v", err)
+	}
+	prog, err := BuildProgram(pkgs, true)
+	if err != nil {
+		t.Fatalf("failed to build program: %v", err)
 	}
 	return prog
 }
