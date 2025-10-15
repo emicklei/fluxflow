@@ -48,5 +48,6 @@ func (r ReturnStmt) Flow(g *grapher) (head Step) {
 		}
 		each.Flow(g)
 	}
+	g.next(r)
 	return
 }

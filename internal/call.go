@@ -6,12 +6,13 @@ import (
 	"reflect"
 )
 
+var _ Flowable = CallExpr{}
 var _ Expr = CallExpr{}
 
 type CallExpr struct {
+	*ast.CallExpr
 	Fun  Expr
 	Args []Expr
-	*ast.CallExpr
 }
 
 func (c CallExpr) evalAppend(vm *VM) {
@@ -133,13 +134,6 @@ func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
 	}
 }
 
-// used?
-func (c CallExpr) Assign(env *Environment, value reflect.Value) {}
-
-func (c CallExpr) String() string {
-	return fmt.Sprintf("CallExpr(%v, len=%d)", c.Fun, len(c.Args))
-}
-
 func (c CallExpr) Flow(g *grapher) (head Step) {
 	// make sure first value is on top of the operand stack
 	// so we can pop in the right order during Eval
@@ -155,4 +149,8 @@ func (c CallExpr) Flow(g *grapher) (head Step) {
 		head = g.current
 	}
 	return head
+}
+
+func (c CallExpr) String() string {
+	return fmt.Sprintf("CallExpr(%v, len=%d)", c.Fun, len(c.Args))
 }

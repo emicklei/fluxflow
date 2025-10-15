@@ -129,7 +129,7 @@ func main() {
 }
 
 func TestMultiAssign(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 func main() {
 	in1, in2 := "flux", "flow"
@@ -162,7 +162,7 @@ func main() {
 }`, "-13.141e+09")
 }
 func TestFunc(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 func plus(a int, b int) int {
 	return a + b
@@ -174,7 +174,7 @@ func main() {
 }
 
 func TestFuncMultiReturn(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 func ab(a int, b int) (int,int) {
 	return a,b
@@ -287,7 +287,7 @@ func main() {
 }
 
 func TestArray(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 func main() {
@@ -296,7 +296,7 @@ func main() {
 }
 
 func TestSliceAppendAndIndex(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 func main() {
@@ -307,7 +307,7 @@ func main() {
 }
 
 func TestAppend(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 func main() {
@@ -319,7 +319,7 @@ func main() {
 }
 
 func TestTimeConstant(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 import "time"
@@ -330,7 +330,7 @@ func main() {
 }
 
 func TestTimeAliasConstant(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 import t "time"
@@ -341,7 +341,7 @@ func main() {
 }
 
 func TestFloats(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 func main() {
@@ -351,13 +351,13 @@ func main() {
 }
 
 func TestNewType(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, false, true, `package main
 type Airplane struct {
-	Kind string
+	Model string
 }
 func main() {
-	heli := Airplane{Kind:"helicopter"}
-	print(heli.Kind)
+	heli := Airplane{Model:"helicopter"}
+	print(heli.Model)
 }`, "helicopter")
 }
 
@@ -365,11 +365,11 @@ func TestPointerToType(t *testing.T) {
 	t.Skip()
 	testProgram(t, true, false, `package main
 type Airplane struct {
-	Kind string
+	Model string
 }
 func main() {
-	heli := &Airplane{Kind:"helicopter"}
-	print(heli.Kind)
+	heli := &Airplane{Model:"helicopter"}
+	print(heli.Model)
 }`, "helicopter")
 }
 
@@ -394,7 +394,7 @@ func main() {
 }
 
 func TestInit(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 func init() {
 	print("0")
@@ -438,9 +438,6 @@ two:
 }
 
 func TestMap(t *testing.T) {
-	// trace = true
-	// defer func() { trace = false }()
-
 	testProgram(t, true, true, `package main
 
 func main() {

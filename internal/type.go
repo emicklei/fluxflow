@@ -33,7 +33,8 @@ func (s TypeSpec) Instantiate(vm *VM) reflect.Value {
 		// fmt.Println(instance)
 		return instance
 	}
-	panic(fmt.Sprintf("expected a CanInstantiate value:%v", s.Type))
+	vm.fatal(fmt.Sprintf("expected a CanInstantiate value:%v", s.Type))
+	return reflect.Value{}
 }
 
 func (s TypeSpec) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
@@ -43,12 +44,24 @@ func (s TypeSpec) LiteralCompose(composite reflect.Value, values []reflect.Value
 	return expected(s.Type, "a CanCompose value")
 }
 
-var _ Expr = StructType{}
+var (
+	_ Flowable = StructType{}
+	_ Expr     = StructType{}
+)
 
 type StructType struct {
 	*ast.StructType
 	Fields  *FieldList
 	Methods map[string]FuncDecl
+}
+
+func (s StructType) Eval(vm *VM) {
+	vm.pushOperand(reflect.ValueOf(s))
+}
+
+func (s StructType) Flow(g *grapher) (head Step) {
+	g.next(s)
+	return g.current
 }
 
 func makeStructType(ast *ast.StructType) StructType {
@@ -59,14 +72,6 @@ func makeStructType(ast *ast.StructType) StructType {
 
 func (s StructType) String() string {
 	return fmt.Sprintf("StructType(%v)", s.Fields)
-}
-
-func (s StructType) Eval(vm *VM) {
-	vm.pushOperand(reflect.ValueOf(s))
-}
-
-func (s StructType) Flow(g *grapher) (head Step) {
-	return g.current
 }
 
 func (s StructType) LiteralCompose(composite reflect.Value, values []reflect.Value) reflect.Value {
@@ -81,7 +86,10 @@ func (s StructType) Instantiate(vm *VM) reflect.Value {
 	return reflect.ValueOf(NewInstance(vm, s))
 }
 
-var _ Expr = MapType{}
+var (
+	_ Flowable = MapType{}
+	_ Expr     = MapType{}
+)
 
 type MapType struct {
 	*ast.MapType
@@ -89,15 +97,12 @@ type MapType struct {
 	Value Expr
 }
 
-func (m MapType) String() string {
-	return fmt.Sprintf("MapType(%v,%v)", m.Key, m.Value)
-}
-
 func (m MapType) Eval(vm *VM) {
 	vm.pushOperand(reflect.ValueOf(m))
 }
 
 func (m MapType) Flow(g *grapher) (head Step) {
+	g.next(m)
 	return g.current
 }
 
@@ -119,4 +124,8 @@ func (m MapType) LiteralCompose(composite reflect.Value, values []reflect.Value)
 		composite.SetMapIndex(k, v)
 	}
 	return composite
+}
+
+func (m MapType) String() string {
+	return fmt.Sprintf("MapType(%v,%v)", m.Key, m.Value)
 }

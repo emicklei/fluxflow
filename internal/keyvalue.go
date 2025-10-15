@@ -21,16 +21,21 @@ func (e KeyValueExpr) String() string {
 func (e KeyValueExpr) Eval(vm *VM) {
 	id, ok := e.Key.(Ident)
 	if !ok {
-		panic("unhandled key type")
+		vm.fatal("unhandled key type:" + fmt.Sprintf("%T", e.Key))
 	}
 	key := reflect.ValueOf(id.Name)
-	value := vm.returnsEval(e.Value)
-	vm.pushOperand(reflect.ValueOf(KeyValue{Key: key, Value: value}))
+	var val reflect.Value
+	if vm.isStepping {
+		val = vm.callStack.top().pop()
+	} else {
+		val = vm.returnsEval(e.Value)
+	}
+	vm.pushOperand(reflect.ValueOf(KeyValue{Key: key, Value: val}))
 }
 
 func (e KeyValueExpr) Flow(g *grapher) (head Step) {
 	head = e.Value.Flow(g)
-	e.Key.Flow(g)
+	g.next(e)
 	return head
 }
 
