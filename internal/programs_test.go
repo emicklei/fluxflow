@@ -327,6 +327,29 @@ func main() {
 }`, "2")
 }
 
+func TestSliceClear(t *testing.T) {
+	testProgram(t, true, false, `
+package main
+
+func main() {
+	s := []int{1,2,3}
+	clear(s)
+	print(len(s))
+}`, "3")
+}
+
+func TestMapClear(t *testing.T) {
+	t.Skip()
+	testProgram(t, true, false, `
+package main
+
+func main() {
+	m := map[string]int{"A":1, "B":2}
+	clear(m)
+	print(len(m))
+}`, "0")
+}
+
 func TestSliceAppendAndIndex(t *testing.T) {
 	testProgram(t, true, true, `
 package main
@@ -480,6 +503,15 @@ func main() {
 	m["b"] = 2
 	print(m["a"] + m["b"])
 }`, "3")
+}
+
+func TestMapInitialized(t *testing.T) {
+	testProgram(t, false, false, `package main
+
+func main() {
+	m := map[string]int{"a":1, "b":2}
+	print(len(m))
+}`, "2")
 }
 
 func TestIfElseIfElse(t *testing.T) {

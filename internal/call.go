@@ -15,35 +15,6 @@ type CallExpr struct {
 	Args []Expr
 }
 
-func (c CallExpr) evalAppend(vm *VM) {
-	args := make([]reflect.Value, len(c.Args))
-	for i, arg := range c.Args {
-		args[i] = vm.returnsEval(arg)
-	}
-	result := reflect.Append(args[0], args[1:]...)
-	vm.pushOperand(result)
-}
-
-func (c CallExpr) evalLen(vm *VM) {
-	var sized reflect.Value
-	if vm.isStepping {
-		sized = vm.callStack.top().pop()
-	} else {
-		sized = vm.returnsEval(c.Args[0])
-	}
-	vm.pushOperand(reflect.ValueOf(sized.Len()))
-}
-
-func (c CallExpr) evalCap(vm *VM) {
-	var sized reflect.Value
-	if vm.isStepping {
-		sized = vm.callStack.top().pop()
-	} else {
-		sized = vm.returnsEval(c.Args[0])
-	}
-	vm.pushOperand(reflect.ValueOf(sized.Cap()))
-}
-
 func (c CallExpr) Eval(vm *VM) {
 	if i, ok := c.Fun.(Ident); ok {
 		switch i.Name {
@@ -55,6 +26,13 @@ func (c CallExpr) Eval(vm *VM) {
 			return
 		case "cap":
 			c.evalCap(vm)
+			return
+		case "clear":
+			cleared := c.evalClear(vm)
+			// the argument of clear needs to be replaced
+			if identArg, ok := c.Args[0].(Ident); ok {
+				vm.callStack.top().env.set(identArg.Name, cleared)
+			}
 			return
 		}
 	}
