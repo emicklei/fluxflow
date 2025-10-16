@@ -19,11 +19,15 @@ func (e KeyValueExpr) String() string {
 }
 
 func (e KeyValueExpr) Eval(vm *VM) {
-	id, ok := e.Key.(Ident)
-	if !ok {
+	var key reflect.Value
+	switch k := e.Key.(type) {
+	case Ident:
+		key = reflect.ValueOf(k.Name)
+	case BasicLit:
+		key = vm.returnsEval(k)
+	default:
 		vm.fatal("unhandled key type:" + fmt.Sprintf("%T", e.Key))
 	}
-	key := reflect.ValueOf(id.Name)
 	var val reflect.Value
 	if vm.isStepping {
 		val = vm.callStack.top().pop()

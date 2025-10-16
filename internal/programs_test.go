@@ -514,6 +514,16 @@ func main() {
 }`, "2")
 }
 
+func TestMapDelete(t *testing.T) {
+	testProgram(t, false, false, `package main
+
+func main() {
+	m := map[string]int{"a":1, "b":2}
+	delete(m, "a")
+	print(len(m))
+}`, "1")
+}
+
 func TestIfElseIfElse(t *testing.T) {
 	testProgram(t, true, true, `package main
 
