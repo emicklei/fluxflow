@@ -5,6 +5,13 @@ import (
 	"reflect"
 )
 
+// https://pkg.go.dev/builtin#delete
+func (c CallExpr) evalDelete(vm *VM) {
+	target := vm.returnsEval(c.Args[0])
+	key := vm.returnsEval(c.Args[1])
+	target.SetMapIndex(key, reflect.Value{}) // delete
+}
+
 // https://pkg.go.dev/builtin#append
 func (c CallExpr) evalAppend(vm *VM) {
 	args := make([]reflect.Value, len(c.Args))

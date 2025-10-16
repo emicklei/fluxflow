@@ -15,7 +15,7 @@
 | Basic literal types (int,string,rune,...) | ✅ |
 | Composite type `array` | ✅ |
 | Composite type `slice` | ✅ |
-| `len`, `append`, `cap` | ✅ |
+| `len`, `append`, `cap`, `delete`, `panic` | ✅ |
 | Package `init` | ✅ |
 | Binary and Unary Operators | ✅ |
 | Composite type `struct` | ✅ |

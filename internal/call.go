@@ -18,6 +18,9 @@ type CallExpr struct {
 func (c CallExpr) Eval(vm *VM) {
 	if i, ok := c.Fun.(Ident); ok {
 		switch i.Name {
+		case "delete":
+			c.evalDelete(vm)
+			return
 		case "append":
 			c.evalAppend(vm)
 			return
@@ -86,7 +89,12 @@ func (c CallExpr) handleFuncLit(vm *VM, fl FuncLit) {
 	// prepare arguments
 	args := make([]reflect.Value, len(c.Args))
 	for i, arg := range c.Args {
-		val := vm.returnsEval(arg)
+		var val reflect.Value
+		if vm.isStepping {
+			val = vm.callStack.top().pop() // first to last, see Flow
+		} else {
+			val = vm.returnsEval(arg)
+		}
 		args[i] = val
 	}
 	frame := vm.pushNewFrame()
@@ -98,7 +106,12 @@ func (c CallExpr) handleFuncLit(vm *VM, fl FuncLit) {
 			p++
 		}
 	}
-	vm.eval(fl.Body)
+	if vm.isStepping {
+		// when stepping we already have the call graph in FuncLit
+		vm.takeAll(fl.callGraph)
+	} else {
+		vm.eval(fl.Body)
+	}
 	top := vm.popFrame()
 	for _, each := range top.returnValues {
 		vm.pushOperand(each)

@@ -118,10 +118,9 @@ func (m MapType) LiteralCompose(composite reflect.Value, values []reflect.Value)
 	if composite.Kind() != reflect.Map {
 		expected(composite, "map")
 	}
-	for i := 0; i < len(values); i += 2 {
-		k := values[i]
-		v := values[i+1]
-		composite.SetMapIndex(k, v)
+	for _, kv := range values {
+		kv := kv.Interface().(KeyValue)
+		composite.SetMapIndex(kv.Key, kv.Value)
 	}
 	return composite
 }

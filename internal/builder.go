@@ -93,6 +93,13 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 			e := b.pop().(BlockStmt)
 			s.Body = &e
 		}
+		//
+		if b.opts.callGraph {
+			// store call graph in the FuncLit
+			g := new(grapher)
+			s.callGraph = s.Flow(g)
+		}
+
 		b.push(s)
 	case *ast.SwitchStmt:
 		s := SwitchStmt{SwitchStmt: n}

@@ -328,7 +328,7 @@ func main() {
 }
 
 func TestSliceClear(t *testing.T) {
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 func main() {
@@ -339,8 +339,7 @@ func main() {
 }
 
 func TestMapClear(t *testing.T) {
-	t.Skip()
-	testProgram(t, true, false, `
+	testProgram(t, true, true, `
 package main
 
 func main() {
@@ -406,7 +405,8 @@ func main() {
 }
 
 func TestNewType(t *testing.T) {
-	testProgram(t, false, true, `package main
+	t.Skip()
+	testProgram(t, false, false, `package main
 type Airplane struct {
 	Model string
 }
@@ -417,8 +417,7 @@ func main() {
 }
 
 func TestAddressOfType(t *testing.T) {
-	t.Skip()
-	testProgram(t, true, false, `package main
+	testProgram(t, false, false, `package main
 type Airplane struct {
 	Model string
 }
@@ -506,7 +505,7 @@ func main() {
 }
 
 func TestMapInitialized(t *testing.T) {
-	testProgram(t, false, false, `package main
+	testProgram(t, true, true, `package main
 
 func main() {
 	m := map[string]int{"a":1, "b":2}
@@ -515,7 +514,7 @@ func main() {
 }
 
 func TestMapDelete(t *testing.T) {
-	testProgram(t, false, false, `package main
+	testProgram(t, true, true, `package main
 
 func main() {
 	m := map[string]int{"a":1, "b":2}
@@ -574,7 +573,7 @@ func main() {
 }
 
 func TestMinMax(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 func main() {
 	print(min(1,2), max(1,2))
@@ -594,7 +593,7 @@ func main() {
 }
 
 func TestFunctionLiteral(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, false, false, `package main
 
 func main() {
 	f := func(a int) int { return a } 
@@ -629,4 +628,19 @@ func main() {
 		print(2)
 	}
 }`, "12")
+}
+
+func TestPanic(t *testing.T) {
+	defer func() {
+		if r := recover(); r != nil {
+			if got, want := fmt.Sprint(r), "oops"; got != want {
+				t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+			}
+		}
+	}()
+	testProgram(t, true, true, `package main
+
+func main() {
+	panic("oops")
+}`, "")
 }

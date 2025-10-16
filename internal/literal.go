@@ -102,8 +102,9 @@ var _ Expr = FuncLit{}
 
 type FuncLit struct {
 	*ast.FuncLit
-	Type *FuncType
-	Body *BlockStmt // TODO not sure what to do when Body and/or Type is nil
+	Type      *FuncType
+	Body      *BlockStmt // TODO not sure what to do when Body and/or Type is nil
+	callGraph Step
 }
 
 func (s FuncLit) Eval(vm *VM) {
@@ -111,7 +112,8 @@ func (s FuncLit) Eval(vm *VM) {
 }
 
 func (s FuncLit) Flow(g *grapher) (head Step) {
-	return s.Body.Flow(g)
+	g.next(s)
+	return g.current
 }
 
 func (s FuncLit) String() string {
