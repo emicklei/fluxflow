@@ -34,6 +34,16 @@ func (c CallExpr) evalLen(vm *VM) {
 	vm.pushOperand(reflect.ValueOf(sized.Len()))
 }
 
+func (c CallExpr) evalCap(vm *VM) {
+	var sized reflect.Value
+	if vm.isStepping {
+		sized = vm.callStack.top().pop()
+	} else {
+		sized = vm.returnsEval(c.Args[0])
+	}
+	vm.pushOperand(reflect.ValueOf(sized.Cap()))
+}
+
 func (c CallExpr) Eval(vm *VM) {
 	if i, ok := c.Fun.(Ident); ok {
 		if i.Name == "append" {
@@ -42,6 +52,10 @@ func (c CallExpr) Eval(vm *VM) {
 		}
 		if i.Name == "len" {
 			c.evalLen(vm)
+			return
+		}
+		if i.Name == "cap" {
+			c.evalCap(vm)
 			return
 		}
 	}

@@ -80,7 +80,8 @@ func (vm *VM) fatal(err any) {
 	s := structexplorer.NewService("vm", vm)
 	for i, each := range vm.callStack {
 		s.Explore(fmt.Sprintf("vm.callStack.%d", i), each, structexplorer.Column(0))
-		s.Explore(fmt.Sprintf("vm.callStack.%d.operandStack", i), each, structexplorer.Column(0))
+		s.Explore(fmt.Sprintf("vm.callStack.%d.operandStack", i), each.operandStack, structexplorer.Column(1))
+		s.Explore(fmt.Sprintf("vm.callStack.%d.returnValues", i), each.returnValues, structexplorer.Column(1))
 	}
 	s.Dump("vm-panic.html")
 	panic(err)

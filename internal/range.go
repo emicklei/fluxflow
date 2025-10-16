@@ -52,7 +52,7 @@ func (r RangeStmt) Flow(g *grapher) (head Step) {
 	g.nextStep(push)
 
 	// index := 0
-	indexVar := Ident{Ident: &ast.Ident{Name: "index"}}
+	indexVar := Ident{Ident: &ast.Ident{Name: fmt.Sprintf("_index_%d", idgen)}} // must be unique in env
 	zeroInt := BasicLit{BasicLit: &ast.BasicLit{Kind: token.INT, Value: "0"}}
 	assign := AssignStmt{
 		AssignStmt: &ast.AssignStmt{
@@ -69,7 +69,7 @@ func (r RangeStmt) Flow(g *grapher) (head Step) {
 			Op: token.LSS,
 		},
 		X: indexVar,
-		Y: CallExpr{Fun: Ident{Ident: &ast.Ident{Name: "len"}}, Args: []Expr{r.X}},
+		Y: ReflectLenExpr{X: r.X},
 	}
 	condition.Flow(g)
 
@@ -92,3 +92,21 @@ func (r RangeStmt) String() string {
 }
 
 func (r RangeStmt) stmtStep() Evaluable { return r }
+
+type ReflectLenExpr struct {
+	// TODO position info
+	X Expr
+}
+
+func (r ReflectLenExpr) Eval(vm *VM) {
+	val := vm.callStack.top().pop()
+	vm.callStack.top().push(reflect.ValueOf(val.Len()))
+}
+func (r ReflectLenExpr) Flow(g *grapher) (head Step) {
+	head = r.X.Flow(g)
+	g.next(r)
+	return
+}
+func (r ReflectLenExpr) String() string {
+	return fmt.Sprintf("ReflectLenExpr(%v)", r.X)
+}
