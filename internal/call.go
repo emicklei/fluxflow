@@ -46,15 +46,14 @@ func (c CallExpr) evalCap(vm *VM) {
 
 func (c CallExpr) Eval(vm *VM) {
 	if i, ok := c.Fun.(Ident); ok {
-		if i.Name == "append" {
+		switch i.Name {
+		case "append":
 			c.evalAppend(vm)
 			return
-		}
-		if i.Name == "len" {
+		case "len":
 			c.evalLen(vm)
 			return
-		}
-		if i.Name == "cap" {
+		case "cap":
 			c.evalCap(vm)
 			return
 		}

@@ -65,3 +65,4 @@ The first step is the head of the chain.
 - more unit tests for walk and eval once design has settled
 - how to handle concurrency. (eval -> native, walk -> simulated?)
 - a literal eval is pushing the value as operand; other literals should do the same.
+- fallthrough cannot be used with a type switch.

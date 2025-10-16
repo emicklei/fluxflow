@@ -15,6 +15,7 @@
 | Basic literal types (int,string,rune,...) | ✅ |
 | Composite type `array` | ✅ |
 | Composite type `slice` | ✅ |
+| `len`, `append`, `cap` | ✅ |
 | Package `init` | ✅ |
 | Binary and Unary Operators | ✅ |
 | Composite type `struct` | ✅ |
@@ -33,4 +34,4 @@
 | defer | ✅ |
 | variadic function | ⬜ |
 | blank identifier | ⬜ |
-| goto, continue, break. fallthrough | ⬜ |
+| goto, continue, break, fallthrough | ⬜ |
