@@ -21,12 +21,6 @@ func (c CallExpr) Eval(vm *VM) {
 		case "append":
 			c.evalAppend(vm)
 			return
-		case "len":
-			c.evalLen(vm)
-			return
-		case "cap":
-			c.evalCap(vm)
-			return
 		case "clear":
 			cleared := c.evalClear(vm)
 			// the argument of clear needs to be replaced
@@ -34,13 +28,19 @@ func (c CallExpr) Eval(vm *VM) {
 				vm.callStack.top().env.set(identArg.Name, cleared)
 			}
 			return
+		case "min":
+			c.evalMin(vm)
+			return
+		case "max":
+			c.evalMax(vm)
+			return
 		}
 	}
 	// function f is either an external or an interpreted one
 	f := vm.returnsEval(c.Fun)
 
 	if !f.IsValid() {
-		vm.fatal("call to invalid function")
+		vm.fatal("call to invalid function:" + fmt.Sprintf("%v", c.Fun))
 	}
 
 	switch f.Kind() {

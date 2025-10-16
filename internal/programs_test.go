@@ -438,8 +438,8 @@ func main() {
 }
 
 func TestRangeOrStrings(t *testing.T) {
-	trace = true
-	defer func() { trace = false }()
+	// trace = true
+	// defer func() { trace = false }()
 	testProgram(t, true, false, `package main
 
 func main() {
@@ -560,6 +560,14 @@ func TestDefer(t *testing.T) {
 func main() {
 	defer print(1)
 	defer print(2)
+}`, "12")
+}
+
+func TestMinMax(t *testing.T) {
+	testProgram(t, true, false, `package main
+
+func main() {
+	print(min(1,2), max(1,2))
 }`, "12")
 }
 

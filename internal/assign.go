@@ -35,7 +35,7 @@ func (a AssignStmt) Eval(vm *VM) {
 		v := vm.callStack.top().pop()
 		target, ok_ := each.(CanAssign)
 		if !ok_ {
-			panic("cannot assign to " + fmt.Sprintf("%T", each))
+			vm.fatal("cannot assign to " + fmt.Sprintf("%T", each))
 		}
 		switch a.AssignStmt.Tok {
 		case token.DEFINE: // :=
@@ -92,7 +92,7 @@ func (a AssignStmt) Eval(vm *VM) {
 	}
 }
 func (a AssignStmt) String() string {
-	return fmt.Sprintf("Assign(%v,%s, %v)", a.Lhs, a.AssignStmt.Tok, a.Rhs)
+	return fmt.Sprintf("AssignStmt(%v %s %v)", a.Lhs, a.AssignStmt.Tok, a.Rhs)
 }
 
 func (a AssignStmt) Flow(g *grapher) (head Step) {

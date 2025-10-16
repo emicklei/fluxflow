@@ -21,8 +21,6 @@ type CanDeclare interface {
 	Declare(vm *VM) bool
 }
 
-type Statement interface{}
-
 type Expr interface {
 	Flowable
 	Evaluable

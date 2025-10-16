@@ -28,4 +28,6 @@ var builtinsMap = map[string]reflect.Value{
 	"false":      reflect.ValueOf(false), // not presented as Literal
 	"print":      reflect.ValueOf(func(args ...any) { fmt.Print(args...) }),
 	"println":    reflect.ValueOf(func(args ...any) { fmt.Println(args...) }),
+	"len":        reflect.ValueOf(func(v any) int { return reflect.ValueOf(v).Len() }),
+	"cap":        reflect.ValueOf(func(v any) int { return reflect.ValueOf(v).Cap() }),
 }

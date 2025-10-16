@@ -22,6 +22,7 @@
 | Composite type `map` | ✅ |
 | Unsigned integer arithmetic | ✅ |
 | `switch` statement | ✅ |
+| `min` , `max` builtins | ✅ |
 | Pointers | ⬜ |
 | Interfaces | ⬜ |
 | Methods | ⬜ |

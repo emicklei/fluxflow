@@ -1,6 +1,9 @@
 package internal
 
-import "reflect"
+import (
+	"go/token"
+	"reflect"
+)
 
 // https://pkg.go.dev/builtin#append
 func (c CallExpr) evalAppend(vm *VM) {
@@ -10,28 +13,6 @@ func (c CallExpr) evalAppend(vm *VM) {
 	}
 	result := reflect.Append(args[0], args[1:]...)
 	vm.pushOperand(result)
-}
-
-// https://pkg.go.dev/builtin#len
-func (c CallExpr) evalLen(vm *VM) {
-	var sized reflect.Value
-	if vm.isStepping {
-		sized = vm.callStack.top().pop()
-	} else {
-		sized = vm.returnsEval(c.Args[0])
-	}
-	vm.pushOperand(reflect.ValueOf(sized.Len()))
-}
-
-// https://pkg.go.dev/builtin#cap
-func (c CallExpr) evalCap(vm *VM) {
-	var sized reflect.Value
-	if vm.isStepping {
-		sized = vm.callStack.top().pop()
-	} else {
-		sized = vm.returnsEval(c.Args[0])
-	}
-	vm.pushOperand(reflect.ValueOf(sized.Cap()))
 }
 
 // https://pkg.go.dev/builtin#clear
@@ -45,4 +26,40 @@ func (c CallExpr) evalClear(vm *VM) reflect.Value {
 	}
 	mapOrSlice.Clear()
 	return mapOrSlice
+}
+
+func (c CallExpr) evalMin(vm *VM) {
+	var left, right reflect.Value
+	if vm.isStepping {
+		right = vm.callStack.top().pop() // first to last, see Flow
+		left = vm.callStack.top().pop()
+	} else {
+		left = vm.returnsEval(c.Args[0])
+		right = vm.returnsEval(c.Args[1])
+	}
+	result := BinaryExprValue{op: token.LSS, left: left, right: right}.Eval()
+	if result.Bool() {
+		result = left
+	} else {
+		result = right
+	}
+	vm.pushOperand(result)
+}
+
+func (c CallExpr) evalMax(vm *VM) {
+	var left, right reflect.Value
+	if vm.isStepping {
+		right = vm.callStack.top().pop() // first to last, see Flow
+		left = vm.callStack.top().pop()
+	} else {
+		left = vm.returnsEval(c.Args[0])
+		right = vm.returnsEval(c.Args[1])
+	}
+	result := BinaryExprValue{op: token.LSS, left: left, right: right}.Eval()
+	if result.Bool() {
+		result = right
+	} else {
+		result = left
+	}
+	vm.pushOperand(result)
 }
