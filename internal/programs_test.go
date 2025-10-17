@@ -489,7 +489,7 @@ two:
 }
 
 func TestMap(t *testing.T) {
-	testProgram(t, true, true, `package main
+	testProgram(t, true, false, `package main
 
 func main() {
 	m := map[string]int{}
