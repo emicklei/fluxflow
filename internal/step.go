@@ -83,9 +83,6 @@ func (s *step) Next() Step {
 }
 
 func (s *step) SetNext(n Step) {
-	if s.next == n {
-		return
-	}
 	s.next = n
 }
 

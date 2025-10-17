@@ -31,6 +31,13 @@ func (u UnaryExpr) Eval(vm *VM) {
 		return
 	}
 	switch v.Kind() {
+	case reflect.Bool:
+		switch u.Op {
+		case token.NOT:
+			vm.pushOperand(reflect.ValueOf(!v.Bool()))
+		default:
+			vm.fatal("missing unary operation on bool:" + u.Op.String())
+		}
 	case reflect.Int:
 		switch u.Op {
 		case token.SUB:
@@ -38,15 +45,138 @@ func (u UnaryExpr) Eval(vm *VM) {
 		case token.AND:
 			actual := v.Interface()
 			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(int(^v.Int())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(int(v.Int())))
 		default:
-			panic("missing unary operation on int:" + u.Op.String())
+			vm.fatal("missing unary operation on int:" + u.Op.String())
+		}
+	case reflect.Int8:
+		switch u.Op {
+		case token.SUB:
+			vm.pushOperand(reflect.ValueOf(int8(-v.Int())))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(int8(^v.Int())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(int8(v.Int())))
+		default:
+			vm.fatal("missing unary operation on int8:" + u.Op.String())
+		}
+	case reflect.Int16:
+		switch u.Op {
+		case token.SUB:
+			vm.pushOperand(reflect.ValueOf(int16(-v.Int())))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(int16(^v.Int())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(int16(v.Int())))
+		default:
+			vm.fatal("missing unary operation on int16:" + u.Op.String())
+		}
+	case reflect.Int32:
+		switch u.Op {
+		case token.SUB:
+			vm.pushOperand(reflect.ValueOf(int32(-v.Int())))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(int32(^v.Int())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(int32(v.Int())))
+		default:
+			vm.fatal("missing unary operation on int32:" + u.Op.String())
 		}
 	case reflect.Int64:
 		switch u.Op {
 		case token.SUB:
 			vm.pushOperand(reflect.ValueOf(-v.Int()))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(^v.Int()))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(int32(v.Int())))
 		default:
-			panic("missing unary operation on int64:" + u.Op.String())
+			vm.fatal("missing unary operation on int64:" + u.Op.String())
+		}
+	case reflect.Uint64:
+		switch u.Op {
+		case token.SUB:
+			vm.pushOperand(reflect.ValueOf(uint64(-v.Uint())))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(uint64(^v.Uint())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(uint64(v.Uint())))
+		default:
+			vm.fatal("missing unary operation on uint64:" + u.Op.String())
+		}
+	case reflect.Uint32:
+		switch u.Op {
+		case token.SUB:
+			vm.pushOperand(reflect.ValueOf(uint32(-v.Uint())))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(uint32(^v.Uint())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(uint32(v.Uint())))
+		default:
+			vm.fatal("missing unary operation on uint32:" + u.Op.String())
+		}
+	case reflect.Uint16:
+		switch u.Op {
+		case token.SUB:
+			vm.pushOperand(reflect.ValueOf(uint16(-v.Uint())))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(uint16(^v.Uint())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(uint16(v.Uint())))
+		default:
+			vm.fatal("missing unary operation on uint16:" + u.Op.String())
+		}
+	case reflect.Uint8:
+		switch u.Op {
+		case token.SUB:
+			vm.pushOperand(reflect.ValueOf(uint8(-v.Uint())))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(uint8(^v.Uint())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(uint8(v.Uint())))
+		default:
+			vm.fatal("missing unary operation on uint8:" + u.Op.String())
+		}
+	case reflect.Uint:
+		switch u.Op {
+		case token.SUB:
+			vm.pushOperand(reflect.ValueOf(uint(-v.Uint())))
+		case token.AND:
+			actual := v.Interface()
+			vm.pushOperand(reflect.ValueOf(&actual))
+		case token.XOR:
+			vm.pushOperand(reflect.ValueOf(uint(^v.Uint())))
+		case token.ADD:
+			vm.pushOperand(reflect.ValueOf(uint(v.Uint())))
+		default:
+			vm.fatal("missing unary operation on uint:" + u.Op.String())
 		}
 	case reflect.Float64:
 		switch u.Op {
@@ -55,7 +185,7 @@ func (u UnaryExpr) Eval(vm *VM) {
 		case token.ADD:
 			vm.pushOperand(reflect.ValueOf(v.Float()))
 		default:
-			panic("missing unary operation on float64:" + u.Op.String())
+			vm.fatal("missing unary operation on float64:" + u.Op.String())
 		}
 	case reflect.Struct:
 		switch u.Op {
@@ -63,10 +193,10 @@ func (u UnaryExpr) Eval(vm *VM) {
 			actual := v.Interface()
 			vm.pushOperand(reflect.ValueOf(&actual))
 		default:
-			panic("missing unary operation on struct:" + u.Op.String())
+			vm.fatal("missing unary operation on struct:" + u.Op.String())
 		}
 	default:
-		panic("not implemented: UnaryExpr.Eval:" + v.Kind().String())
+		vm.fatal("not implemented: UnaryExpr.Eval:" + v.Kind().String())
 	}
 }
 

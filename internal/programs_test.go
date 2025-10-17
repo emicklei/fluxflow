@@ -644,3 +644,106 @@ func main() {
 	panic("oops")
 }`, "")
 }
+
+func TestFuncAsPackageVar(t *testing.T) {
+	testProgram(t, true, false, `package main
+
+const h = "1"
+var f = func() string { return h }
+	
+func main() {
+	print(f())
+}`, "1")
+}
+
+func TestIfMultiAssign(t *testing.T) {
+	testProgram(t, true, true, `package main
+
+func main() {
+	if got, want := min(1,2), 1; got == want {
+		print("min")
+	}
+}`, "min")
+}
+
+func TestMakeMap(t *testing.T) {
+	testProgram(t, true, true, `package main
+
+func main() {
+	c := make(map[string]int)
+	print(len(c))
+	c2 := make(map[string]int,10)
+	print(len(c2))
+}`, "00")
+}
+
+func TestRecover(t *testing.T) {
+	testProgram(t, false, false, `package main
+
+func main() {
+	defer func() {
+		r := recover()
+		print(r)
+	}()
+	panic("0")
+}`, "0")
+}
+
+func TestUnaries(t *testing.T) {
+	tests := []struct {
+		src  string
+		op   string
+		want string
+	}{
+		{"true", "!", "false"},
+		{"int(1)", "^", "-2"},
+		{"int8(1)", "^", "-2"},
+		{"int16(1)", "^", "-2"},
+		{"int32(1)", "^", "-2"},
+		{"int64(1)", "^", "-2"},
+		{"uint64(1)", "^", "18446744073709551614"},
+		{"uint32(1)", "^", "4294967294"},
+		{"uint16(1)", "^", "65534"},
+		{"uint8(1)", "^", "254"},
+		{"uint(1)", "^", "18446744073709551614"},
+		{"int(1)", "+", "1"},
+		{"int8(1)", "+", "1"},
+		{"int16(1)", "+", "1"},
+		{"int32(1)", "+", "1"},
+		{"int64(1)", "+", "1"},
+		{"uint64(1)", "+", "1"},
+		{"uint32(1)", "+", "1"},
+		{"uint16(1)", "+", "1"},
+		{"uint8(1)", "+", "1"},
+		{"uint(1)", "+", "1"},
+		{"int(1)", "+", "1"},
+		{"int8(1)", "-", "-1"},
+		{"int16(1)", "-", "-1"},
+		{"int32(1)", "-", "-1"},
+		{"int64(1)", "-", "-1"},
+		{"uint64(1)", "-", "18446744073709551615"},
+		{"uint32(1)", "-", "4294967295"},
+		{"uint16(1)", "-", "65535"},
+		{"uint8(1)", "-", "255"},
+		{"uint(1)", "-", "18446744073709551615"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.op, func(t *testing.T) {
+			src := fmt.Sprintf(`
+			package main
+			
+			func main() {
+				v := %s				
+				print(%sv)
+			}`, tt.src, tt.op)
+			out := parseAndRun(t, src)
+			if got, want := out, tt.want; got != want {
+				t.Errorf("%s got [%[1]v:%[1]T] want [%[2]v:%[2]T]", tt.src, got, want)
+			}
+			out = parseAndWalk(t, src)
+			if got, want := out, tt.want; got != want {
+				t.Errorf("%s got [%[1]v:%[1]T] want [%[2]v:%[2]T]", tt.src, got, want)
+			}
+		})
+	}
+}

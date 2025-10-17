@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"go/token"
 	"reflect"
 )
@@ -69,4 +70,14 @@ func (c CallExpr) evalMax(vm *VM) {
 		result = left
 	}
 	vm.pushOperand(result)
+}
+
+func (c CallExpr) evalMake(vm *VM) {
+	typ := vm.returnsEval(c.Args[0])
+	if ci, ok := typ.Interface().(CanInstantiate); ok {
+		instance := ci.Instantiate(vm)
+		vm.pushOperand(instance)
+		return
+	}
+	vm.fatal(fmt.Sprintf("make: expected a CanInstantiate value:%v", typ))
 }

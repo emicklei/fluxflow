@@ -37,6 +37,9 @@ func (c CallExpr) Eval(vm *VM) {
 		case "max":
 			c.evalMax(vm)
 			return
+		case "make":
+			c.evalMake(vm)
+			return
 		}
 	}
 	// function f is either an external or an interpreted one
