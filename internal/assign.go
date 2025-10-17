@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"reflect"
 )
 
 var _ Stmt = AssignStmt{}
@@ -20,20 +21,23 @@ func (a AssignStmt) Eval(vm *VM) {
 	if !vm.isStepping {
 		// when stepping, the rhs are already evaluated
 		// so here we need to eval each rhs to push values onto the operand stack
-		for _, each := range a.Rhs {
-			// values are on operand stack
+		// right to left
+		for i := len(a.Rhs) - 1; i >= 0; i-- {
+			each := a.Rhs[i]
 			vm.eval(each)
 		}
 	}
-	// operands are stacked in reverse order
-	for i := len(a.Lhs) - 1; i != -1; i-- {
+	var lastVal reflect.Value
+	for i := 0; i < len(a.Lhs); i++ {
 		each := a.Lhs[i]
-		if trace {
-			if len(vm.callStack.top().operandStack) == 0 {
-				vm.fatal("operand stack empty before assignment")
-			}
+		var v reflect.Value
+		// handle "ok" idiom for map index expressions
+		if vm.callStack.top().operandStack.isEmpty() {
+			v = reflect.ValueOf(!lastVal.IsZero())
+		} else {
+			v = vm.callStack.top().pop()
+			lastVal = v
 		}
-		v := vm.callStack.top().pop()
 		target, ok_ := each.(CanAssign)
 		if !ok_ {
 			vm.fatal("cannot assign to " + fmt.Sprintf("%T", each))
@@ -100,8 +104,10 @@ func (a AssignStmt) String() string {
 }
 
 func (a AssignStmt) Flow(g *grapher) (head Step) {
-	for i, each := range a.Rhs {
-		if i == 0 {
+	// right to left
+	for i := len(a.Rhs) - 1; i >= 0; i-- {
+		each := a.Rhs[i]
+		if i == len(a.Rhs)-1 {
 			head = each.Flow(g)
 			continue
 		}

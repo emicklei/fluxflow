@@ -38,7 +38,7 @@ func (r ReturnStmt) Eval(vm *VM) {
 }
 
 func (r ReturnStmt) Flow(g *grapher) (head Step) {
-	head = g.current
+	//head = g.current
 	// reverse order to keep Eval correct
 	for i := len(r.Results) - 1; i >= 0; i-- {
 		each := r.Results[i]
@@ -48,6 +48,17 @@ func (r ReturnStmt) Flow(g *grapher) (head Step) {
 		}
 		each.Flow(g)
 	}
+	// for i := 0; i < len(r.Results); i++ {
+	// 	each := r.Results[i]
+	// 	if i == 0 {
+	// 		head = each.Flow(g)
+	// 		continue
+	// 	}
+	// 	each.Flow(g)
+	// }
 	g.next(r)
+	if head == nil {
+		head = g.current
+	}
 	return
 }
