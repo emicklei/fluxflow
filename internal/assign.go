@@ -19,6 +19,7 @@ func (a AssignStmt) stmtStep() Evaluable { return a }
 func (a AssignStmt) Eval(vm *VM) {
 	if !vm.isStepping {
 		// when stepping, the rhs are already evaluated
+		// so here we need to eval each rhs to push values onto the operand stack
 		for _, each := range a.Rhs {
 			// values are on operand stack
 			vm.eval(each)
@@ -89,6 +90,9 @@ func (a AssignStmt) Eval(vm *VM) {
 		default:
 			panic("unsupported assignment " + a.AssignStmt.Tok.String())
 		}
+	}
+	if len(a.Lhs) < len(a.Rhs) {
+		_ = vm.callStack.top().pop()
 	}
 }
 func (a AssignStmt) String() string {

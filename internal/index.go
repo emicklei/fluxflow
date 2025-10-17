@@ -28,7 +28,10 @@ func (i IndexExpr) Eval(vm *VM) {
 		target = vm.returnsEval(i.X)
 	}
 	if target.Kind() == reflect.Map {
-		vm.pushOperand(target.MapIndex(index))
+		v := target.MapIndex(index)
+		vm.pushOperand(v)
+		// for "ok" idiom, caller must handle 2 operands
+		vm.pushOperand(reflect.ValueOf(!v.IsZero()))
 		return
 	}
 	if target.Kind() == reflect.Slice || target.Kind() == reflect.Array {
