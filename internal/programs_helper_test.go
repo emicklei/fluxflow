@@ -75,6 +75,7 @@ func parseAndRun(t *testing.T, source string) string {
 }
 
 func testProgram(t *testing.T, running bool, stepping bool, source string, wantFuncOrString any) {
+	t.Parallel()
 	t.Helper()
 	if running {
 		out := parseAndRun(t, source)

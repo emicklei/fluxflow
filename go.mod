@@ -4,7 +4,7 @@ go 1.25
 
 require (
 	github.com/emicklei/dot v1.9.2
-	github.com/emicklei/structexplorer v0.9.1
+	github.com/emicklei/structexplorer v0.9.2
 	golang.org/x/tools v0.37.0
 )
 

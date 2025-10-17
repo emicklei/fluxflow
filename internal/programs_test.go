@@ -8,7 +8,6 @@ import (
 )
 
 func TestProgramTypeConvert(t *testing.T) {
-	t.Skip()
 	tests := []struct {
 		typeName string
 	}{
@@ -20,14 +19,9 @@ func TestProgramTypeConvert(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.typeName, func(t *testing.T) {
-			src := fmt.Sprintf(`
-			package main
-			
-			fun
-			out = parseAndWalk(t, src)	c main() {
-			package main
-			
-			fun
+			t.Parallel()
+			src := fmt.Sprintf(`package main			
+			func main() {
 				a := %s(1) + 2
 				print(a)
 			}`, tt.typeName)
@@ -56,6 +50,7 @@ func TestProgramTypeUnsignedConvert(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.typeName, func(t *testing.T) {
+			t.Parallel()
 			src := fmt.Sprintf(`
 			package main
 			
@@ -729,6 +724,7 @@ func TestUnaries(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.op, func(t *testing.T) {
+			t.Parallel()
 			src := fmt.Sprintf(`
 			package main
 			

@@ -10,3 +10,6 @@ todo:
 
 bench:
 	go test -bench=. ./internal
+
+install:
+	cd cmd/fluxflow && go install

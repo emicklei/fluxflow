@@ -24,7 +24,7 @@ func (s SelectorExpr) Eval(vm *VM) {
 		vm.pushOperand(sel)
 		return
 	}
-	panic("expected FieldSelectable: " + recv.String())
+	vm.fatal("expected FieldSelectable: " + recv.String())
 }
 
 func (s SelectorExpr) Assign(env *Environment, value reflect.Value) {

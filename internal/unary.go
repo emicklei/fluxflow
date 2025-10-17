@@ -25,7 +25,8 @@ func (u UnaryExpr) Eval(vm *VM) {
 	} else {
 		v = vm.returnsEval(u.X)
 	}
-	// propagate invalid value ?? TODO when?
+	// propagate invalid value. this happens when the expression is
+	// used in a package variable or constant declaration
 	if !v.IsValid() {
 		vm.pushOperand(v)
 		return

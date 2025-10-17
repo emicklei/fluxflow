@@ -116,7 +116,17 @@ func (s SwitchStmt) String() string {
 }
 
 func (s SwitchStmt) Flow(g *grapher) (head Step) {
-	return g.current // TODO
+	head = g.newPushStackFrame()
+	g.nextStep(head)
+	if s.Init != nil {
+		s.Init.Flow(g)
+	}
+	if s.Tag != nil {
+		s.Tag.Flow(g)
+	}
+	s.Body.Flow(g)
+	g.nextStep(g.newPopStackFrame())
+	return head
 }
 
 var _ Flowable = CaseClause{}

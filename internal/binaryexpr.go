@@ -24,11 +24,15 @@ func (s BinaryExpr) Eval(vm *VM) {
 		left = vm.callStack.top().pop()
 	} else {
 		left = vm.returnsEval(s.X)
+		// propagate invalid value. this happens when the expression is
+		// used in a package variable or constant declaration
 		if !left.IsValid() {
 			vm.pushOperand(left)
 			return
 		}
 		right = vm.returnsEval(s.Y)
+		// propagate invalid value. this happens when the expression is
+		// used in a package variable or constant declaration
 		if !right.IsValid() {
 			vm.pushOperand(right)
 			return

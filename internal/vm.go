@@ -3,6 +3,7 @@ package internal
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"reflect"
 
 	"github.com/emicklei/structexplorer"
@@ -84,7 +85,8 @@ func (vm *VM) fatal(err any) {
 		s.Explore(fmt.Sprintf("vm.callStack.%d.returnValues", i), each.returnValues, structexplorer.Column(1))
 	}
 	s.Dump("vm-panic.html")
-	panic(err)
+	fmt.Fprintln(os.Stderr, "[fluxflow] fatal error:", err)
+	os.Exit(1)
 }
 
 func (vm *VM) eval(e Evaluable) {
