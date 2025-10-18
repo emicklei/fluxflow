@@ -775,3 +775,23 @@ func main() {
 	print(imag(a))
 }`, "(+1.000000e+000+2.000000e+000i)+1.000000e+000+2.000000e+000")
 }
+
+// https://go.dev/ref/spec#Package_initialization
+func TestDeclarationExample(t *testing.T) {
+	testProgram(t, true, true, `package main
+
+var (
+	a = c + b  // == 9
+	b = f()    // == 4
+	c = f()    // == 5
+	d = 3      // == 5 after initialization has finished
+)
+
+func f() int {
+	d++
+	return d
+}
+func main() {
+	print(a,b,c,d)
+}`, "9455")
+}
