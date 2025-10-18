@@ -1,14 +1,19 @@
 package internal
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 type Package struct {
-	Name string // key in env
-	Path string
+	Name        string // key in env
+	Path        string
+	Env         Env
+	Initialized bool
 }
 
 func (p Package) String() string {
-	return "Package(" + p.Name + " " + p.Path + ")"
+	return fmt.Sprintf("Package(%s,%s)", p.Name, p.Path)
 }
 func (p Package) Select(name string) reflect.Value {
 	symbolTable, ok := stdpkg[p.Path]

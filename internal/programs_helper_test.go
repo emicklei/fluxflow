@@ -57,7 +57,7 @@ func parseAndWalk(t *testing.T, source string) string {
 	prog := buildProgram(t, source)
 	vm := newVM(prog.builder.env)
 	collectPrintOutput(vm)
-	if err := WalkProgram(prog, vm); err != nil {
+	if err := WalkFunction(prog.builder.env, "main", vm); err != nil {
 		panic(err)
 	}
 	return vm.output.String()

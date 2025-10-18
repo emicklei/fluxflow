@@ -13,3 +13,15 @@ func Run(absolutePath string) error {
 	}
 	return internal.RunProgram(prog, nil)
 }
+
+/**
+type Package = internal.Package
+
+func LoadPackage(absolutePath string) (*Package, error) {
+	return nil, nil
+}
+
+func Call(pkg *Package, funcName string, args []any) ([]any, error) {
+	return nil, nil
+}
+**/

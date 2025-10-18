@@ -795,3 +795,20 @@ func main() {
 	print(a,b,c,d)
 }`, "9455")
 }
+
+func TestSubpackage(t *testing.T) {
+	trace = true
+	defer func() { trace = false }()
+	testProgram(t, false, false, `package main
+
+import (
+	"fmt"
+
+	"github.com/emicklei/fluxflow/examples/subpkg/pkg"
+)
+
+func main() {
+	print(pkg.Name, pkg.IsWeekend("Sunday"))
+}
+`, "")
+}

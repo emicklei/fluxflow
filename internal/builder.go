@@ -18,13 +18,14 @@ type buildOptions struct {
 }
 
 type builder struct {
-	stack []*step
-	env   Env
-	opts  buildOptions
+	stack            []*step
+	env              Env
+	opts             buildOptions
+	importedPackages []Package
 }
 
 func newBuilder() builder {
-	builtins := &Environment{valueTable: builtinsMap}
+	builtins := newBuiltinsEnvironment(nil)
 	pkgenv := newPkgEnvironment(builtins)
 	return builder{env: pkgenv, opts: buildOptions{callGraph: true}}
 }
@@ -224,17 +225,21 @@ func (b *builder) Visit(node ast.Node) ast.Visitor {
 		b.push(s)
 	case *ast.ImportSpec:
 		unq, _ := strconv.Unquote(n.Path.Value)
-		p := Package{Path: unq}
+		p := Package{Path: unq, Env: newPkgEnvironment(b.env)}
 		if n.Name != nil {
 			p.Name = n.Name.Name
 		} else {
 			// derive name from path
 			p.Name = path.Base(unq)
 		}
+		if !b.env.rootPackageEnv().registerPackage(p) {
+			if trace {
+				println("build this imported package", p.Path, "only once")
+			}
+		}
 		b.envSet(p.Name, reflect.ValueOf(p))
 	case *ast.BasicLit:
-		s := BasicLit{BasicLit: n}
-		b.push(s)
+		b.push(BasicLit{BasicLit: n})
 	case *ast.BinaryExpr:
 		s := BinaryExpr{BinaryExpr: n}
 		b.Visit(n.X)

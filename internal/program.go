@@ -40,6 +40,9 @@ func BuildProgram(pkgs []*packages.Package, isStepping bool) (*Program, error) {
 	b := newBuilder()
 	b.opts = buildOptions{callGraph: isStepping}
 	for _, pkg := range pkgs {
+		if trace {
+			fmt.Printf("Building package: %s from %s\n", pkg.Name, pkg.PkgPath)
+		}
 		for _, stx := range pkg.Syntax {
 			for _, decl := range stx.Decls {
 				b.Visit(decl)
@@ -85,12 +88,12 @@ func RunProgram(p *Program, optionalVM *VM) error {
 	return nil
 }
 
-func WalkProgram(p *Program, optionalVM *VM) error {
+func WalkFunction(env Env, functionName string, optionalVM *VM) error {
 	var vm *VM
 	if optionalVM != nil {
 		vm = optionalVM
 	} else {
-		vm = newVM(p.builder.env)
+		vm = newVM(env)
 	}
 	// first run const and vars
 	// try declare all of them until none left
@@ -112,11 +115,11 @@ func WalkProgram(p *Program, optionalVM *VM) error {
 		vm.popFrame()
 	}
 
-	main := p.builder.env.valueLookUp("main")
-	if !main.IsValid() {
-		return errors.New("main not found")
+	fun := env.valueLookUp(functionName)
+	if !fun.IsValid() {
+		return fmt.Errorf("%s function definition not found", functionName)
 	}
-	decl := main.Interface().(FuncDecl)
+	decl := fun.Interface().(FuncDecl)
 
 	// run it step by step
 	vm.takeAll(decl.callGraph)

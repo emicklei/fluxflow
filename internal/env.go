@@ -17,20 +17,28 @@ type Env interface {
 	depth() int
 	getParent() Env
 	addConstOrVar(cv ConstOrVar)
+	rootPackageEnv() *PkgEnvironment
 }
 
 type PkgEnvironment struct {
 	Env
-	pkgTable  map[string]ImportSpec
-	declTable map[string]CanDeclare
-	inits     []FuncDecl
+	declTable    map[string]CanDeclare
+	inits        []FuncDecl
+	packageTable map[string]Package // path -> Package
+}
+
+func newBuiltinsEnvironment(parent Env) Env {
+	return &Environment{
+		parent:     parent,
+		valueTable: builtinsMap,
+	}
 }
 
 func newPkgEnvironment(parent Env) Env {
 	return &PkgEnvironment{
-		Env:       newEnvironment(parent),
-		pkgTable:  map[string]ImportSpec{},
-		declTable: map[string]CanDeclare{},
+		Env:          newEnvironment(parent),
+		declTable:    map[string]CanDeclare{},
+		packageTable: map[string]Package{},
 	}
 }
 func (p *PkgEnvironment) addInit(f FuncDecl) {
@@ -41,8 +49,28 @@ func (p *PkgEnvironment) addConstOrVar(cv ConstOrVar) {
 	p.declTable[cv.Name.Name] = CanDeclare(cv)
 }
 
+// registerPackage adds the package to the package table.
+// It returns true if the package was newly added, false if it already existed.
+func (p *PkgEnvironment) registerPackage(pkg Package) bool {
+	if _, exists := p.packageTable[pkg.Path]; exists {
+		return false
+	}
+	p.packageTable[pkg.Path] = pkg
+	return true
+}
+
+func (p *PkgEnvironment) rootPackageEnv() *PkgEnvironment {
+	if p.getParent() == nil {
+		return p
+	}
+	if _, ok := p.getParent().(*Environment); ok {
+		return p
+	}
+	return p.getParent().rootPackageEnv()
+}
+
 func (p *PkgEnvironment) String() string {
-	return fmt.Sprintf("PkgEnv(pkgs=%d)", len(p.pkgTable))
+	return fmt.Sprintf("PkgEnvironment(pkgs=%d)", len(p.packageTable))
 }
 
 func (p *PkgEnvironment) newChild() Env {
@@ -117,3 +145,10 @@ func (e *Environment) set(name string, value reflect.Value) {
 }
 
 func (e *Environment) addConstOrVar(cv ConstOrVar) {}
+
+func (e *Environment) rootPackageEnv() *PkgEnvironment {
+	if e.parent == nil {
+		return nil
+	}
+	return e.parent.rootPackageEnv()
+}
