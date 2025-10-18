@@ -145,6 +145,8 @@ func (b BinaryExprValue) IntEval(left int64) reflect.Value {
 		return b.IntOpInt(left, b.right.Int())
 	case reflect.Float64:
 		return b.FloatOpFloat(float64(left), b.right.Float())
+	case reflect.Complex128:
+		return b.ComplexOpComplex(complex(float64(left), 0), b.right.Complex())
 	}
 	panic("not implemented: BinaryExprValue.IntEval:" + b.right.Kind().String())
 }
@@ -179,6 +181,14 @@ func (b BinaryExprValue) FloatOpFloat(left float64, right float64) reflect.Value
 		return reflect.ValueOf(left / right)
 	}
 	panic("not implemented: BinaryExprValue.FloatOpFloat:" + b.op.String())
+}
+
+func (b BinaryExprValue) ComplexOpComplex(left, right complex128) reflect.Value {
+	switch b.op {
+	case token.ADD:
+		return reflect.ValueOf(left + right)
+	}
+	panic("not implemented: BinaryExprValue.ComplexOpComplex:" + b.op.String())
 }
 
 func (b BinaryExprValue) IntOpInt(left int64, right int64) reflect.Value {

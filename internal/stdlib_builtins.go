@@ -19,10 +19,12 @@ var builtinsMap = map[string]reflect.Value{
 	"int32":      reflect.ValueOf(func(i int) int32 { return int32(i) }),
 	"int64":      reflect.ValueOf(func(i int) int64 { return int64(i) }),
 	"int8":       reflect.ValueOf(func(i int) int8 { return int8(i) }),
+	"imag":       reflect.ValueOf(func(f float64) complex128 { return complex(0, f) }),
 	"len":        reflect.ValueOf(func(v any) int { return reflect.ValueOf(v).Len() }),
 	"panic":      reflect.ValueOf(func(v any) { panic(v) }),
 	"print":      reflect.ValueOf(func(args ...any) { fmt.Print(args...) }),
 	"println":    reflect.ValueOf(func(args ...any) { fmt.Println(args...) }),
+	"real":       reflect.ValueOf(func(c complex128) float64 { return real(c) }),
 	"rune":       reflect.ValueOf(func(i int) rune { return rune(i) }), // alias for int32
 	"true":       reflect.ValueOf(true),                                // not presented as Literal
 	"uint":       reflect.ValueOf(func(i int) uint { return uint(i) }),

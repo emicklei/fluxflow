@@ -20,11 +20,11 @@ func (f *stackFrame) push(v reflect.Value) {
 	f.operandStack.push(v)
 }
 
-func (f stackFrame) pushOperand(v reflect.Value) stackFrame {
+func (f stackFrame) withOperand(v reflect.Value) stackFrame {
 	f.operandStack.push(v)
 	return f
 }
-func (f stackFrame) pushReturnValue(v reflect.Value) stackFrame {
+func (f stackFrame) withReturnValue(v reflect.Value) stackFrame {
 	f.returnValues = append(f.returnValues, v)
 	return f
 }

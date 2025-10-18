@@ -431,7 +431,7 @@ func main() {
 }`, func(out string) bool { return strings.HasPrefix(out, "0x") })
 }
 
-func TestRangeOrStrings(t *testing.T) {
+func TestRangeOfStrings(t *testing.T) {
 	// trace = true
 	// defer func() { trace = false }()
 	testProgram(t, true, false, `package main
@@ -564,8 +564,7 @@ func main() {
 }
 
 func TestVariadicFunction(t *testing.T) {
-	t.Skip()
-	testProgram(t, true, false, `package main
+	testProgram(t, false, false, `package main
 
 func sum(nums ...int) int {
 	total := 0
@@ -764,4 +763,15 @@ func TestUnaries(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestImaginary(t *testing.T) {
+	testProgram(t, false, false, `package main
+
+func main() {
+	a := 1+2i
+	print(a)
+	print(real(a))
+	print(imag(a))
+}`, "(+1.000000e+000+2.000000e+000i)+1.000000e+000+2.000000e+000")
 }

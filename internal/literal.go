@@ -29,6 +29,9 @@ func (s BasicLit) Eval(vm *VM) {
 	case token.CHAR:
 		// a character literal is a rune, which is an alias for int32
 		vm.pushOperand(reflect.ValueOf(s.Value))
+	case token.IMAG:
+		i, _ := strconv.ParseComplex(s.Value, 128)
+		vm.pushOperand(reflect.ValueOf(i))
 	default:
 		panic("not implemented: BasicList.Eval:" + s.Kind.String())
 	}

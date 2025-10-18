@@ -81,9 +81,9 @@ func (c CallExpr) Eval(vm *VM) {
 			c.handleFuncDecl(vm, lf)
 			return
 		}
-		vm.fatal("expected FuncDecl, got " + fmt.Sprintf("%T", f.Interface()))
+		vm.fatal("expected FuncDecl or FuncLit, got " + fmt.Sprintf("%T", f.Interface()))
 	default:
-		vm.fatal("call to unknown function type")
+		vm.fatal("call to unknown function type:" + fmt.Sprintf("%T", f.Interface()))
 	}
 }
 
