@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"reflect"
-	"slices"
 )
 
 var _ Flowable = CallExpr{}
@@ -117,8 +116,10 @@ func (c CallExpr) handleFuncLit(vm *VM, fl FuncLit) {
 		vm.eval(fl.Body)
 	}
 	top := vm.popFrame()
-	for _, each := range top.returnValues {
-		vm.pushOperand(each)
+	// Push return values onto the operand stack in reverse order,
+	// so the first return value ends up on top of the stack.
+	for i := len(top.returnValues) - 1; i >= 0; i-- {
+		vm.pushOperand(top.returnValues[i])
 	}
 }
 func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
@@ -150,10 +151,10 @@ func (c CallExpr) handleFuncDecl(vm *VM, fd FuncDecl) {
 		vm.eval(fd.Body)
 	}
 	top := vm.popFrame()
-	// TODO optimize this
-	slices.Reverse(top.returnValues)
-	for _, each := range top.returnValues {
-		vm.pushOperand(each)
+	// Push return values onto the operand stack in reverse order,
+	// so the first return value ends up on top of the stack.
+	for i := len(top.returnValues) - 1; i >= 0; i-- {
+		vm.pushOperand(top.returnValues[i])
 	}
 }
 

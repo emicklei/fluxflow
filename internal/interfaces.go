@@ -11,8 +11,10 @@ type Evaluable interface {
 }
 
 type CanAssign interface {
+	// =
 	Assign(vm *VM, value reflect.Value)
-	Define(vm *VM, value reflect.Value) // needed?
+	// :=
+	Define(vm *VM, value reflect.Value)
 }
 
 type CanDeclare interface {

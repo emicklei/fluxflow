@@ -444,6 +444,17 @@ func main() {
 }`, "0hello1world")
 }
 
+func TestRangeOfMap(t *testing.T) {
+	testProgram(t, true, false, `package main
+
+func main() {
+	m := map[string]int{"a":1, "b":2}
+	for k,v := range m {
+		print(k,v)
+	}
+}`, func(out string) bool { return out == "a1b2" || out == "b2a1" })
+}
+
 func TestInit(t *testing.T) {
 	testProgram(t, true, true, `package main
 
@@ -489,7 +500,7 @@ two:
 }
 
 func TestMap(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 func main() {
 	m := map[string]int{}
@@ -500,7 +511,7 @@ func main() {
 }
 
 func TestMapOk(t *testing.T) {
-	testProgram(t, true, false, `package main
+	testProgram(t, true, true, `package main
 
 func main() {
 	m := map[string]int{}

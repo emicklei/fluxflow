@@ -22,26 +22,38 @@ type RangeStmt struct {
 func (r RangeStmt) Eval(vm *VM) {
 	rangeable := vm.returnsEval(r.X)
 	vm.pushNewFrame()
-	for i := 0; i < rangeable.Len(); i++ {
-		if r.Key != nil {
-			if ca, ok := r.Key.(CanAssign); ok {
-				if i == 0 {
+
+	// special case for Map
+	if rangeable.Kind() == reflect.Map {
+		iter := rangeable.MapRange()
+		for iter.Next() {
+			if r.Key != nil {
+				if ca, ok := r.Key.(CanAssign); ok {
+					ca.Define(vm, iter.Key())
+				}
+			}
+			if r.Value != nil {
+				if ca, ok := r.Value.(CanAssign); ok {
+					ca.Define(vm, iter.Value())
+				}
+			}
+			vm.eval(r.Body)
+		}
+	}
+	if rangeable.Kind() == reflect.Slice || rangeable.Kind() == reflect.Array {
+		for i := 0; i < rangeable.Len(); i++ {
+			if r.Key != nil {
+				if ca, ok := r.Key.(CanAssign); ok {
 					ca.Define(vm, reflect.ValueOf(i))
-				} else {
-					ca.Assign(vm, reflect.ValueOf(i))
 				}
 			}
-		}
-		if r.Value != nil {
-			if ca, ok := r.Value.(CanAssign); ok {
-				if i == 0 {
+			if r.Value != nil {
+				if ca, ok := r.Value.(CanAssign); ok {
 					ca.Define(vm, rangeable.Index(i))
-				} else {
-					ca.Assign(vm, rangeable.Index(i))
 				}
 			}
+			vm.eval(r.Body)
 		}
-		vm.eval(r.Body)
 	}
 	vm.popFrame()
 }
